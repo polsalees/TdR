@@ -1,1 +1,38 @@
 
+import pygame
+
+pygame.init()
+
+#Preparar la pantalla
+size = (500, 500)
+screen = pygame.display.set_mode(size)
+pygame.display.set_caption("Pygame Window")
+
+#Coses del bloc
+posició_bloc=[50,50]
+velocitat_bloc = 3
+
+#Codi del joc
+running = True
+while running:
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            running = False
+
+    #Posar panatlla en negre
+    screen.fill((0, 0, 0))
+
+    #Moviments del bloc
+    posició_bloc[0]+=velocitat_bloc
+
+    #Comprovar limits
+    if posició_bloc[0] >= size[0] or posició_bloc[0] <= 0:
+        velocitat_bloc *= -1
+
+    #Dibuixar qualsevol cosa
+    pygame.draw.rect(screen, (255, 255, 255), pygame.Rect(posició_bloc[0],posició_bloc[1],50,50))
+
+    #Actualitzar la pantalla
+    pygame.display.flip()
+
+pygame.quit()
