@@ -18,8 +18,7 @@ pantalla_amplada, pantalla_alçada = 800, 600
 pantalla = pygame.display.set_mode((pantalla_amplada, pantalla_alçada))
 pygame.display.set_caption("Angry Birds")
 
-
-# Creació d'ocells
+# Creació ocells
 def ocells():
     ocell_radi = 20
     ocell_posició = (100, pantalla_alçada - ocell_radi - 100)
@@ -46,6 +45,7 @@ def GameLoop():
         # Netejar la pantalla
         pantalla.fill((255, 255, 255))
         
+        # Aparèixer porcs i ocells
         porcs()
         ocells()
 
