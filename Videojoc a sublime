@@ -1,0 +1,88 @@
+import pygame
+
+# Iniciar programa
+pygame.init()
+
+# Definir els colors bàsics
+negre = (0, 0, 0)
+blanc = (255, 255, 255)
+vermell = (255, 0, 0)
+verd = (0, 255, 0)
+blau = (0, 0, 255)
+cian = (0, 255, 255)
+rosa = (255, 0, 255)
+groc = (255, 255, 0)
+
+# Preparar la pantalla
+pantalla_amplada, pantalla_alçada = 800, 600
+pantalla = pygame.display.set_mode((pantalla_amplada, pantalla_alçada))
+pygame.display.set_caption("Angry Birds")
+
+# Eines per escriure
+font = pygame.font.Font(None, 50)
+text = font.render("Hello world!", True, negre)
+pantalla.blit(text, (pantalla_amplada // 2 - text.get_width() // 2, pantalla_alçada // 2 - text.get_height() // 2))
+
+# Creació ocells
+def ocells():
+    ocell_radi = 20
+    ocell_posició = (100, pantalla_alçada - ocell_radi - 100)
+    pygame.draw.circle(pantalla, vermell, ocell_posició, ocell_radi)
+
+# Creació porcs
+def porcs():
+    porc_radi = 30
+    porc_posició = (pantalla_amplada - porc_radi - 100, pantalla_alçada - porc_radi - 10)
+    pygame.draw.circle(pantalla, verd, porc_posició, porc_radi)
+
+# Menú principal
+def menú():
+    while True:
+        for event in pygame.event.get():
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    return False
+                elif event.key == pygame.K_SPACE:
+                    return True
+
+        pantalla.fill(blanc)
+
+        font = pygame.font.Font(None, 50)
+        text = font.render("Angry Birds", True, negre)
+        pantalla.blit(text, (pantalla_amplada // 2 - text.get_width() // 2, pantalla_alçada // 2 - text.get_height() // 2))
+
+        pygame.display.flip()
+
+
+
+# Game loop
+def GameLoop():
+
+    partida = False
+    while True:
+        if not partida:
+            if not menú():
+                break
+            partida = True
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                partida = False
+            elif event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    partida = False
+        
+        # Netejar la pantalla
+        pantalla.fill(blanc)
+        
+        # Aparèixer porcs i ocells
+        porcs()
+        ocells()
+
+        # Recarregar la pantalla
+        pygame.display.flip()
+
+    # Sortir del joc
+    pygame.quit()
+
+# Córrer el joc
+GameLoop()
