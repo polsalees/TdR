@@ -1,87 +1,32 @@
 import pygame
-import math
 
-# Initialize Pygame
+# Iniciar programa
 pygame.init()
 
-# Set up the display
-screen_width, screen_height = 800, 600
-screen = pygame.display.set_mode((screen_width, screen_height))
-pygame.display.set_caption("Angry Birds Clone")
-
-# Colors
-WHITE = (255, 255, 255)
-BLUE = (0, 0, 255)
-GREEN = (0, 255, 0)
-RED = (255, 0, 0)
-
-# Bird properties
-bird_radius = 20
-bird_pos = [100, screen_height // 2]
-bird_velocity = [0, 0]
-bird_gravity = 0.5
-
-# Pig properties
-pig_radius = 25
-pig_pos = [600, screen_height // 2]
-
-# Launch properties
-launching = False
-launch_power = 0
-launch_angle = math.pi / 4
+# Preparar la pantalla
+amplada_pantalla, alçada_pantalla = 800, 600
+pantalla = pygame.display.set_mode((amplada_pantalla, alçada_pantalla))
+pygame.display.set_caption("Angry Birds")
 
 # Game loop
-running = True
-while running:
-    screen.fill(WHITE)
+def GameLoop():
+    partida = True
+    while partida:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                partida = False
+            elif event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_q:
+                    partida = False
 
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            running = False
-        elif event.type == pygame.MOUSEBUTTONDOWN and not launching:
-            # Start launching the bird
-            bird_pos = [100, screen_height // 2]
-            launch_power = 0
-            launching = True
-        elif event.type == pygame.MOUSEBUTTONUP and launching:
-            # Launch the bird
-            bird_velocity = [launch_power * math.cos(launch_angle),
-                             launch_power * math.sin(launch_angle)]
-            launching = False
+        # Netejar la pantalla
+        pantalla.fill((255, 255, 255))
 
-    if launching:
-        # Update launch power based on mouse position
-        mouse_pos = pygame.mouse.get_pos()
-        launch_power = math.sqrt((mouse_pos[0] - bird_pos[0])**2 + (mouse_pos[1] - bird_pos[1])**2)
-        launch_power = min(launch_power, 100)  # Limit maximum launch power
+        # Recarregar la pantalla
+        pygame.display.flip()
 
-        # Draw launch indicator
-        launch_end = (bird_pos[0] + math.cos(launch_angle) * launch_power,
-                      bird_pos[1] + math.sin(launch_angle) * launch_power)
-        pygame.draw.line(screen, BLUE, bird_pos, launch_end, 4)
+    # Sortir del joc
+    pygame.quit()
 
-    else:
-        # Apply gravity to the bird
-        bird_velocity[1] += bird_gravity
-
-        # Update bird's position
-        bird_pos[0] += bird_velocity[0]
-        bird_pos[1] += bird_velocity[1]
-
-        # Check collision with the pig
-        distance = math.sqrt((bird_pos[0] - pig_pos[0])**2 + (bird_pos[1] - pig_pos[1])**2)
-        if distance < bird_radius + pig_radius:
-            pygame.draw.circle(screen, RED, pig_pos, pig_radius)
-            bird_velocity = [0, 0]  # Stop the bird's motion
-
-        # Draw the bird
-        pygame.draw.circle(screen, RED, bird_pos, bird_radius)
-
-    # Draw the pig
-    pygame.draw.circle(screen, GREEN, pig_pos, pig_radius)
-
-    pygame.display.flip()
-
-# Quit Pygame
-pygame.quit()
-
+# Córrer el joc
+GameLoop()
