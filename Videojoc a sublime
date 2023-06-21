@@ -116,4 +116,4 @@ def GameLoop():
     pygame.quit()
 
 # Córrer el joc
-GameLoop()
+GameLoop()GameLoop()
