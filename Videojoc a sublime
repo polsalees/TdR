@@ -35,6 +35,36 @@ def porcs():
     porc_posició = (pantalla_amplada - porc_radi - 100, pantalla_alçada - porc_radi - 10)
     pygame.draw.circle(pantalla, verd, porc_posició, porc_radi)
 
+# Selecció de nivell
+def selecció_dificultat():
+    dificultat_seleccionada = None
+    while not dificultat_seleccionada:
+        for event in pygame.event.get():
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_1:
+                    dificultat_seleccionada = "Fàcil"
+                elif event.key == pygame.K_2:
+                    dificultat_seleccionada = "Intermig"
+                elif event.key == pygame.K_3:
+                    dificultat_seleccionada = "Difícil"
+        
+        pantalla.fill(blanc)
+        
+        font = pygame.font.Font(None, 50)
+        text1 = font.render("Seleccioinar dificultat:", True, negre)
+        text2 = font.render("1 - Fàcil", True, negre)
+        text3 = font.render("2 - Intermig", True, negre)
+        text4 = font.render("3 - Difícil", True, negre)
+
+        pantalla.blit(text1, (pantalla_amplada // 2 - text1.get_width() // 2, pantalla_alçada // 2 - text1.get_height() // 2 - 75))
+        pantalla.blit(text2, (pantalla_amplada // 2 - text2.get_width() // 2, pantalla_alçada // 2 - text2.get_height() // 2 - 25))
+        pantalla.blit(text3, (pantalla_amplada // 2 - text3.get_width() // 2, pantalla_alçada // 2 - text3.get_height() // 2 + 25))
+        pantalla.blit(text4, (pantalla_amplada // 2 - text4.get_width() // 2, pantalla_alçada // 2 - text4.get_height() // 2 + 75))
+
+        pygame.display.flip()
+
+    return dificultat_seleccionada
+
 # Menú principal
 def menú():
     while True:
@@ -43,7 +73,10 @@ def menú():
                 if event.key == pygame.K_ESCAPE:
                     return False
                 elif event.key == pygame.K_SPACE:
-                    return True
+                    dificultat = selecció_dificultat()
+                    if dificultat:
+                        print("Dificultat seleccionada:", dificultat)
+                        return True
 
         pantalla.fill(blanc)
 
@@ -52,8 +85,6 @@ def menú():
         pantalla.blit(text, (pantalla_amplada // 2 - text.get_width() // 2, pantalla_alçada // 2 - text.get_height() // 2))
 
         pygame.display.flip()
-
-
 
 # Game loop
 def GameLoop():
