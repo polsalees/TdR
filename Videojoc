@@ -53,8 +53,6 @@ def menú():
 
         pygame.display.flip()
 
-# Explicació al Glenn de com utilitzar Github
-
 # Game loop
 def GameLoop():
 
