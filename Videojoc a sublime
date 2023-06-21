@@ -19,10 +19,6 @@ pantalla_amplada, pantalla_alçada = 800, 600
 pantalla = pygame.display.set_mode((pantalla_amplada, pantalla_alçada))
 pygame.display.set_caption("Angry Birds")
 
-# Rellotge
-rellotge =  pygame.time.Clock()
-FPS = 30 
-
 # Eines per escriure
 font = pygame.font.Font(None, 50)
 text = font.render("Hello world!", True, negre)
@@ -41,7 +37,7 @@ superficie = superficie_rectangle.copy()
 superficie.set_colorkey(blanc)
 rect = superficie.get_rect()
 rect.center = (100, 480)
-mantenint = False
+
 # Creació linea que indica direcció ocell
 def linea():
     global rect   
@@ -115,6 +111,7 @@ def menú():
 
 # Game loop
 def GameLoop():
+    mantenint = False
     mantenint_ocell = False
     partida = False
     while True:
@@ -128,16 +125,21 @@ def GameLoop():
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
                     partida = False
-            if event.type == pygame.MOUSEBUTTONDOWN and pygame.mouse.get_pos()[1]>460 and pygame.mouse.get_pos()[1]<500 and pygame.mouse.get_pos()[0]>80 and pygame.mouse.get_pos()[0]<120:
-                mantenint_ocell = True
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                mantenint = True
             elif event.type == pygame.MOUSEBUTTONUP:
+                mantenint = False
                 mantenint_ocell = False
+        
+        #Detectem si estem mantenint l'ocell
+        if mantenint == True and pygame.mouse.get_pos()[1]>460 and pygame.mouse.get_pos()[1]<500 and pygame.mouse.get_pos()[0]>80 and pygame.mouse.get_pos()[0]<120:
+            mantenint_ocell=True
+        
         # Netejar la pantalla
         pantalla.fill(blanc)
         
-        # Aparèixer porcs i ocells
-        if mantenint_ocell == True:
-            print("No")
+        # Aparèixer porcs, ocells i linea
+        if mantenint_ocell:
             linea()
         porcs()
         ocells()
