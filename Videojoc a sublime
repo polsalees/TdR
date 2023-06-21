@@ -1,4 +1,5 @@
 import pygame
+import math
 
 # Iniciar programa
 pygame.init()
@@ -18,6 +19,10 @@ pantalla_amplada, pantalla_alçada = 800, 600
 pantalla = pygame.display.set_mode((pantalla_amplada, pantalla_alçada))
 pygame.display.set_caption("Angry Birds")
 
+# Rellotge
+rellotge =  pygame.time.Clock()
+FPS = 30 
+
 # Eines per escriure
 font = pygame.font.Font(None, 50)
 text = font.render("Hello world!", True, negre)
@@ -28,6 +33,27 @@ def ocells():
     ocell_radi = 20
     ocell_posició = (100, pantalla_alçada - ocell_radi - 100)
     pygame.draw.circle(pantalla, vermell, ocell_posició, ocell_radi)
+
+# Variables linea
+superficie_rectangle = pygame.Surface((200,200))
+superficie_rectangle.set_colorkey(blanc)
+superficie_rectangle.fill(blanc)
+pygame.draw.rect(superficie_rectangle, blau, pygame.Rect(0,100,60,5))
+superficie = superficie_rectangle.copy()
+superficie.set_colorkey(blanc)
+rect = superficie.get_rect()
+rect.center = (100, 480)
+
+# Creació linea que indica direcció ocell
+def linea():
+    global rect 
+    global velocitat_rectangle
+    angle = math.degrees(math.atan2(pygame.mouse.get_pos()[0] - 100, pygame.mouse.get_pos()[1] - 480))
+    old_center = rect.center
+    rectangle_nou = pygame.transform.rotate(superficie_rectangle, angle+87)
+    rect = rectangle_nou.get_rect()
+    rect.center = old_center
+    pantalla.blit(rectangle_nou, rect)
 
 # Creació porcs
 def porcs():
@@ -106,7 +132,8 @@ def GameLoop():
         pantalla.fill(blanc)
         
         # Aparèixer porcs i ocells
-        porcs()
+        linea()
+	porcs()
         ocells()
 
         # Recarregar la pantalla
@@ -116,4 +143,4 @@ def GameLoop():
     pygame.quit()
 
 # Córrer el joc
-GameLoop()GameLoop()
+GameLoop()
