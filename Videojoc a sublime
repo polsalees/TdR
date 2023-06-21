@@ -131,7 +131,7 @@ def GameLoop():
         # Netejar la pantalla
         pantalla.fill(blanc)
         
-        # Aparèixer porcs i ocells
+        # Aparèixer porcs, ocells i linea
         linea()
 	porcs()
         ocells()
