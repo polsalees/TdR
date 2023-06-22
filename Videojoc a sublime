@@ -15,7 +15,7 @@ rosa = (255, 0, 255)
 groc = (255, 255, 0)
 
 # Preparar la pantalla
-pantalla_amplada, pantalla_alçada = 800, 600
+pantalla_amplada, pantalla_alçada = 1920, 1038
 pantalla = pygame.display.set_mode((pantalla_amplada, pantalla_alçada))
 pygame.display.set_caption("Angry Birds")
 
@@ -39,7 +39,6 @@ class linea(pygame.sprite.Sprite):
         rect.center = (100, 480)
     
     def update(self):
-
         superficie_rectangle.fill(blanc)
         amplada = ((pygame.mouse.get_pos()[0] - 100)**2 + (pygame.mouse.get_pos()[1] - 480)**2)**0.5 
         pygame.draw.rect(superficie_rectangle, blau, pygame.Rect(100-amplada,100,1000,5))
@@ -112,7 +111,7 @@ def GameLoop():
     mantenint = False
     mantenint_ocell = False
     partida = False
-    line=linea()
+    line = linea()
     while True:
         if not partida:
             if not menú():
@@ -131,9 +130,9 @@ def GameLoop():
                     mantenint = False
                     mantenint_ocell = False
         
-            #Detectem si estem mantenint l'ocell
+            # Detectem si estem mantenint l'ocell
             if mantenint == True and pygame.mouse.get_pos()[1]>460 and pygame.mouse.get_pos()[1]<500 and pygame.mouse.get_pos()[0]>80 and pygame.mouse.get_pos()[0]<120:
-                mantenint_ocell=True
+                mantenint_ocell = True
         
             # Netejar la pantalla
             pantalla.fill(blanc)
