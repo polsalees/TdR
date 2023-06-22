@@ -48,14 +48,14 @@ class ocells(pygame.sprite.Sprite):
             self.velocitat = [0,0]
             self.ocell_posició = [100, pantalla_alçada - self.ocell_radi - 100]
     def llançament(self):
-        self.potencia = ((pygame.mouse.get_pos()[0] - 200)**2 + (pygame.mouse.get_pos()[1] - 818)**2)**0.5
-        self.angle = math.atan2(pygame.mouse.get_pos()[0] - 200, pygame.mouse.get_pos()[1]-818)
-        self.velocitat[0] = -math.sin(self.angle)*self.potencia*0.1
-        self.velocitat[1] = -math.cos(self.angle)*self.potencia*0.1
+        self.potencia = ((pygame.mouse.get_pos()[0] - 200)**2 + (pygame.mouse.get_pos()[1] - 818) ** 2) ** 0.5
+        self.angle = math.atan2(pygame.mouse.get_pos()[0] - 200, pygame.mouse.get_pos()[1] - 818)
+        self.velocitat[0] = -math.sin(self.angle) * self.potencia * 0.1
+        self.velocitat[1] = -math.cos(self.angle) * self.potencia * 0.1
         self.aire = True
 
 # Variables linea
-superficie_rectangle = pygame.Surface((200,200))
+superficie_rectangle = pygame.Surface((200, 200))
 superficie_rectangle.set_colorkey(fons)
 superficie = superficie_rectangle.copy()
 superficie.set_colorkey(fons)
@@ -66,16 +66,16 @@ rect.center = (200, 818)
 class linea(pygame.sprite.Sprite):
    
     def __init__(self):
-        superficie_rectangle = pygame.Surface((200,200))
+        superficie_rectangle = pygame.Surface((200, 200))
         superficie_rectangle.set_colorkey(fons)
         rect = superficie.get_rect()
         rect.center = (200, 818)
     
     def update(self):
         superficie_rectangle.fill(blanc)
-        amplada = ((pygame.mouse.get_pos()[0] - 200)**2 + (pygame.mouse.get_pos()[1] - 818)**2)**0.5 
-        pygame.draw.rect(superficie_rectangle, blau, pygame.Rect(100-amplada,100,1000,5))
-        pygame.draw.rect(superficie_rectangle, fons, pygame.Rect(100,100,100,5))
+        amplada = ((pygame.mouse.get_pos()[0] - 200) **2 + (pygame.mouse.get_pos()[1] - 818) ** 2) ** 0.5 
+        pygame.draw.rect(superficie_rectangle, blau, pygame.Rect(100 - amplada, 100, 1000, 5))
+        pygame.draw.rect(superficie_rectangle, fons, pygame.Rect(100, 100, 100, 5))
         angle = math.degrees(math.atan2(pygame.mouse.get_pos()[0] - 200, pygame.mouse.get_pos()[1] - 818)) + 87.5
         rectangle_nou = pygame.transform.rotate(superficie_rectangle, angle)
         rect = rectangle_nou.get_rect()
@@ -95,7 +95,7 @@ def selecció_nivell():
         for event in pygame.event.get():
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_1:
-                    dnivell_seleccionat = 1
+                    nivell_seleccionat = 1
                 elif event.key == pygame.K_2:
                     nivell_seleccionat = 2
                 elif event.key == pygame.K_3:
@@ -146,7 +146,7 @@ def selecció_nivell():
 
         pygame.display.flip()
 
-    return dificultat_seleccionada
+    return nivell_seleccionat
 
 # Menú principal
 def menú():
