@@ -39,18 +39,24 @@ rect = superficie.get_rect()
 rect.center = (100, 480)
 
 # Creació linea que indica direcció ocell
-def linea():
-    global rect   
-    superficie_rectangle.fill(blanc)
-    amplada = ((pygame.mouse.get_pos()[0] - 100)**2 + (pygame.mouse.get_pos()[1] - 480)**2)**0.5 
-    pygame.draw.rect(superficie_rectangle, blau, pygame.Rect(100-amplada,100,1000,5))
-    pygame.draw.rect(superficie_rectangle, blanc, pygame.Rect(100,100,100,5))
-    angle = math.degrees(math.atan2(pygame.mouse.get_pos()[0] - 100, pygame.mouse.get_pos()[1] - 480))
-    old_center = rect.center
-    rectangle_nou = pygame.transform.rotate(superficie_rectangle, angle+87)
-    rect = rectangle_nou.get_rect()
-    rect.center = old_center
-    pantalla.blit(rectangle_nou, rect)
+class linea(pygame.sprite.Sprite):
+    def __init__(self):
+        superficie_rectangle = pygame.Surface((200,200))
+        superficie_rectangle.set_colorkey(blanc)
+        rect = superficie.get_rect()
+        rect.center = (100, 480)
+    
+    def update(self):
+
+        superficie_rectangle.fill(blanc)
+        amplada = ((pygame.mouse.get_pos()[0] - 100)**2 + (pygame.mouse.get_pos()[1] - 480)**2)**0.5 
+        pygame.draw.rect(superficie_rectangle, blau, pygame.Rect(100-amplada,100,1000,5))
+        pygame.draw.rect(superficie_rectangle, blanc, pygame.Rect(100,100,100,5))
+        angle = math.degrees(math.atan2(pygame.mouse.get_pos()[0] - 100, pygame.mouse.get_pos()[1] - 480))
+        rectangle_nou = pygame.transform.rotate(superficie_rectangle, angle+87.5)
+        rect = rectangle_nou.get_rect()
+        rect.center = (100, 480)
+        pantalla.blit(rectangle_nou, rect)
 
 # Creació porcs
 def porcs():
@@ -114,35 +120,37 @@ def GameLoop():
     mantenint = False
     mantenint_ocell = False
     partida = False
+    line=linea()
     while True:
         if not partida:
             if not menú():
                 break
             partida = True
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                partida = False
-            elif event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_ESCAPE:
+        else:
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
                     partida = False
-            if event.type == pygame.MOUSEBUTTONDOWN:
-                mantenint = True
-            elif event.type == pygame.MOUSEBUTTONUP:
-                mantenint = False
-                mantenint_ocell = False
+                elif event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_ESCAPE:
+                        partida = False
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    mantenint = True
+                elif event.type == pygame.MOUSEBUTTONUP:
+                    mantenint = False
+                    mantenint_ocell = False
         
-        #Detectem si estem mantenint l'ocell
-        if mantenint == True and pygame.mouse.get_pos()[1]>460 and pygame.mouse.get_pos()[1]<500 and pygame.mouse.get_pos()[0]>80 and pygame.mouse.get_pos()[0]<120:
-            mantenint_ocell=True
+            #Detectem si estem mantenint l'ocell
+            if mantenint == True and pygame.mouse.get_pos()[1]>460 and pygame.mouse.get_pos()[1]<500 and pygame.mouse.get_pos()[0]>80 and pygame.mouse.get_pos()[0]<120:
+                mantenint_ocell=True
         
-        # Netejar la pantalla
-        pantalla.fill(blanc)
+            # Netejar la pantalla
+            pantalla.fill(blanc)
         
-        # Aparèixer porcs, ocells i linea
-        if mantenint_ocell:
-            linea()
-        porcs()
-        ocells()
+            # Aparèixer porcs, ocells i linea
+            if mantenint_ocell:
+                line.update()
+            porcs()
+            ocells()
 
         # Recarregar la pantalla
         pygame.display.flip()
