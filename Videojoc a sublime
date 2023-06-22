@@ -60,7 +60,7 @@ class linea(pygame.sprite.Sprite):
 # Creació porcs
 def porcs():
     porc_radi = 30
-    porc_posició = (pantalla_amplada - porc_radi - 100, pantalla_alçada - porc_radi - 10)
+    porc_posició = (pantalla_amplada - porc_radi - 150, pantalla_alçada - porc_radi - 100)
     pygame.draw.circle(pantalla, verd, porc_posició, porc_radi)
 
 # Selecció de nivell
