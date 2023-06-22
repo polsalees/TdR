@@ -48,11 +48,11 @@ class linea(pygame.sprite.Sprite):
     
     def update(self):
         superficie_rectangle.fill(blanc)
-        amplada = ((pygame.mouse.get_pos()[0] - 100)**2 + (pygame.mouse.get_pos()[1] - 480)**2)**0.5 
-        pygame.draw.rect(superficie_rectangle, blau, pygame.Rect(100-amplada,100,1000,5))
-        pygame.draw.rect(superficie_rectangle, blanc, pygame.Rect(100,100,100,5))
+        amplada = ((pygame.mouse.get_pos()[0] - 100) ** 2 + (pygame.mouse.get_pos()[1] - 480) ** 2) ** 0.5 
+        pygame.draw.rect(superficie_rectangle, blau, pygame.Rect(100-amplada, 100, 1000, 5))
+        pygame.draw.rect(superficie_rectangle, blanc, pygame.Rect(100, 100, 100, 5))
         angle = math.degrees(math.atan2(pygame.mouse.get_pos()[0] - 100, pygame.mouse.get_pos()[1] - 480))
-        rectangle_nou = pygame.transform.rotate(superficie_rectangle, angle+87.5)
+        rectangle_nou = pygame.transform.rotate(superficie_rectangle, angle + 87.5)
         rect = rectangle_nou.get_rect()
         rect.center = (100, 480)
         pantalla.blit(rectangle_nou, rect)
@@ -103,7 +103,6 @@ def menú():
                 elif event.key == pygame.K_SPACE:
                     dificultat = selecció_dificultat()
                     if dificultat:
-                        print("Dificultat seleccionada:", dificultat)
                         return True
 
         pantalla.fill(blanc)
@@ -139,7 +138,7 @@ def GameLoop():
                     mantenint_ocell = False
         
             # Detectem si estem mantenint l'ocell
-            if mantenint == True and pygame.mouse.get_pos()[1]>460 and pygame.mouse.get_pos()[1]<500 and pygame.mouse.get_pos()[0]>80 and pygame.mouse.get_pos()[0]<120:
+            if mantenint == True and pygame.mouse.get_pos()[1] > 460 and pygame.mouse.get_pos()[1] < 500 and pygame.mouse.get_pos()[0] > 80 and pygame.mouse.get_pos()[0] < 120:
                 mantenint_ocell = True
         
             # Netejar la pantalla
