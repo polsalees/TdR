@@ -35,7 +35,7 @@ pantalla.blit(text, (pantalla_amplada // 2 - text.get_width() // 2, pantalla_al�
 # Creació ocells
 def ocells():
     ocell_radi = 20
-    ocell_posició = (100, pantalla_alçada - ocell_radi - 100)
+    ocell_posició = (200, pantalla_alçada - ocell_radi - 200)
     pygame.draw.circle(pantalla, vermell, ocell_posició, ocell_radi)
 
 # Creació linea que indica direcció ocell
