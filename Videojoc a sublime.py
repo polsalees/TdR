@@ -17,7 +17,7 @@ taronja = (255, 165, 0)
 fons = (80, 80, 255)
 
 # Preparar la pantalla
-pantalla_amplada, pantalla_alçada = 1920, 1038
+pantalla_amplada, pantalla_alçada = 1000, 600
 pantalla = pygame.display.set_mode((pantalla_amplada, pantalla_alçada))
 pygame.display.set_caption("Angry Birds")
 
@@ -31,7 +31,7 @@ class ocells(pygame.sprite.Sprite):
     def __init__(self):
         pygame.sprite.Sprite.__init__(self)
         self.ocell_radi = 20
-        self.ocell_posició = [200, pantalla_alçada - self.ocell_radi - 200]
+        self.ocell_posició = [100, pantalla_alçada - self.ocell_radi - 100]
         self.velocitat = [0,0]
         self.potencia = 0
         self.angle = 0
@@ -43,13 +43,15 @@ class ocells(pygame.sprite.Sprite):
         if self.aire == True:
             self.velocitat[1] += 0.05
         pygame.draw.circle(pantalla, vermell, self.ocell_posició, self.ocell_radi)
-        if self.ocell_posició[1]>1500:
+        if self.ocell_posició[1]>1000:
             self.aire = False
             self.velocitat = [0,0]
             self.ocell_posició = [100, pantalla_alçada - self.ocell_radi - 100]
     def llançament(self):
-        self.potencia = ((pygame.mouse.get_pos()[0] - 200)**2 + (pygame.mouse.get_pos()[1] - 818) ** 2) ** 0.5
-        self.angle = math.atan2(pygame.mouse.get_pos()[0] - 200, pygame.mouse.get_pos()[1] - 818)
+        self.potencia = ((pygame.mouse.get_pos()[0] - 100)**2 + (pygame.mouse.get_pos()[1] - 480) ** 2) ** 0.5
+        if self.potencia >= 100:
+            self.potencia = 100
+        self.angle = math.atan2(pygame.mouse.get_pos()[0] - 100, pygame.mouse.get_pos()[1] - 480)
         self.velocitat[0] = -math.sin(self.angle) * self.potencia * 0.1
         self.velocitat[1] = -math.cos(self.angle) * self.potencia * 0.1
         self.aire = True
@@ -60,7 +62,7 @@ superficie_rectangle.set_colorkey(fons)
 superficie = superficie_rectangle.copy()
 superficie.set_colorkey(fons)
 rect = superficie.get_rect()
-rect.center = (200, 818)
+rect.center = (100, 480)
 
 # Creació linea que indica direcció ocell
 class linea(pygame.sprite.Sprite):
@@ -69,17 +71,17 @@ class linea(pygame.sprite.Sprite):
         superficie_rectangle = pygame.Surface((200, 200))
         superficie_rectangle.set_colorkey(fons)
         rect = superficie.get_rect()
-        rect.center = (200, 818)
+        rect.center = (100, pantalla_alçada - 480)
     
     def update(self):
-        superficie_rectangle.fill(blanc)
-        amplada = ((pygame.mouse.get_pos()[0] - 200) **2 + (pygame.mouse.get_pos()[1] - 818) ** 2) ** 0.5 
+        superficie_rectangle.fill(fons)
+        amplada = ((pygame.mouse.get_pos()[0] - 100) **2 + (pygame.mouse.get_pos()[1] - 480) ** 2) ** 0.5 
         pygame.draw.rect(superficie_rectangle, blau, pygame.Rect(100 - amplada, 100, 1000, 5))
         pygame.draw.rect(superficie_rectangle, fons, pygame.Rect(100, 100, 100, 5))
-        angle = math.degrees(math.atan2(pygame.mouse.get_pos()[0] - 200, pygame.mouse.get_pos()[1] - 818)) + 87.5
+        angle = math.degrees(math.atan2(pygame.mouse.get_pos()[0] - 100, pygame.mouse.get_pos()[1] - 480)) + 87.5
         rectangle_nou = pygame.transform.rotate(superficie_rectangle, angle)
         rect = rectangle_nou.get_rect()
-        rect.center = (200, 818)
+        rect.center = (100, 480)
         pantalla.blit(rectangle_nou, rect)
 
 # Creació porcs
@@ -196,7 +198,7 @@ def GameLoop():
                         mantenint_ocell = False
                         vermellet.llançament()
             #Detectem si estem mantenint l'ocell
-            if mantenint == True and pygame.mouse.get_pos()[1]>798 and pygame.mouse.get_pos()[1]<838 and pygame.mouse.get_pos()[0]>180 and pygame.mouse.get_pos()[0]<220:
+            if mantenint == True and pygame.mouse.get_pos()[1]>460 and pygame.mouse.get_pos()[1]<500 and pygame.mouse.get_pos()[0]>80 and pygame.mouse.get_pos()[0]<120:
                 mantenint_ocell=True
         
             # Netejar la pantalla
