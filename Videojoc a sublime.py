@@ -169,7 +169,7 @@ def menú():
 
         pygame.display.flip()
 
-# Game loop
+# Game GameLoop
 def GameLoop():
     mantenint = False
     mantenint_ocell = False
