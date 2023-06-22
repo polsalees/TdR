@@ -30,14 +30,6 @@ def ocells():
     ocell_posició = (100, pantalla_alçada - ocell_radi - 100)
     pygame.draw.circle(pantalla, vermell, ocell_posició, ocell_radi)
 
-# Variables linea
-superficie_rectangle = pygame.Surface((200,200))
-superficie_rectangle.set_colorkey(blanc)
-superficie = superficie_rectangle.copy()
-superficie.set_colorkey(blanc)
-rect = superficie.get_rect()
-rect.center = (100, 480)
-
 # Creació linea que indica direcció ocell
 class linea(pygame.sprite.Sprite):
     def __init__(self):
