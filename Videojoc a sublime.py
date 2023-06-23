@@ -47,17 +47,42 @@ class ocells(pygame.sprite.Sprite):
         self.aire = False
         self.color = color
         self.zona = False
-
+        self.frenada = False
+   
     def update(self):     
         self.posició[0] += self.velocitat[0] 
         self.posició[1] += self.velocitat[1]
         if self.aire == True:
             self.velocitat[1] += 0.05
         pygame.draw.circle(pantalla, self.color, self.posició, self.radi)
-        if self.posició[1] > (pantalla_alçada+2*self.radi) or self.posició[0] > (pantalla_amplada+2*self.radi):
-            self.aire = False
-            self.velocitat = [0,0]
-            self.posició = [200, pantalla_alçada - 240]
+        if self.posició[1] > (pantalla_alçada-self.radi):
+            self.velocitat[1] *=-0.25 
+            self.posició[1] = pantalla_alçada-self.radi
+            if self.velocitat[1] < 0 and self.velocitat[1] > -0.5:
+                self.aire = False
+                self.velocitat[1] = 0
+                self.frenada = True
+        elif self.posició[0] > (pantalla_amplada-self.radi):
+            self.velocitat[0] *= -0.25
+            self.posició[0] = pantalla_amplada-self.radi
+        elif self.posició[1] < self.radi:
+            self.velocitat[1] = 0
+            self.posició[1] = self.radi
+        elif self.posició[0] < self.radi:
+            self.velocitat[0] *= -0.25
+            self.posició[0] = self.radi
+        elif self.frenada == True:
+            if self.velocitat[0] > 0:
+                self.velocitat[0] -= 0.01
+                if self.velocitat[0] <= 0.01:
+                    self.velocitat[0] = 0
+                    self.frenada = False
+            elif self.velocitat[0] < 0:
+                self.velocitat[0] += 0.01
+                if self.velocitat[0] >= -0.01:
+                    self.velocitat[0] = 0
+                    self.frenada = False  
+    
     def llançament(self):
         self.potencia = distancia_ocell_ratoli() - self.radi
         if self.potencia >= 100:
@@ -184,6 +209,9 @@ def GameLoop():
     partida = False
     line = linea()
     vermellet = ocells(20, vermell)
+    bomardero = ocells(30, negre)
+    pequeñin = ocells(10, cian)
+    racista = ocells(20, groc)
     while True:
         if not partida:
             if not menú():
