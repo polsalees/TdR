@@ -26,35 +26,56 @@ font = pygame.font.Font(None, 50)
 text = font.render("Hello world!", True, negre)
 pantalla.blit(text, (pantalla_amplada // 2 - text.get_width() // 2, pantalla_alçada // 2 - text.get_height() // 2))
 
+#Creació funcions basiques
+def calcular_angle():
+    angle = math.degrees(math.atan2(pygame.mouse.get_pos()[0] - 200, pygame.mouse.get_pos()[1] - (pantalla_alçada - 240)))
+    return angle
+
+def distancia_ocell_ratoli():
+    amplada = math.sqrt(((pygame.mouse.get_pos()[0] - 200) **2 + (pygame.mouse.get_pos()[1] - (pantalla_alçada - 240)) ** 2))
+    return amplada
+
 # Creació ocells
 class ocells(pygame.sprite.Sprite):
-    def __init__(self):
+    def __init__(self, radi, color):
         pygame.sprite.Sprite.__init__(self)
-        self.ocell_radi = 20
-        self.ocell_posició = [200, pantalla_alçada - self.ocell_radi - 200]
+        self.radi = radi
+        self.posició = [200, pantalla_alçada - 240]
         self.velocitat = [0,0]
         self.potencia = 0
         self.angle = 0
         self.aire = False
+        self.color = color
+        self.zona = False
 
     def update(self):     
-        self.ocell_posició[0] += self.velocitat[0] 
-        self.ocell_posició[1] += self.velocitat[1]
+        self.posició[0] += self.velocitat[0] 
+        self.posició[1] += self.velocitat[1]
         if self.aire == True:
             self.velocitat[1] += 0.05
-        pygame.draw.circle(pantalla, vermell, self.ocell_posició, self.ocell_radi)
-        if self.ocell_posició[1]>1500:
+        pygame.draw.circle(pantalla, self.color, self.posició, self.radi)
+        if self.posició[1] > (pantalla_alçada+2*self.radi) or self.posició[0] > (pantalla_amplada+2*self.radi):
             self.aire = False
             self.velocitat = [0,0]
-            self.ocell_posició = [200, pantalla_alçada - self.ocell_radi - 200]
+            self.posició = [200, pantalla_alçada - 240]
     def llançament(self):
-        self.potencia = ((pygame.mouse.get_pos()[0] - 200)**2 + (pygame.mouse.get_pos()[1] - 818) ** 2) ** 0.5
+        self.potencia = distancia_ocell_ratoli() - self.radi
         if self.potencia >= 100:
             self.potencia = 100
-        self.angle = math.atan2(pygame.mouse.get_pos()[0] - 200, pygame.mouse.get_pos()[1] - 818)
+        elif self.potencia <= 0:
+            self.potencia = 0
+        self.angle = math.radians(calcular_angle())
         self.velocitat[0] = -math.sin(self.angle) * self.potencia * 0.1
         self.velocitat[1] = -math.cos(self.angle) * self.potencia * 0.1
-        self.aire = True
+        if self.potencia != 0:
+            self.aire = True
+    def zona_llançament(self):
+        self.distancia = distancia_ocell_ratoli() - self.radi
+        if self.distancia <= 0:
+            self.zona = True
+        if self.distancia >= 0:
+            self.zona = False
+        return self.zona
 
 # Variables linea
 superficie_rectangle = pygame.Surface((200, 200))
@@ -62,26 +83,19 @@ superficie_rectangle.set_colorkey(fons)
 superficie = superficie_rectangle.copy()
 superficie.set_colorkey(fons)
 rect = superficie.get_rect()
-rect.center = (200, 818)
+rect.center = (200, pantalla_alçada - 240)
 
 # Creació linea que indica direcció ocell
 class linea(pygame.sprite.Sprite):
-   
-    def __init__(self):
-        superficie_rectangle = pygame.Surface((200, 200))
-        superficie_rectangle.set_colorkey(fons)
-        rect = superficie.get_rect()
-        rect.center = (200, 818)
-    
     def update(self):
         superficie_rectangle.fill(fons)
-        amplada = ((pygame.mouse.get_pos()[0] - 200) **2 + (pygame.mouse.get_pos()[1] - 818) ** 2) ** 0.5 
+        amplada = distancia_ocell_ratoli() 
         pygame.draw.rect(superficie_rectangle, blau, pygame.Rect(100 - amplada, 100, 1000, 5))
         pygame.draw.rect(superficie_rectangle, fons, pygame.Rect(100, 100, 100, 5))
-        angle = math.degrees(math.atan2(pygame.mouse.get_pos()[0] - 200, pygame.mouse.get_pos()[1] - 818)) + 87.5
+        angle = calcular_angle() + 87.5
         rectangle_nou = pygame.transform.rotate(superficie_rectangle, angle)
         rect = rectangle_nou.get_rect()
-        rect.center = (200, 818)
+        rect.center = (200, pantalla_alçada - 240)
         pantalla.blit(rectangle_nou, rect)
 
 # Creació porcs
@@ -103,13 +117,14 @@ def selecció_nivell():
                     nivell_seleccionat -= 1
                 elif event.key == pygame.K_SPACE:
                     selecció_nivell_acabada = True
-
+        
         pantalla.fill(fons)
         
         font = pygame.font.Font(None, 150)
         text1 = font.render("Nivells", True, taronja)
+
         pantalla.blit(text1, (pantalla_amplada // 2 - text1.get_width() // 2, pantalla_alçada // 5 - text1.get_height() // 2 ))
-        
+
         # Crear una llista de textos de números de l'1 al 12
         numeros = [str(i) for i in range(1, 13)]
         textos = [font.render(num, True, taronja) for num in numeros]
@@ -163,17 +178,19 @@ def menú():
 
 # Game GameLoop
 def GameLoop():
+    zona_ocell = False
     mantenint = False
     mantenint_ocell = False
     partida = False
     line = linea()
-    vermellet = ocells()
+    vermellet = ocells(20, vermell)
     while True:
         if not partida:
             if not menú():
                 break
             partida = True
         else:
+            zona_ocell = vermellet.zona_llançament()
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     partida = False
@@ -188,7 +205,7 @@ def GameLoop():
                         mantenint_ocell = False
                         vermellet.llançament()
             #Detectem si estem mantenint l'ocell
-            if mantenint == True and pygame.mouse.get_pos()[1]>798 and pygame.mouse.get_pos()[1]<838 and pygame.mouse.get_pos()[0]>180 and pygame.mouse.get_pos()[0]<220:
+            if mantenint == True and zona_ocell == True:
                 mantenint_ocell=True
         
             # Netejar la pantalla
@@ -199,7 +216,6 @@ def GameLoop():
                 line.update()
             porcs()
             vermellet.update()
-
         # Recarregar la pantalla
         pygame.display.flip()
 
