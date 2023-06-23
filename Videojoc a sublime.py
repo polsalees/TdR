@@ -92,59 +92,49 @@ def porcs():
 
 # Selecció de nivell
 def selecció_nivell():
-    nivell_seleccionat = None
-    while not nivell_seleccionat:
+    nivell_seleccionat = 1
+    selecció_nivell_acabada = False
+    while not selecció_nivell_acabada:
         for event in pygame.event.get():
             if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_1:
-                    nivell_seleccionat = 1
-                elif event.key == pygame.K_2:
-                    nivell_seleccionat = 2
-                elif event.key == pygame.K_3:
-                    nivell_seleccionat = 3
-                elif event.key == pygame.K_4:
-                    nivell_seleccionat = 4
-                elif event.key == pygame.K_5:
-                    nivell_seleccionat = 5
-                elif event.key == pygame.K_6:
-                    nivell_seleccionat = 6
-                elif event.key == pygame.K_7:
-                    nivell_seleccionat = 7
-                elif event.key == pygame.K_8:
-                    nivell_seleccionat = 8
-                elif event.key == pygame.K_9:
-                    nivell_seleccionat = 9
-        
+                if event.key == pygame.K_RIGHT and nivell_seleccionat < 12:
+                    nivell_seleccionat += 1
+                elif event.key == pygame.K_LEFT and nivell_seleccionat > 1:
+                    nivell_seleccionat -= 1
+                elif event.key == pygame.K_SPACE:
+                    selecció_nivell_acabada = True
+
         pantalla.fill(fons)
         
-        font = pygame.font.Font(None, 100)
-        text1 = font.render("Seleccionar nivell:", True, taronja)
-        text2 = font.render("1", True, taronja)
-        text3 = font.render("2", True, taronja)
-        text4 = font.render("3", True, taronja)
-        text5 = font.render("4", True, taronja)
-        text6 = font.render("5", True, taronja)
-        text7 = font.render("6", True, taronja)
-        text8 = font.render("7", True, taronja)
-        text9 = font.render("8", True, taronja)
-        text10 = font.render("9", True, taronja)
-        text11= font.render("10", True, taronja)
-        text12 = font.render("11", True, taronja)
-        text13 = font.render("12", True, taronja)
-
+        font = pygame.font.Font(None, 150)
+        text1 = font.render("Nivells", True, taronja)
         pantalla.blit(text1, (pantalla_amplada // 2 - text1.get_width() // 2, pantalla_alçada // 5 - text1.get_height() // 2 ))
-        pantalla.blit(text2, (pantalla_amplada // 5 - text2.get_width() // 2, pantalla_alçada * 2 // 5 - text2.get_height() // 2 ))
-        pantalla.blit(text3, (pantalla_amplada * 2 // 5 - text3.get_width() // 2, pantalla_alçada * 2 // 5 - text3.get_height() // 2 ))
-        pantalla.blit(text4, (pantalla_amplada * 3 // 5 - text4.get_width() // 2, pantalla_alçada * 2 // 5 - text4.get_height() // 2 ))
-        pantalla.blit(text5, (pantalla_amplada * 4 // 5 - text5.get_width() // 2, pantalla_alçada * 2 // 5 - text5.get_height() // 2 ))
-        pantalla.blit(text6, (pantalla_amplada // 5 - text6.get_width() // 2, pantalla_alçada * 3 // 5 - text6.get_height() // 2 ))
-        pantalla.blit(text7, (pantalla_amplada * 2 // 5 - text7.get_width() // 2, pantalla_alçada * 3 // 5 - text7.get_height() // 2 ))
-        pantalla.blit(text8, (pantalla_amplada * 3 // 5 - text8.get_width() // 2, pantalla_alçada * 3 // 5 - text8.get_height() // 2 ))
-        pantalla.blit(text9, (pantalla_amplada * 4 // 5 - text9.get_width() // 2, pantalla_alçada * 3 // 5 - text9.get_height() // 2 ))
-        pantalla.blit(text10, (pantalla_amplada // 5 - text10.get_width() // 2, pantalla_alçada * 4 // 5 - text10.get_height() // 2 ))
-        pantalla.blit(text11, (pantalla_amplada * 2 // 5 - text11.get_width() // 2, pantalla_alçada * 4 // 5 - text11.get_height() // 2 ))
-        pantalla.blit(text12, (pantalla_amplada * 3 // 5 - text12.get_width() // 2, pantalla_alçada * 4 // 5 - text12.get_height() // 2 ))
-        pantalla.blit(text13, (pantalla_amplada * 4 // 5 - text13.get_width() // 2, pantalla_alçada * 4 // 5 - text13.get_height() // 2 ))
+        
+        # Crear una llista de textos de números de l'1 al 12
+        numeros = [str(i) for i in range(1, 13)]
+        textos = [font.render(num, True, taronja) for num in numeros]
+
+        posicions = [(pantalla_amplada // 5, pantalla_alçada * 2 // 5),
+              (pantalla_amplada * 2 // 5, pantalla_alçada * 2 // 5),
+              (pantalla_amplada * 3 // 5, pantalla_alçada * 2 // 5),
+              (pantalla_amplada * 4 // 5, pantalla_alçada * 2 // 5),
+              (pantalla_amplada // 5, pantalla_alçada * 3 // 5),
+              (pantalla_amplada * 2 // 5, pantalla_alçada * 3 // 5),
+              (pantalla_amplada * 3 // 5, pantalla_alçada * 3 // 5),
+              (pantalla_amplada * 4 // 5, pantalla_alçada * 3 // 5),
+              (pantalla_amplada // 5, pantalla_alçada * 4 // 5),
+              (pantalla_amplada * 2 // 5, pantalla_alçada * 4 // 5),
+              (pantalla_amplada * 3 // 5, pantalla_alçada * 4 // 5),
+              (pantalla_amplada * 4 // 5, pantalla_alçada * 4 // 5)]
+
+        font_gran = pygame.font.Font(None, 150)  # Mida de la font més gran
+
+        for i, text in enumerate(textos):
+            pos = posicions[i]
+            num_text = font_gran.render(str(i+1), True, taronja)
+            num_x = pos[0] - num_text.get_width() // 2
+            num_y = pos[1] - num_text.get_height() // 2
+            pantalla.blit(num_text, (num_x, num_y))
 
         pygame.display.flip()
 
