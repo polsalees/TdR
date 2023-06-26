@@ -26,6 +26,10 @@ font = pygame.font.Font(None, 50)
 text = font.render("Hello world!", True, negre)
 pantalla.blit(text, (pantalla_amplada // 2 - text.get_width() // 2, pantalla_alçada // 2 - text.get_height() // 2))
 
+# LListes on es troben els objectes en pantalla i els que han estat en algun moment
+llista_objectes_pantalla = []
+sprites = []
+
 #Creació funcions basiques
 def calcular_angle():
     angle = math.degrees(math.atan2(pygame.mouse.get_pos()[0] - 200, pygame.mouse.get_pos()[1] - (pantalla_alçada - 240)))
@@ -49,7 +53,9 @@ class ocells(pygame.sprite.Sprite):
         self.zona = False
         self.frenada = False
         self.llançat = False
-   
+        global llista_objectes_pantalla
+        self.cooldown = 0
+    
     def update(self):     
         self.posició[0] += self.velocitat[0] 
         self.posició[1] += self.velocitat[1]
@@ -58,7 +64,7 @@ class ocells(pygame.sprite.Sprite):
         if self.posició[1] > (pantalla_alçada-self.radi):
             self.velocitat[1] *=-0.25 
             self.posició[1] = pantalla_alçada-self.radi
-            if self.velocitat[1] < 0 and self.velocitat[1] > -0.5:
+            if self.velocitat[1] < 0 and self.velocitat[1] > -0.05:
                 self.aire = False
                 self.velocitat[1] = 0
                 self.frenada = True
@@ -73,29 +79,34 @@ class ocells(pygame.sprite.Sprite):
             self.posició[0] = self.radi
         elif self.frenada == True:
             if self.velocitat[0] > 0:
-                self.velocitat[0] -= 0.01
-                if self.velocitat[0] <= 0.01:
+                self.velocitat[0] -= 0.005
+                if self.velocitat[0] <= 0.005:
                     self.velocitat[0] = 0
                     self.frenada = False
             elif self.velocitat[0] < 0:
-                self.velocitat[0] += 0.01
-                if self.velocitat[0] >= -0.01:
+                self.velocitat[0] += 0.005
+                if self.velocitat[0] >= -0.005:
                     self.velocitat[0] = 0
-                    self.frenada = False  
+                    self.frenada = False
+        if self.llançat == True and self.velocitat == [0,0]:
+            self.cooldown += 1
         pygame.draw.circle(pantalla, self.color, self.posició, self.radi)
+        if self.cooldown >= 150:     
+            llista_objectes_pantalla.remove(self)
+   
     def llançament(self):
-        if self.llançat == False:
-            self.potencia = distancia_ocell_ratoli() - self.radi
-            if self.potencia >= 100:
-                self.potencia = 100
-            elif self.potencia <= 0:
-                self.potencia = 0
-            self.angle = math.radians(calcular_angle())
-            self.velocitat[0] = -math.sin(self.angle) * self.potencia * 0.1
-            self.velocitat[1] = -math.cos(self.angle) * self.potencia * 0.1
-            if self.potencia != 0:
-                self.aire = True
-                self.llançat = True 
+        self.potencia = distancia_ocell_ratoli() - self.radi
+        if self.potencia >= 100:
+            self.potencia = 100
+        elif self.potencia <= 0:
+            self.potencia = 0
+        self.angle = math.radians(calcular_angle())
+        self.velocitat[0] = -math.sin(self.angle) * self.potencia * 0.1
+        self.velocitat[1] = -math.cos(self.angle) * self.potencia * 0.1
+        if self.potencia != 0:
+            self.aire = True
+            self.llançat = True 
+    
     def zona_llançament(self):
         self.distancia = distancia_ocell_ratoli() - self.radi
         if self.distancia <= 0:
@@ -111,61 +122,113 @@ class ocells(pygame.sprite.Sprite):
         self.llançat = False
         self.posició = [200, pantalla_alçada - 240]
         self.zona = False
+        self.cooldown = 0
 
-# Ocells creats
+# Ocells creats 
 vermellet = ocells(20, vermell)
-bombardero = ocells(30, negre)
-pequeñin = ocells(10, cian)
+vermellet2 = ocells(20, vermell)
+vermellet3 = ocells(20, vermell)
+bombardero = ocells(25, negre)
+bombardero2 = ocells(25, negre)
+bombardero3 = ocells(25, negre)
+pequeñin = ocells(15, cian)
+pequeñin2 = ocells(15, cian)
+pequeñin3 = ocells(15, cian)
 racista = ocells(20, groc)
+racista2 = ocells(20, groc)
+racista3 = ocells(20, groc)
 no_ocell = ocells(0, fons)
-llista_ocell = []
 
 #Creació ordre d'ocells
-def ordre_ocell():
-    if vermellet.llançat == False:
-        if llista_ocell.count(vermellet) < 1:
-            llista_ocell.append(vermellet)
-        x = 0
-    elif vermellet.llançat == True:
-        if bombardero.llançat == False:
-            if llista_ocell.count(bombardero) < 1:
-                llista_ocell.append(bombardero)
-            x = 1
-        elif bombardero.llançat == True:
-            if pequeñin.llançat == False:
-                if llista_ocell.count(pequeñin) < 1:
-                    llista_ocell.append(pequeñin)
-                x = 2
-            elif pequeñin.llançat == True:
-                if racista.llançat == False:
-                    if llista_ocell.count(racista) < 1:
-                         llista_ocell.append(racista)
-                    x = 3
-                elif racista.llançat == True:
-                    if llista_ocell.count(no_ocell) < 1:
-                        llista_ocell.append(no_ocell)
-                    x = 4
+def següent_ocell(ocell1, ocell2, ocell3, ocell4, ocell5, ocell6):
+    if ocell1.llançat == False:
+        if llista_objectes_pantalla.count(ocell1) < 1:
+            llista_objectes_pantalla.append(ocell1)
+            sprites.append(ocell1)
+        x = llista_objectes_pantalla.index(ocell1)
+    elif ocell1.llançat == True:
+        if ocell2.llançat == False:
+            if llista_objectes_pantalla.count(ocell2) < 1:
+                llista_objectes_pantalla.append(ocell2)
+                sprites.append(ocell2)
+            x = llista_objectes_pantalla.index(ocell2)
+        elif ocell2.llançat == True:
+            if ocell3.llançat == False:
+                if llista_objectes_pantalla.count(ocell3) < 1:
+                    llista_objectes_pantalla.append(ocell3)
+                    sprites.append(ocell3)
+                x = llista_objectes_pantalla.index(ocell3)
+            elif ocell3.llançat == True:
+                if ocell4.llançat == False:
+                    if llista_objectes_pantalla.count(ocell4) < 1:
+                         llista_objectes_pantalla.append(ocell4)
+                         sprites.append(ocell4)
+                    x = llista_objectes_pantalla.index(ocell4)
+                elif ocell4.llançat == True:
+                    if ocell5.llançat == False:
+                        if llista_objectes_pantalla.count(ocell5) < 1:
+                            llista_objectes_pantalla.append(ocell5)
+                            sprites.append(ocell5)
+                        x = llista_objectes_pantalla.index(ocell5) 
+                    elif ocell5.llançat == True:
+                        if ocell6.llançat == False:
+                            if llista_objectes_pantalla.count(ocell6) < 1:
+                                llista_objectes_pantalla.append(ocell6)
+                                sprites.append(ocell6)
+                            x = llista_objectes_pantalla.index(ocell6)
+                        elif ocell6.llançat == True:
+                            if llista_objectes_pantalla.count(no_ocell) < 1:
+                                llista_objectes_pantalla.append(no_ocell)
+                            x = llista_objectes_pantalla.index(no_ocell)
     return x
-# Variables linea
-superficie_rectangle = pygame.Surface((200, 200))
-superficie_rectangle.set_colorkey(fons)
-superficie = superficie_rectangle.copy()
-superficie.set_colorkey(fons)
-rect = superficie.get_rect()
-rect.center = (200, pantalla_alçada - 240)
+
+# Creació linea ocells
+def linea_ocells(ocell1, ocell2, ocell3, ocell4, ocell5, ocell6):
+    if ocell1.llançat == False:
+        pygame.draw.circle(pantalla, ocell2.color, (180, pantalla_alçada - ocell2.radi), ocell2.radi)
+        pygame.draw.circle(pantalla, ocell3.color, (130, pantalla_alçada - ocell3.radi), ocell3.radi)
+        pygame.draw.circle(pantalla, ocell4.color, (80, pantalla_alçada - ocell4.radi), ocell4.radi)
+        pygame.draw.circle(pantalla, ocell5.color, (30, pantalla_alçada - ocell5.radi), ocell5.radi)
+        pygame.draw.circle(pantalla, ocell6.color, (-20, pantalla_alçada - ocell6.radi), ocell6.radi) 
+    elif ocell1.llançat == True:
+        if ocell2.llançat == False:
+            pygame.draw.circle(pantalla, ocell3.color, (180, pantalla_alçada - ocell3.radi), ocell3.radi)
+            pygame.draw.circle(pantalla, ocell4.color, (130, pantalla_alçada - ocell4.radi), ocell4.radi)
+            pygame.draw.circle(pantalla, ocell5.color, (80, pantalla_alçada - ocell5.radi), ocell5.radi)
+            pygame.draw.circle(pantalla, ocell6.color, (30, pantalla_alçada - ocell6.radi), ocell6.radi)
+        elif ocell2.llançat == True:
+            if ocell3.llançat == False:
+                pygame.draw.circle(pantalla, ocell4.color, (180, pantalla_alçada - ocell4.radi), ocell4.radi)
+                pygame.draw.circle(pantalla, ocell5.color, (130, pantalla_alçada - ocell5.radi), ocell5.radi)
+                pygame.draw.circle(pantalla, ocell6.color, (80, pantalla_alçada - ocell6.radi), ocell6.radi)
+            elif ocell3.llançat == True:
+                if ocell4.llançat == False:
+                    pygame.draw.circle(pantalla, ocell5.color, (180, pantalla_alçada - ocell5.radi), ocell5.radi)
+                    pygame.draw.circle(pantalla, ocell6.color, (130, pantalla_alçada - ocell6.radi), ocell6.radi)
+                elif ocell4.llançat == True:
+                    if ocell5.llançat == False:
+                        pygame.draw.circle(pantalla, ocell6.color, (180, pantalla_alçada - ocell6.radi), ocell6.radi)
 
 # Creació linea que indica direcció ocell
 class linea(pygame.sprite.Sprite):
+    def __init__(self, x):
+        self.costat = 200 + 2*x.radi
+        self.superficie_rectangle = pygame.Surface((self.costat, self.costat))
+        self.superficie_rectangle.set_colorkey(fons)
+        self.superficie = self.superficie_rectangle.copy()
+        self.superficie.set_colorkey(fons)
+        self.rect = self.superficie.get_rect()
+        self.rect.center = (200, pantalla_alçada - 240)
     def update(self):
-        superficie_rectangle.fill(fons)
-        amplada = distancia_ocell_ratoli() 
-        pygame.draw.rect(superficie_rectangle, blau, pygame.Rect(100 - amplada, 100, 1000, 5))
-        pygame.draw.rect(superficie_rectangle, fons, pygame.Rect(100, 100, 100, 5))
-        angle = calcular_angle() + 87.5
-        rectangle_nou = pygame.transform.rotate(superficie_rectangle, angle)
-        rect = rectangle_nou.get_rect()
-        rect.center = (200, pantalla_alçada - 240)
-        pantalla.blit(rectangle_nou, rect)
+        self.superficie_rectangle.fill(fons)
+        self.amplada = distancia_ocell_ratoli() 
+        pygame.draw.rect(self.superficie_rectangle, blau, pygame.Rect(self.costat/2 - 2.5, self.costat/2 - self.amplada, 5, 1000))
+        pygame.draw.rect(self.superficie_rectangle, fons, pygame.Rect(self.costat/2 - 2.5, self.costat/2, 5, 1000))
+        self.angle = calcular_angle() + 180 
+        self.rectangle_nou = pygame.transform.rotate(self.superficie_rectangle, self.angle)
+        self.rect = self.rectangle_nou.get_rect()
+        self.rect.center = (200, pantalla_alçada - 240)
+        pantalla.blit(self.rectangle_nou, self.rect)
 
 # Creació porcs
 def porcs():
@@ -244,19 +307,23 @@ def menú():
         pantalla.blit(text, (pantalla_amplada // 2 - text.get_width() // 2, pantalla_alçada // 2 - text.get_height() // 2))
 
         pygame.display.flip()
+
 #Definim reinici al sortir del nivell
 def reinici():
-    global llista_ocell
-    for i in llista_ocell:
+    global llista_objectes_pantalla
+    global sprites
+    for i in sprites:
                 i.reinici()
-    llista_ocell = []
+    llista_objectes_pantalla = []
+    sprites = []
+
 # Game GameLoop
 def GameLoop():
     zona_ocell = False
     mantenint = False
     mantenint_ocell = False
     partida = False
-    line = linea()
+    nivell = [bombardero, vermellet, racista2, vermellet2, pequeñin, racista]
     while True:
         if not partida:
             reinici()
@@ -264,7 +331,9 @@ def GameLoop():
                 break
             partida = True
         else:
-            zona_ocell = llista_ocell[ordre_ocell()].zona_llançament()
+            següent_ocell(nivell[0], nivell[1], nivell[2], nivell[3], nivell[4], nivell[5])
+            ocell_actual =  llista_objectes_pantalla[següent_ocell(nivell[0], nivell[1], nivell[2], nivell[3], nivell[4], nivell[5])]
+            zona_ocell = ocell_actual.zona_llançament()
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     partida = False
@@ -277,21 +346,24 @@ def GameLoop():
                     mantenint = False
                     if mantenint_ocell == True:
                         mantenint_ocell = False
-                        llista_ocell[ordre_ocell()].llançament()
+                        ocell_actual.llançament()
             
             #Detectem si estem mantenint l'ocell
             if mantenint == True and zona_ocell == True:
                 mantenint_ocell=True
-        
+
+            # Creem una linea que començi desde un punt o altre depenent del ocell que llancem
+            line = linea(ocell_actual)
+            
             # Netejar la pantalla
             pantalla.fill(fons)
-        
             # Aparèixer porcs, ocells i linea
             if mantenint_ocell:
                 line.update()
             porcs()
-            for i in llista_ocell:
+            for i in  llista_objectes_pantalla:
                 i.update()
+            linea_ocells(nivell[0], nivell[1], nivell[2], nivell[3], nivell[4], nivell[5])
         # Recarregar la pantalla
         pygame.display.flip()
 
