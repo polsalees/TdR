@@ -13,7 +13,7 @@ blau = (0, 0, 255)
 cian = (0, 255, 255)
 rosa = (255, 0, 255)
 groc = (255, 255, 0)
-taronja = (255, 165, )
+taronja = (255, 165, 0)
 fons = (80, 80, 255)
 
 # Preparar la pantalla
