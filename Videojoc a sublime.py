@@ -16,6 +16,9 @@ groc = (255, 255, 0)
 taronja = (255, 165, 0)
 fons = (80, 80, 255)
 
+# Definim la gravetat
+gravetat = 0.05
+
 # Preparar la pantalla
 pantalla_amplada, pantalla_alçada = 1920, 1038
 pantalla = pygame.display.set_mode((pantalla_amplada, pantalla_alçada))
@@ -27,7 +30,9 @@ text = font.render("Hello world!", True, negre)
 pantalla.blit(text, (pantalla_amplada // 2 - text.get_width() // 2, pantalla_alçada // 2 - text.get_height() // 2))
 
 # LListes on es troben els objectes en pantalla i els que han estat en algun moment
+llista_objectes_rodons = []
 llista_objectes_pantalla = []
+llista_ocells_llançats = []
 sprites = []
 
 #Creació funcions basiques
@@ -42,6 +47,7 @@ def distancia_ocell_ratoli():
 # Creació ocells
 class ocells(pygame.sprite.Sprite):
     def __init__(self, radi, color):
+        global gravetat
         pygame.sprite.Sprite.__init__(self)
         self.radi = radi
         self.posició = [200, pantalla_alçada - 240]
@@ -55,59 +61,149 @@ class ocells(pygame.sprite.Sprite):
         self.llançat = False
         global llista_objectes_pantalla
         self.cooldown = 0
+        self.posició_primer_xoc = [0, 0]
         self.tocat_objecte = False
+        self.linea_direció = False
+        self.linea_direció_radi = 0
+        self.linea_direció_velocitat = [0,0]
+        self.linea_direció_posició = [200, pantalla_alçada - 240]
+        self.linea_direció_tocat_objecte = False
+        self.linea_direció_moviment = 0
+        self.estela_velocitat = [0,0] 
+    
+    def calcul_posició_primer_xoc (self):
+        if self.tocat_objecte == False:
+            self.posició_primer_xoc[0] += self.posició[0]
+            self.posició_primer_xoc[1] += self.posició[1]
     
     def colisió(self,x):
-        if (self.radi + x.radi) > math.sqrt(((self.posició[0] - x.posició[0]) **2 + (self.posició[1] - x.posició[1]) ** 2)):
-            self.tocat_objecte = True
-            self.posició[0] -= self.velocitat[0] 
-            self.posició[1] -= self.velocitat[1]
-            if self.velocitat[0] > 0:    
-                if (self.posició[0] - x.posició[0]) > 0:
-                    x.velocitat[0] += self.velocitat[0]*0.25
-                    self.velocitat[0] *= 0.25
-                if (self.posició[0] - x.posició[0]) < 0:
-                    x.velocitat[0] += self.velocitat[0]*0.25
-                    self.velocitat[0] *= -0.25
-            if self.velocitat[0] < 0:
-                if (self.posició[0] - x.posició[0]) > 0:
-                    x.velocitat[0] += self.velocitat[0]*0.25
-                    self.velocitat[0] *= -0.25
-                if (self.posició[0] - x.posició[0]) < 0:
-                    x.velocitat[0] += self.velocitat[0]*0.25
-                    self.velocitat[0] *= 0.25
-            x.velocitat[1] += self.velocitat[1]*0.25
-            self.velocitat[1] *= -0.25
-            if self.velocitat[1] < 0 and self.velocitat[1] > -0.05 and self.aire:
-                if (self.posició[0] - x.posició[0]) > 0:
-                    self.posició[0] += 2
-                if (self.posició[0] - x.posició[0]) < 0:
-                    self.posició[0] -= 2
-
+        if x in llista_objectes_rodons:    
+            if (self.radi + x.radi) > math.sqrt(((self.posició[0] - x.posició[0]) **2 + (self.posició[1] - x.posició[1]) ** 2)):
+                self.calcul_posició_primer_xoc()
+                self.tocat_objecte = True
+                x.tocat_objecte = True
+                self.posició[0] -= self.velocitat[0] * 2
+                self.posició[1] -= self.velocitat[1] * 2
+                self.angle_cercle = 90 - math.degrees(math.acos((x.posició[0]-self.posició[0])/(self.radi*x.radi)))
+                self.angle_velocitat = math.degrees(math.atan2(self.velocitat[1], self.velocitat[0]))
+                self. magnitud_velocitat = math.sqrt(((self.velocitat[0]) **2 + (self.velocitat[1]) ** 2))
+                if self.posició[0] - x.posició[0] < 0: 
+                    self.nou_angle = -(self.angle_velocitat + 2 * self.angle_cercle)
+                else:
+                    self.nou_angle = (self.angle_velocitat + 2 * self.angle_cercle)
+                if self.posició[1] - x.posició[1] < 0:
+                    self.velocitat[0] = self.magnitud_velocitat * math.sin(math.radians(self.nou_angle))*0.25
+                    self.velocitat[1] = self.magnitud_velocitat * math.cos(math.radians(self.nou_angle))*0.25
+                if self.posició[1] - x.posició[1] > 0:
+                    self.velocitat[0] = -self.magnitud_velocitat * math.sin(math.radians(self.nou_angle))*0.25
+                    self.velocitat[1] = self.magnitud_velocitat * math.cos(math.radians(self.nou_angle))*0.25
+                if self.posició[1] - x.posició[1] == 0:
+                    self.velocitat[0] *= -0.5
+                    self.velocitat[1] *= 0.5
+                x.velocitat[0] -= self.velocitat[0] 
+                x.velocitat[1] -= self.velocitat[1] 
+    
+    def calcul_linea_direció(self):
+        n = self.linea_direció_moviment
+        self.linea_direció_radi = 5
+        self.linea_direció_posició = [200, pantalla_alçada - 240]
+        self.linea_direció_tocat_objecte = False
+        self.potencia = distancia_ocell_ratoli() - self.radi
+        self.angle = math.radians(calcular_angle())
+        if self.potencia >= 100:
+            self.potencia = 100
+        if self.potencia <= 0 or self.angle > -0.1 or self.angle < -3:
+            self.potencia = 0
+        self.linea_direció_velocitat[0] = -math.sin(self.angle) * self.potencia * 0.1
+        self.linea_direció_velocitat[1] = -math.cos(self.angle) * self.potencia * 0.1
+        if self.potencia !=0:    
+            while not self.linea_direció_tocat_objecte:
+                n -= 1
+                self.linea_direció_radi -= 0.01
+                self.linea_direció_velocitat[1]  += gravetat * 0.2
+                self.linea_direció_posició[0] += self.linea_direció_velocitat[0] * 0.2
+                self.linea_direció_posició[1] += self.linea_direció_velocitat[1] * 0.2
+                if self.linea_direció_posició[1] > (pantalla_alçada - self.linea_direció_radi) or self.linea_direció_radi <= 0:
+                    self.linea_direció_tocat_objecte = True
+                if self.linea_direció_posició[0] > (pantalla_amplada - self.linea_direció_radi):
+                    self.linea_direció_tocat_objecte = True
+                if self.linea_direció_posició[0] < self.linea_direció_radi:
+                    self.linea_direció_tocat_objecte = True
+                for i in llista_objectes_pantalla:
+                    if i != self:
+                        if i in llista_objectes_rodons:    
+                            if (i.radi + self.linea_direció_radi) > math.sqrt(((i.posició[0] - self.linea_direció_posició[0]) **2 + (i.posició[1] - self.linea_direció_posició[1]) ** 2)):
+                                self.linea_direció_posició[0] -= self.linea_direció_velocitat[0]
+                                self.linea_direció_posició[1] -= self.linea_direció_velocitat[1]
+                                self.linea_direció_tocat_objecte = True 
+                if n % 30  == 0:
+                    pygame.draw.circle(pantalla, blanc, self.linea_direció_posició, self.linea_direció_radi)
+            self.linea_direció_moviment +=1
+    
+    def estela(self): 
+        n = 0
+        self.estela_radi = 2
+        self.estela_posició = [200, pantalla_alçada - 240]
+        self.estela_tocat_ocell = False
+        self.estela_velocitat[0] = -math.sin(self.angle) * self.potencia * 0.1
+        self.estela_velocitat[1] = -math.cos(self.angle) * self.potencia * 0.1   
+        if self.tocat_objecte == False:    
+            while self.estela_tocat_ocell == False :
+                n += 1  
+                self.estela_velocitat[1]  += gravetat
+                self.estela_posició[0] += self.estela_velocitat[0]
+                self.estela_posició[1] += self.estela_velocitat[1]
+                if (self.radi + 2) > math.sqrt(((self.posició[0] - self.estela_posició[0]) **2 + (self.posició[1] - self.estela_posició[1]) ** 2)):
+                    self.estela_tocat_ocell = True 
+                if (n % 5) == 0:     
+                    pygame.draw.circle(pantalla, blanc, self.estela_posició, self.estela_radi)
+                    self.estela_radi += 1
+                    if self.estela_radi > 3:
+                        self.estela_radi = 2
+        else:
+            while self.estela_posició[0] < self.posició_primer_xoc[0] and self.estela:
+                n += 1  
+                self.estela_velocitat[1]  += gravetat
+                self.estela_posició[0] += self.estela_velocitat[0]
+                self.estela_posició[1] += self.estela_velocitat[1]
+                if (n % 5) == 0:     
+                    pygame.draw.circle(pantalla, blanc, self.estela_posició, self.estela_radi)
+                    self.estela_radi += 1
+                    if self.estela_radi > 3:
+                        self.estela_radi = 2
     def update(self):     
+        if self.linea_direció:
+            self.calcul_linea_direció()    
+        if self.llançat and self.tocat_objecte == False:
+            self.estela()
         if self.posició[1] < (pantalla_alçada-self.radi) and self.llançat:
             self.aire = True
-        self.posició[0] += self.velocitat[0] 
+        self.posició[0] += self.velocitat[0]
         self.posició[1] += self.velocitat[1]
-        if self.aire:
-            self.velocitat[1] += 0.05
+        if self.aire: 
+            self.velocitat[1] += gravetat
         if self.posició[1] > (pantalla_alçada-self.radi):
+            self.calcul_posició_primer_xoc()
             self.tocat_objecte = True
-            self.velocitat[1] *=-0.25 
+            self.velocitat[1] *=-0.25  
             self.posició[1] = pantalla_alçada-self.radi
             if self.velocitat[1] < 0 and self.velocitat[1] > -0.05:
                 self.aire = False
                 self.velocitat[1] = 0
         elif self.posició[0] > (pantalla_amplada-self.radi):
+            self.calcul_posició_primer_xoc()
             self.tocat_objecte = True
             self.velocitat[0] *= -0.25
             self.posició[0] = pantalla_amplada-self.radi
         elif self.posició[0] < self.radi:
+            self.calcul_posició_primer_xoc()
             self.tocat_objecte = True
             self.velocitat[0] *= -0.25
             self.posició[0] = self.radi
-        if self.velocitat[1] == 0 and self.posició[1] == (pantalla_alçada-self.radi) and self.velocitat[0] != 0:
-            self.frenada  = True
+        if self.velocitat[1] == 0 and self.velocitat[0] != 0:
+            self.frenada = True
+        else:
+            self.frenada = False
         if self.frenada:
             if self.velocitat[0] > 0:
                 self.velocitat[0] -= 0.005
@@ -140,7 +236,7 @@ class ocells(pygame.sprite.Sprite):
         self.velocitat[0] = -math.sin(self.angle) * self.potencia * 0.1
         self.velocitat[1] = -math.cos(self.angle) * self.potencia * 0.1
         if self.potencia != 0:
-            self.llançat = True 
+            self.llançat = True
     def zona_llançament(self):
         self.distancia = distancia_ocell_ratoli() - self.radi
         if self.distancia <= 0:
@@ -158,6 +254,8 @@ class ocells(pygame.sprite.Sprite):
         self.zona = False
         self.cooldown = 0
         self.tocat_objecte = False
+        self.linea_direció = False
+        self.posició_primer_xoc = [0, 0] 
 
 # Ocells creats 
 vermellet = ocells(20, vermell)
@@ -173,7 +271,9 @@ racista = ocells(20, groc)
 racista2 = ocells(20, groc)
 racista3 = ocells(20, groc)
 no_ocell = ocells(0, fons)
-llista_objectes_pantall = [no_ocell]
+llista_ocells = [vermellet, vermellet2, vermellet3, bombardero, bombardero2, bombardero3, pequeñin, pequeñin2, pequeñin3, racista, racista2, racista3]
+llista_ocells_llançats = [no_ocell]
+llista_objectes_rodons.extend(llista_ocells)
 
 #Creació ordre d'ocells
 def següent_ocell(ocell1, ocell2, ocell3, ocell4, ocell5, ocell6):
@@ -181,54 +281,60 @@ def següent_ocell(ocell1, ocell2, ocell3, ocell4, ocell5, ocell6):
         if llista_objectes_pantalla.count(ocell1) < 1:
             llista_objectes_pantalla.append(ocell1)
             sprites.append(ocell1)
-        x = llista_objectes_pantalla.index(ocell1)
+            llista_ocells_llançats.append(ocell1)
+        x = llista_ocells_llançats.index(ocell1)
     if ocell1.llançat: 
         if ocell1.tocat_objecte == False:
-            x = llista_objectes_pantalla.index(no_ocell)
+            x = llista_ocells_llançats.index(no_ocell)
         if ocell1.tocat_objecte:
             if ocell2.llançat == False:
                 if llista_objectes_pantalla.count(ocell2) < 1:
                     llista_objectes_pantalla.append(ocell2)
                     sprites.append(ocell2)
-                x = llista_objectes_pantalla.index(ocell2)
+                    llista_ocells_llançats.append(ocell2)
+                x = llista_ocells_llançats.index(ocell2)
             if ocell2.llançat:
                 if ocell2.tocat_objecte == False:
-                    x = llista_objectes_pantalla.index(no_ocell)
+                    x = llista_ocells_llançats.index(no_ocell)
                 if ocell2.tocat_objecte:
                     if ocell3.llançat == False:
                         if llista_objectes_pantalla.count(ocell3) < 1:
                             llista_objectes_pantalla.append(ocell3)
                             sprites.append(ocell3)
-                        x = llista_objectes_pantalla.index(ocell3)
+                            llista_ocells_llançats.append(ocell3)
+                        x = llista_ocells_llançats.index(ocell3)
                     if ocell3.llançat:
                         if ocell3.tocat_objecte == False:
-                            x = llista_objectes_pantalla.index(no_ocell)
+                            x = llista_ocells_llançats.index(no_ocell)
                         if ocell3.tocat_objecte:
                             if ocell4.llançat == False:
                                 if llista_objectes_pantalla.count(ocell4) < 1:
                                      llista_objectes_pantalla.append(ocell4)
                                      sprites.append(ocell4)
-                                x = llista_objectes_pantalla.index(ocell4)
+                                     llista_ocells_llançats.append(ocell4)
+                                x = llista_ocells_llançats.index(ocell4)
                             if ocell4.llançat:
                                 if ocell4.tocat_objecte == False:
-                                    x = llista_objectes_pantalla.index(no_ocell)
+                                    x = llista_ocells_llançats.index(no_ocell)
                                 if ocell4.tocat_objecte:
                                     if ocell5.llançat == False:
                                         if llista_objectes_pantalla.count(ocell5) < 1:
                                             llista_objectes_pantalla.append(ocell5)
                                             sprites.append(ocell5)
-                                        x = llista_objectes_pantalla.index(ocell5) 
+                                            llista_ocells_llançats.append(ocell5)
+                                        x = llista_ocells_llançats.index(ocell5) 
                                     if ocell5.llançat:
                                         if ocell5.tocat_objecte == False:
-                                            x = llista_objectes_pantalla.index(no_ocell)
+                                            x = llista_ocells_llançats.index(no_ocell)
                                         if ocell5.tocat_objecte:
                                             if ocell6.llançat == False:
                                                 if llista_objectes_pantalla.count(ocell6) < 1:
                                                     llista_objectes_pantalla.append(ocell6)
                                                     sprites.append(ocell6)
-                                                x = llista_objectes_pantalla.index(ocell6)
+                                                    llista_ocells_llançats.append(ocell6)
+                                                x = llista_ocells_llançats.index(ocell6)
                                             if ocell6.llançat:
-                                                x = llista_objectes_pantalla.index(no_ocell)
+                                                x = llista_ocells_llançats.index(no_ocell)
     return x
 
 # Creació linea ocells
@@ -363,25 +469,27 @@ def reinici():
     global sprites
     for i in sprites:
                 i.reinici()
-    llista_objectes_pantalla = [no_ocell]
+    llista_objectes_pantalla = []
     sprites = []
+    llista_ocells_llançats = [no_ocell]
 
 # Game GameLoop
 def GameLoop():
     zona_ocell = False
-    mantenint = False
     mantenint_ocell = False
     partida = False
     nivell = [bombardero, vermellet, racista2, vermellet2, pequeñin, racista]
     while True:
         if not partida:
             reinici()
+            mantenint_ocell = False
             if not menú():
                 break
             partida = True
         else:
-            següent_ocell(nivell[0], nivell[1], nivell[2], nivell[3], nivell[4], nivell[5])
-            ocell_actual =  llista_objectes_pantalla[següent_ocell(nivell[0], nivell[1], nivell[2], nivell[3], nivell[4], nivell[5])]
+            ocell_actual =  llista_ocells_llançats[següent_ocell(nivell[0], nivell[1], nivell[2], nivell[3], nivell[4], nivell[5])]
+            if len(llista_ocells_llançats) > 1:
+                ocell_anterior =  llista_ocells_llançats[següent_ocell(nivell[0], nivell[1], nivell[2], nivell[3], nivell[4], nivell[5])-1]
             zona_ocell = ocell_actual.zona_llançament()
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
@@ -391,9 +499,11 @@ def GameLoop():
                         partida = False
                 if event.type == pygame.MOUSEBUTTONDOWN and zona_ocell:
                     mantenint_ocell = True
+                    ocell_actual.linea_direció = True
                 elif event.type == pygame.MOUSEBUTTONUP:
                     if mantenint_ocell:
                         mantenint_ocell = False
+                        ocell_actual.linea_direció = False
                         ocell_actual.llançament()
 
             # Creem una linea que començi desde un punt o altre depenent del ocell que llancem
@@ -405,6 +515,7 @@ def GameLoop():
             if mantenint_ocell:
                 line.update()
             porcs()
+            ocell_anterior.estela()
             for i in  llista_objectes_pantalla:
                 i.update()
             linea_ocells(nivell[0], nivell[1], nivell[2], nivell[3], nivell[4], nivell[5])
