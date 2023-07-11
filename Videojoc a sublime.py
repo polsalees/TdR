@@ -81,27 +81,102 @@ class ocells(pygame.sprite.Sprite):
             if (self.radi + x.radi) > math.sqrt(((self.posició[0] - x.posició[0]) **2 + (self.posició[1] - x.posició[1]) ** 2)):
                 self.calcul_posició_primer_xoc()
                 self.tocat_objecte = True
-                x.tocat_objecte = True
-                self.posició[0] -= self.velocitat[0] * 2
-                self.posició[1] -= self.velocitat[1] * 2
-                self.angle_cercle = 90 - math.degrees(math.acos((x.posició[0]-self.posició[0])/(self.radi*x.radi)))
-                self.angle_velocitat = math.degrees(math.atan2(self.velocitat[1], self.velocitat[0]))
-                self. magnitud_velocitat = math.sqrt(((self.velocitat[0]) **2 + (self.velocitat[1]) ** 2))
-                if self.posició[0] - x.posició[0] < 0: 
-                    self.nou_angle = -(self.angle_velocitat + 2 * self.angle_cercle)
+                nou_angle_velocitat = 0
+                if x in llista_ocells:     
+                    x.calcul_posició_primer_xoc()
+                    x.tocat_objecte = True
+                if (self.posició[0]-x.posició[0]) != 0:    
+                    angle_cercle = -1*math.degrees(math.atan((self.posició[1]-x.posició[1])/ (self.posició[0]-x.posició[0])))
+                if angle_cercle == 0:
+                    if self.posició[0] - x.posició[0] > 0:
+                        angle_cercle -=180
+                if angle_cercle <= 0:
+                    angle_cercle +=180
+                if self.posició[1]-x.posició[1] > 0:
+                    angle_cercle +=180
+                if self.velocitat[0] != 0:
+                    self.angle_velocitat = -1*math.degrees(math.atan(self.velocitat[1]/self.velocitat[0]))
                 else:
-                    self.nou_angle = (self.angle_velocitat + 2 * self.angle_cercle)
-                if self.posició[1] - x.posició[1] < 0:
-                    self.velocitat[0] = self.magnitud_velocitat * math.sin(math.radians(self.nou_angle))*0.25
-                    self.velocitat[1] = self.magnitud_velocitat * math.cos(math.radians(self.nou_angle))*0.25
-                if self.posició[1] - x.posició[1] > 0:
-                    self.velocitat[0] = -self.magnitud_velocitat * math.sin(math.radians(self.nou_angle))*0.25
-                    self.velocitat[1] = self.magnitud_velocitat * math.cos(math.radians(self.nou_angle))*0.25
-                if self.posició[1] - x.posició[1] == 0:
-                    self.velocitat[0] *= -0.5
-                    self.velocitat[1] *= 0.5
-                x.velocitat[0] -= self.velocitat[0] 
-                x.velocitat[1] -= self.velocitat[1] 
+                    if self.velocitat[1] > 0:
+                        self.angle_velocitat = 270
+                    elif self.velocitat[1] < 0:
+                        self.angle_velocitat = 90
+                    else:
+                        self.angle_velocitat = 0
+                if self.angle_velocitat == 0:
+                    if self.velocitat[0] >= 0:
+                        self.angle_velocitat -=180
+                if self.angle_velocitat <= 0:
+                    self.angle_velocitat +=180
+                if self.velocitat[1] > 0:
+                    self.angle_velocitat +=180
+                self.magnitud_velocitat = math.sqrt(((self.velocitat[0]) **2 + (self.velocitat[1]) ** 2))
+                x.magnitud_velocitat = math.sqrt(((x.velocitat[0]) **2 + (x.velocitat[1]) ** 2))
+                if x.velocitat[0] != 0:
+                    x.angle_velocitat = -1*math.degrees(math.atan(x.velocitat[1]/x.velocitat[0]))
+                else:
+                    if x.velocitat[1] > 0:
+                        x.angle_velocitat = 270
+                    elif self.velocitat[1] < 0:
+                        x.angle_velocitat = 90
+                    else:
+                        x.angle_velocitat = 0
+                if x.angle_velocitat == 0:
+                    if x.velocitat[0] >= 0:
+                        x.angle_velocitat -=180
+                if x.angle_velocitat <= 0:
+                    x.angle_velocitat +=180
+                if x.velocitat[1] > 0:
+                    x.angle_velocitat +=180
+                angle_cercle_2 = angle_cercle + 180
+                if angle_cercle_2 > 360:
+                    angle_cercle_2 -= 360
+                if self.magnitud_velocitat != 0 and x.magnitud_velocitat != 0:
+                    if self.angle_velocitat // 90 != angle_cercle//90:
+                        if x.angle_velocitat // 90 != angle_cercle_2//90:
+                            while (self.radi + x.radi) >= math.sqrt(((self.posició[0] - x.posició[0]) **2 + (self.posició[1] - x.posició[1]) ** 2)):
+                                x.posició[1] -= x.velocitat[1]*0.1
+                                x.posició[0] -= x.velocitat[0]*0.1
+                                self.posició[1] -= self.velocitat[1]*0.1
+                                self.posició[0] -= self.velocitat[0]*0.1
+                        else:
+                            while (self.radi + x.radi) >= math.sqrt(((self.posició[0] - x.posició[0]) **2 + (self.posició[1] - x.posició[1]) ** 2)):
+                                self.posició[1] -= self.velocitat[1]*0.1
+                                self.posició[0] -= self.velocitat[0]*0.1
+                    else:
+                         while (self.radi + x.radi) >= math.sqrt(((self.posició[0] - x.posició[0]) **2 + (self.posició[1] - x.posició[1]) ** 2)):
+                            x.posició[1] -= x.velocitat[1]*0.1
+                            x.posició[0] -= x.velocitat[0]*0.1
+                if self.magnitud_velocitat == 0 and x.magnitud_velocitat !=0:
+                    while (self.radi + x.radi) >= math.sqrt(((self.posició[0] - x.posició[0]) **2 + (self.posició[1] - x.posició[1]) ** 2)):
+                            x.posició[1] -= x.velocitat[1]*0.1
+                            x.posició[0] -= x.velocitat[0]*0.1
+                if x.magnitud_velocitat == 0 and self.magnitud_velocitat != 0:
+                    while (self.radi + x.radi) >= math.sqrt(((self.posició[0] - x.posició[0]) **2 + (self.posició[1] - x.posició[1]) ** 2)):
+                            self.posició[1] -= self.velocitat[1]*0.1
+                            self.posició[0] -= self.velocitat[0]*0.1
+                if angle_cercle < 180:
+                    nou_angle_velocitat = 180 - self.angle_velocitat + 2*angle_cercle
+                if angle_cercle > 180:
+                    nou_angle_velocitat = -180 - self.angle_velocitat + 2*angle_cercle
+                if (angle_cercle % 90) != 0:   
+                    self.velocitat[0] = self.magnitud_velocitat * math.cos(math.radians(nou_angle_velocitat)) * 0.4
+                    self.velocitat[1] = -self.magnitud_velocitat * math.sin(math.radians(nou_angle_velocitat)) * 0.4
+                if angle_cercle == 0 or angle_cercle == 180:
+                    self.velocitat[0] *= -0.4
+                if angle_cercle == 90 or angle_cercle == 270:
+                    self.velocitat[1] *= -0.4
+                if angle_cercle_2 < 180:
+                    nou_angle_velocitat_2 = 180 - x.angle_velocitat + 2*angle_cercle_2
+                if angle_cercle_2 > 180:
+                    nou_angle_velocitat_2 = -180 - x.angle_velocitat + 2*angle_cercle_2
+                if (angle_cercle_2 % 90) != 0:   
+                    x.velocitat[0] = x.magnitud_velocitat * math.cos(math.radians(nou_angle_velocitat_2)) * 0.4
+                    x.velocitat[1] = -x.magnitud_velocitat * math.sin(math.radians(nou_angle_velocitat_2)) * 0.4
+                if angle_cercle_2 == 0 or angle_cercle_2 == 180:
+                    x.velocitat[0] *=-0.4
+                if angle_cercle_2 == 90 or angle_cercle_2 == 270:
+                    x.velocitat[1] *=-0.4
     
     def calcul_linea_direció(self):
         n = self.linea_direció_moviment
@@ -112,11 +187,11 @@ class ocells(pygame.sprite.Sprite):
         self.angle = math.radians(calcular_angle())
         if self.potencia >= 100:
             self.potencia = 100
-        if self.potencia <= 0 or self.angle > -0.1 or self.angle < -3:
+        if self.potencia <= 0:
             self.potencia = 0
         self.linea_direció_velocitat[0] = -math.sin(self.angle) * self.potencia * 0.1
         self.linea_direció_velocitat[1] = -math.cos(self.angle) * self.potencia * 0.1
-        if self.potencia !=0:    
+        if self.potencia !=0  or self.angle > -0.1 or self.angle < -3:    
             while not self.linea_direció_tocat_objecte:
                 n -= 1
                 self.linea_direció_radi -= 0.01
@@ -161,7 +236,7 @@ class ocells(pygame.sprite.Sprite):
                     if self.estela_radi > 3:
                         self.estela_radi = 2
         else:
-            while self.estela_posició[0] < self.posició_primer_xoc[0] and self.estela:
+            while self.estela_posició[0] < self.posició_primer_xoc[0]:
                 n += 1  
                 self.estela_velocitat[1]  += gravetat
                 self.estela_posició[0] += self.estela_velocitat[0]
@@ -176,30 +251,32 @@ class ocells(pygame.sprite.Sprite):
             self.calcul_linea_direció()    
         if self.llançat and self.tocat_objecte == False:
             self.estela()
-        if self.posició[1] < (pantalla_alçada-self.radi) and self.llançat:
+        if self.posició[1] < (pantalla_alçada-self.radi) and self.llançat or self.velocitat[1] < 0:
             self.aire = True
+        if self.aire: 
+            self.velocitat[1] += gravetat        
         self.posició[0] += self.velocitat[0]
         self.posició[1] += self.velocitat[1]
-        if self.aire: 
-            self.velocitat[1] += gravetat
         if self.posició[1] > (pantalla_alçada-self.radi):
             self.calcul_posició_primer_xoc()
             self.tocat_objecte = True
-            self.velocitat[1] *=-0.25  
-            self.posició[1] = pantalla_alçada-self.radi
-            if self.velocitat[1] < 0 and self.velocitat[1] > -0.05:
+            if self.velocitat[1] > 0 and self.velocitat[1] <= 0.05:
                 self.aire = False
                 self.velocitat[1] = 0
+            self.velocitat[1] *= -0.4
+            self.posició[1] = pantalla_alçada-self.radi
         elif self.posició[0] > (pantalla_amplada-self.radi):
             self.calcul_posició_primer_xoc()
             self.tocat_objecte = True
-            self.velocitat[0] *= -0.25
+            self.velocitat[0] *= -0.4
             self.posició[0] = pantalla_amplada-self.radi
+            self.posició[1] -= self.velocitat[1]
         elif self.posició[0] < self.radi:
             self.calcul_posició_primer_xoc()
             self.tocat_objecte = True
-            self.velocitat[0] *= -0.25
+            self.velocitat[0] *= -0.4
             self.posició[0] = self.radi
+            self.posició[1] -= self.velocitat[1]
         if self.velocitat[1] == 0 and self.velocitat[0] != 0:
             self.frenada = True
         else:
@@ -219,9 +296,6 @@ class ocells(pygame.sprite.Sprite):
             self.cooldown += 1
         else:
             self.cooldown = 0
-        for i in llista_objectes_pantalla:
-            if i != self and math.sqrt(((i.posició[0] - 200) **2 + (i.posició[1] - (pantalla_alçada - 240)) ** 2)) > (self.radi + i.radi): 
-                    self.colisió(i)
         pygame.draw.circle(pantalla, self.color, self.posició, self.radi)
         if self.cooldown >= 500:     
             llista_objectes_pantalla.remove(self)
@@ -231,12 +305,13 @@ class ocells(pygame.sprite.Sprite):
         self.angle = math.radians(calcular_angle())
         if self.potencia >= 100:
             self.potencia = 100
-        if self.potencia <= 0 or self.angle > -0.1 or self.angle < -3:
+        if self.potencia <= 0  or self.angle > -0.1 or self.angle < -3:
             self.potencia = 0
         self.velocitat[0] = -math.sin(self.angle) * self.potencia * 0.1
         self.velocitat[1] = -math.cos(self.angle) * self.potencia * 0.1
         if self.potencia != 0:
             self.llançat = True
+    
     def zona_llançament(self):
         self.distancia = distancia_ocell_ratoli() - self.radi
         if self.distancia <= 0:
@@ -516,6 +591,11 @@ def GameLoop():
                 line.update()
             porcs()
             ocell_anterior.estela()
+            for self in llista_objectes_pantalla:
+                if self in llista_ocells:
+                    for i in llista_objectes_pantalla:
+                        if i != self and i.posició[0] != 200 and i.posició[1] != (pantalla_alçada - 240): 
+                            self.colisió(i)
             for i in  llista_objectes_pantalla:
                 i.update()
             linea_ocells(nivell[0], nivell[1], nivell[2], nivell[3], nivell[4], nivell[5])
