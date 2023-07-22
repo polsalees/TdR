@@ -120,11 +120,10 @@ class ocells(pygame.sprite.Sprite):
         if math.sqrt((self.posició[0] - puntx) **2 + (self.posició[1] - punty) ** 2) <= self.radi:
             self.angle_velocitat = self.calcul_angle_velocitat()
             self.angle_cercle = self.calcul_angle_cercle(puntx, punty)
-            self.magnitud_velocitat = math.sqrt(self.velocitat[0]**2 + self.velocitat[1]**2)
-            while math.sqrt((self.posició[0] - puntx) **2 + (self.posició[1] - punty) ** 2) <= self.radi and self.magnitud_velocitat > 0:    
-                self.posició[0] += self.magnitud_velocitat * math.cos(math.radians(self.angle_cercle)) * 0.1
-                self.posició[1] += -self.magnitud_velocitat * math.sin(math.radians(self.angle_cercle)) * 0.1
             if (self.angle_velocitat // 90) != (self.angle_cercle // 90) and self.magnitud_velocitat > 0:   
+                while math.sqrt((self.posició[0] - puntx) **2 + (self.posició[1] - punty) ** 2) <= self.radi and self.magnitud_velocitat > 0:    
+                    self.posició[0] += self.magnitud_velocitat * math.cos(math.radians(self.angle_cercle)) * 0.1
+                    self.posició[1] += -self.magnitud_velocitat * math.sin(math.radians(self.angle_cercle)) * 0.1
                 if self.angle_cercle <= 180:
                     nou_angle_velocitat = 180 -self.angle_velocitat + 2*self.angle_cercle
                 else:    
@@ -135,9 +134,11 @@ class ocells(pygame.sprite.Sprite):
                 elif coordenada == "y":
                     self.velocitat[0] = self.magnitud_velocitat * math.cos(math.radians(nou_angle_velocitat)) * 0.4
                     self.velocitat[1] = -self.magnitud_velocitat * math.sin(math.radians(nou_angle_velocitat)) 
+            elif x.magnitud_velocitat > 1:
+                self.velocitat[0] += x.velocitat[0]*0.4 
+                self.velocitat[1] += x.velocitat[1]*0.4
             if x.movible == True:
                 angle_direcció_rectangle = self.angle_cercle + 180
-                x.magnitud_velocitat = math.sqrt(x.velocitat[0]**2 + x.velocitat[1]**2)
                 if math.sqrt(x.magnitud_velocitat**2) <= gravetat:
                     x.magnitud_velocitat = 0
                 if angle_direcció_rectangle >= 360:
@@ -157,6 +158,11 @@ class ocells(pygame.sprite.Sprite):
                 if x.velocitat[1] > 0:
                     angle_velocitat +=180
                 if (angle_velocitat // 90) != (angle_direcció_rectangle // 90) and x.magnitud_velocitat > 0:    
+                    while math.sqrt((self.posició[0] - puntx) **2 + (self.posició[1] - punty) ** 2) <= self.radi and x.magnitud_velocitat > 0:    
+                        puntx += x.magnitud_velocitat * math.cos(math.radians(angle_direcció_rectangle)) * 0.1
+                        punty += -x.magnitud_velocitat * math.sin(math.radians(angle_direcció_rectangle)) * 0.1
+                        x.posició[0] += x.magnitud_velocitat * math.cos(math.radians(angle_direcció_rectangle)) * 0.1
+                        x.posició[1] += -x.magnitud_velocitat * math.sin(math.radians(angle_direcció_rectangle)) * 0.1
                     if angle_direcció_rectangle <= 180:
                         nou_angle_velocitat_rectangle = 180 -angle_velocitat + 2*angle_direcció_rectangle
                     else:    
@@ -167,7 +173,13 @@ class ocells(pygame.sprite.Sprite):
                     elif coordenada == "y":
                         x.velocitat[0] = x.magnitud_velocitat * math.cos(math.radians(nou_angle_velocitat_rectangle))*0.4
                         x.velocitat[1] = -x.magnitud_velocitat * math.sin(math.radians(nou_angle_velocitat_rectangle))
-    
+                elif self.magnitud_velocitat > 1:
+                    if coordenada == "x":    
+                        x.velocitat[0] += -self.velocitat[0]*0.6*0.4
+                        x.velocitat[1] += -self.velocitat[1]*0.6
+                    if coordenada == "y":    
+                        x.velocitat[0] += -self.velocitat[0]*0.6 
+                        x.velocitat[1] += -self.velocitat[1]*0.6*0.4
     def colisió(self,x):
         if x in llista_objectes_rodons:    
             if (self.radi + x.radi) > math.sqrt(((self.posició[0] - x.posició[0]) **2 + (self.posició[1] - x.posició[1]) ** 2)):
@@ -183,7 +195,7 @@ class ocells(pygame.sprite.Sprite):
                 x.angle_cercle = self.angle_cercle + 180
                 if x.angle_cercle >= 360:
                     x.angle_cercle -= 360
-                if self.magnitud_velocitat != 0 and x.magnitud_velocitat != 0:
+                if self.magnitud_velocitat != 0 and x.magnitud_velocitat != 0 and self.angle != 180:
                     if self.angle_velocitat // 90 != self.angle_cercle//90:
                         if x.angle_velocitat // 90 != x.angle_cercle//90:
                             while (self.radi + x.radi) >= math.sqrt(((self.posició[0] - x.posició[0]) **2 + (self.posició[1] - x.posició[1]) ** 2)):
@@ -207,68 +219,106 @@ class ocells(pygame.sprite.Sprite):
                     while (self.radi + x.radi) >= math.sqrt(((self.posició[0] - x.posició[0]) **2 + (self.posició[1] - x.posició[1]) ** 2)):
                             self.posició[0] += self.magnitud_velocitat * math.cos(math.radians(self.angle_cercle)) * 0.1
                             self.posició[1] += -self.magnitud_velocitat * math.sin(math.radians(self.angle_cercle)) * 0.1
-                if (self.angle_velocitat // 90) != (self.angle_cercle // 90) or x.magnitud_velocitat==0:    
+                if (self.angle_velocitat // 90) != (self.angle_cercle // 90) or self.magnitud_velocitat==0:    
                     if self.angle_cercle <= 180:
                         nou_angle_velocitat = 180 - self.angle_velocitat + 2*self.angle_cercle
                     if self.angle_cercle > 180:
                         nou_angle_velocitat = -180 - self.angle_velocitat + 2*self.angle_cercle  
                     self.velocitat[0] = self.magnitud_velocitat * math.cos(math.radians(nou_angle_velocitat)) *0.4
                     self.velocitat[1] = -self.magnitud_velocitat * math.sin(math.radians(nou_angle_velocitat)) *0.4
-                if (self.angle_velocitat // 90) != (self.angle_cercle // 90) or self.magnitud_velocitat==0:        
+                else:
+                    self.velocitat[0] += x.velocitat[0]*0.4 
+                    self.velocitat[1] += x.velocitat[1]*0.4
+                if (x.angle_velocitat // 90) != (x.angle_cercle // 90) or x.magnitud_velocitat==0:        
                     if x.angle_cercle <= 180:
                         nou_angle_velocitat_2 = 180 - x.angle_velocitat + 2*x.angle_cercle
                     if x.angle_cercle > 180:
                         nou_angle_velocitat_2 = -180 - x.angle_velocitat + 2*x.angle_cercle   
                     x.velocitat[0] = x.magnitud_velocitat * math.cos(math.radians(nou_angle_velocitat_2)) *0.4
                     x.velocitat[1] = -x.magnitud_velocitat * math.sin(math.radians(nou_angle_velocitat_2)) *0.4 
-        
+                else:
+                    x.velocitat[0] += -self.velocitat[0]
+                    x.velocitat[1] += -self.velocitat[1]
         if x in llista_objectes_rectangulars:
             if self.posició[0] > (x.posició[0]-self.radi) and self.posició[0] < (x.posició[0] + x.amplada + self.radi) and self.posició[1] > (x.posició[1]-self.radi) and self.posició[1] < (x.posició[1] + x.alçada + self.radi):
                 self.calcul_posició_primer_xoc()
-                if (self.posició[0] - x.posició[0]) < 0:     
-                    if self.posició[1] > (x.posició[1] + x.alçada):
-                        self.calcul_xoc(x.posició[0], x.posició[1] + x.alçada, "x", x)
-                    elif self.posició[1] < x.posició[1]:
-                        self.calcul_xoc(x.posició[0], x.posició[1], "x", x)
-                    else:    
-                        self.posició[0] = x.posició[0]-self.radi
-                        if self.velocitat[0] > 0:  
-                            self.velocitat[0] *= -0.4
-                        if x.movible == True and x.velocitat[0] < 0:    
-                            x.velocitat[0] *= -0.4
-                if (self.posició[0] - (x.posició[0] + x.amplada)) > 0:   
-                    if self.posició[1] > (x.posició[1] + x.alçada):
-                        self.calcul_xoc(x.posició[0] + x.amplada, x.posició[1] + x.alçada, "x", x)
-                    elif self.posició[1] < x.posició[1]:
-                        self.calcul_xoc(x.posició[0] + x.amplada, x.posició[1], "x", x)
-                    else:    
-                        self.posició[0] = x.posició[0] + x.amplada+self.radi
-                        if self.velocitat[0] < 0:     
-                            self.velocitat[0] *= -0.4
-                        if x.movible == True and x.velocitat[0] > 0:    
-                            x.velocitat[0] *= -0.4
-                if (self.posició[1] - x.posició[1]) < 0:     
-                    if self.posició[0] > (x.posició[0] + x.amplada):
-                        self.calcul_xoc(x.posició[0] + x.amplada, x.posició[1], "y", x)
-                    elif self.posició[0] < x.posició[0]:
-                        self.calcul_xoc(x.posició[0], x.posició[1], "y", x)
-                    else:    
-                        self.posició[1] = x.posició[1] -self.radi
-                        if self.velocitat[1] > 0:      
-                            self.velocitat[1] *= -0.4
-                        if x.movible == True and x.velocitat[1] < 0:     
-                            x.velocitat[1] *= -0.4
-                if (self.posició[1] - (x.posició[1]+x.alçada)) > 0:     
-                    if self.posició[0] > (x.posició[0] + x.amplada):
-                        self.calcul_xoc(x.posició[0] + x.amplada, x.posició[1] + x.alçada, "y", x)
-                    elif self.posició[0] < x.posició[0]:
-                        self.calcul_xoc(x.posició[0], x.posició[1] + x.alçada, "y", x)
-                    else:    
-                        self.posició[1] = x.posició[1] + x.alçada+self.radi
-                        if self.velocitat[1] < 0:    
-                            self.velocitat[1] *= -0.4
-                        if x.movible == True and x.velocitat[1] > 0:     
-                            x.velocitat[1] *= -0.4
+                x.magnitud_velocitat = math.sqrt(x.velocitat[0]**2 + x.velocitat[1]**2)
+                self.magnitud_velocitat = math.sqrt(self.velocitat[0]**2 + self.velocitat[1]**2)    
+                if self.magnitud_velocitat > 8 and x.movible:
+                    llista_objectes_pantalla.remove(x)
+                    self.velocitat = [self.velocitat[0]*0.4, self.velocitat[1]*0.4] 
+                else:
+                    if x.magnitud_velocitat > 8 and x.movible:
+                        llista_objectes_pantalla.remove(x)
+                    if (self.posició[0] - x.posició[0]) < 0:     
+                        if self.posició[1] > (x.posició[1] + x.alçada):
+                            self.calcul_xoc(x.posició[0], x.posició[1] + x.alçada, "x", x)
+                        elif self.posició[1] < x.posició[1]:
+                            self.calcul_xoc(x.posició[0], x.posició[1], "x", x)
+                        else:    
+                            if self.velocitat[0] > 0:
+                                self.posició[0] = x.posició[0]-self.radi                                  
+                                self.velocitat[0] *= -0.4
+                            elif x.magnitud_velocitat > 1:
+                                self.velocitat[0] += x.velocitat[0]*0.4
+                            if x.movible == True: 
+                                if x.velocitat[0] < 0:
+                                    x.posició[0] = self.posició[0]+self.radi
+                                    x.velocitat[0] *= -0.4
+                                elif self.magnitud_velocitat > 1:
+                                    x.velocitat[0] += -self.velocitat[0]*0.6
+                    if (self.posició[0] - (x.posició[0] + x.amplada)) > 0:   
+                        if self.posició[1] > (x.posició[1] + x.alçada):
+                            self.calcul_xoc(x.posició[0] + x.amplada, x.posició[1] + x.alçada, "x", x)
+                        elif self.posició[1] < x.posició[1]:
+                            self.calcul_xoc(x.posició[0] + x.amplada, x.posició[1], "x", x)
+                        else:    
+                            if self.velocitat[0] < 0:
+                                self.posició[0] = x.posició[0] + x.amplada+self.radi     
+                                self.velocitat[0] *= -0.4
+                            elif x.magnitud_velocitat > 1:
+                                self.velocitat[0] += x.velocitat[0]*0.4
+                            if x.movible == True :
+                                if x.velocitat[0] > 0:    
+                                    x.posició[0] = self.posició[0] - x.amplada-self.radi
+                                    x.velocitat[0] *= -0.4
+                                elif self.magnitud_velocitat > 1:
+                                    x.velocitat[0] += -self.velocitat[0]*0.6
+                    if (self.posició[1] - x.posició[1]) < 0:     
+                        if self.posició[0] > (x.posició[0] + x.amplada):
+                            self.calcul_xoc(x.posició[0] + x.amplada, x.posició[1], "y", x)
+                        elif self.posició[0] < x.posició[0]:
+                            self.calcul_xoc(x.posició[0], x.posició[1], "y", x)
+                        else:    
+                            if self.velocitat[1] > 0:      
+                                self.posició[1] = x.posició[1] -self.radi
+                                self.velocitat[1] *= -0.4
+                            elif x.magnitud_velocitat > 1:
+                                self.velocitat[1] += x.velocitat[1]*0.4
+                            if x.movible == True:
+                                if x.velocitat[1] < 0:     
+                                    x.posició[1] = self.posició[1] + self.radi
+                                    x.velocitat[1] *= -0.4
+                                elif self.magnitud_velocitat > 1:
+                                    x.velocitat[1] += -self.velocitat[1]*0.6
+                    if (self.posició[1] - (x.posició[1]+x.alçada)) > 0:     
+                        if self.posició[0] > (x.posició[0] + x.amplada):
+                            self.calcul_xoc(x.posició[0] + x.amplada, x.posició[1] + x.alçada, "y", x)
+                        elif self.posició[0] < x.posició[0]:
+                            self.calcul_xoc(x.posició[0], x.posició[1] + x.alçada, "y", x)
+                        else:    
+                            if self.velocitat[1] < 0:    
+                                self.posició[1] = x.posició[1] + x.alçada + self.radi
+                                self.velocitat[1] *= -0.4
+                            elif x.magnitud_velocitat > 1:
+                                self.velocitat[1] += x.velocitat[1]*0.4
+                            if x.movible == True:
+                                if x.velocitat[1] > 0:     
+                                    x.posició[1] = self.posició[1] - x.alçada - self.radi
+                                    x.velocitat[1] *= -0.4
+                                elif self.magnitud_velocitat > 1:
+                                    x.velocitat[1] += -self.velocitat[1]*0.6
+                             
     
     def calcul_linea_direció(self):
         n = 0 
@@ -355,6 +405,8 @@ class ocells(pygame.sprite.Sprite):
                 self.velocitat[1] += gravetat
         if self.velocitat[1] < gravetat and self.velocitat[1] > 0 and self.tocat_objecte:
             self.velocitat[1] = 0
+        if self.velocitat[1] > gravetat and self.velocitat[1] < 0 and self.tocat_objecte:
+            self.velocitat[1] = 0
         self.posició[0] += self.velocitat[0]
         self.posició[1] += self.velocitat[1]
         if self.velocitat[1] == 0 and self.velocitat[0] != 0:
@@ -363,13 +415,13 @@ class ocells(pygame.sprite.Sprite):
             self.frenada = False
         if self.frenada:
             if self.velocitat[0] > 0:
-                self.velocitat[0] -= 0.005
-                if self.velocitat[0] <= 0.005:
+                self.velocitat[0] -= 0.01
+                if self.velocitat[0] <= 0.01:
                     self.velocitat[0] = 0
                     self.frenada = False
             elif self.velocitat[0] < 0:
-                self.velocitat[0] += 0.005
-                if self.velocitat[0] >= -0.005:
+                self.velocitat[0] += 0.01
+                if self.velocitat[0] >= -0.01:
                     self.velocitat[0] = 0
                     self.frenada = False
         if self.llançat and self.velocitat[0] == 0:
@@ -420,7 +472,7 @@ class ocells(pygame.sprite.Sprite):
 vermellet = ocells(20, vermell)
 vermellet2 = ocells(20, vermell)
 vermellet3 = ocells(20, vermell)
-bombardero = ocells(30, negre)
+bombardero = ocells(25, negre)
 bombardero2 = ocells(25, negre)
 bombardero3 = ocells(25, negre)
 pequeñin = ocells(15, cian)
@@ -591,14 +643,16 @@ class caixa(pygame.sprite.Sprite):
         pygame.draw.rect(pantalla, marró , (self.posició, (self.amplada, self.alçada)))
 
     def dintre(self, puntX, puntY):
-        if puntX > self.posició[0] and puntX < (self.posició[0] + self.amplada) and puntY > self.posició[1] and puntY < (self.posició[1] + self.alçada):
+        if puntX >= self.posició[0] and puntX <= (self.posició[0] + self.amplada) and puntY >= self.posició[1] and puntY <= (self.posició[1] + self.alçada):
             return True
         else:
             return False
 
     def colisió(self, x):
         if x in llista_objectes_rectangulars:
-            if x.dintre(self.posició[0] +self.amplada, self.posició[1]) == True or x.dintre(self.posició[0] + self.amplada, self.posició[1] + self.alçada) == True or x.dintre(self.posició[0], self.posició[1]) == True or x.dintre(self.posició[0], self.posició[1] + self.alçada) == True:
+            if (x.dintre(self.posició[0] +self.amplada, self.posició[1]) == True or x.dintre(self.posició[0] + self.amplada, self.posició[1] + self.alçada) == True or x.dintre(self.posició[0], self.posició[1]) == True or x.dintre(self.posició[0], self.posició[1] + self.alçada) == True) and (x.movible or self.movible):
+                x.magnitud_velocitat = math.sqrt(x.velocitat[0]**2 + x.velocitat[1]**2)
+                self.magnitud_velocitat = math.sqrt(self.velocitat[0]**2 + self.velocitat[1]**2)
                 if x.movible == False:
                     if (self.posició[0] - x.posició[0]) < 0 and not self.velocitat[0] <= 0:     
                         self.posició[0] = x.posició[0]-self.amplada
@@ -635,23 +689,31 @@ class caixa(pygame.sprite.Sprite):
                                 self.posició[0] = x.posició[0]-self.amplada
                                 self.velocitat[0] *= -0.4
                                 x.velocitat[0] *= -0.4
-                            elif self.velocitat[0] < 0 and x.velocitat[0] < 0:    
+                            elif self.velocitat[0] <= 0 and x.velocitat[0] < 0:    
                                 x.posició[0] = self.posició[0] + self.amplada
                                 x.velocitat[0] *= -0.4
-                            elif self.velocitat[0] > 0 and x.velocitat[0] > 0:
+                                if x.magnitud_velocitat > 0.5:    
+                                    self.velocitat[0] += -x.velocitat[0]
+                            elif self.velocitat[0] > 0 and x.velocitat[0] >= 0:
                                 self.posició[0] = x.posició[0]-self.amplada
                                 self.velocitat[0] *= -0.4
+                                if self.magnitud_velocitat > 0.5:    
+                                    x.velocitat[0] += -self.velocitat[0]
                         if valor >= (x.posició[1] + x.alçada - self.posició[1]):
                             if self.velocitat[1] < 0 and x.velocitat[1] > 0: 
                                 self.posició[1] = x.posició[1] + x.alçada   
                                 self.velocitat[1] *= -0.4
                                 x.velocitat[1] *= -0.4
-                            elif self.velocitat[1] > 0 and x.velocitat[1] > 0:  
+                            elif self.velocitat[1] >= 0 and x.velocitat[1] > 0:  
                                 x.posició[1] = self.posició[1] - x.alçada  
                                 x.velocitat[1] *= -0.4
-                            elif self.velocitat[1] < 0 and x.velocitat[1] < 0:
+                                if x.magnitud_velocitat > 0.5:    
+                                    self.velocitat[1] += -x.velocitat[1]
+                            elif self.velocitat[1] < 0 and x.velocitat[1] <= 0:
                                 self.posició[1] = x.posició[1] + x.alçada
                                 self.velocitat[1] *= -0.4
+                                if self.magnitud_velocitat > 0.5:    
+                                    x.velocitat[1] += -self.velocitat[1]
                     elif x.dintre(self.posició[0], self.posició[1]) == True:
                         valor = x.posició[0] + x.amplada - self.posició[0]
                         if valor <= x.posició[1] + x.alçada - self.posició[1]:
@@ -659,23 +721,31 @@ class caixa(pygame.sprite.Sprite):
                                 self.posició[0] = x.posició[0] + x.amplada
                                 self.velocitat[0] *= -0.4
                                 x.velocitat[0] *= -0.4
-                            elif self.velocitat[0] > 0 and x.velocitat[0] > 0:    
+                            elif self.velocitat[0] >= 0 and x.velocitat[0] > 0:    
                                 x.posició[0] = self.posició[0] - x.amplada
                                 x.velocitat[0] *= -0.4
-                            elif self.velocitat[0] < 0 and x.velocitat[0] < 0:
+                                if x.magnitud_velocitat > 0.5:    
+                                    self.velocitat[0] += -x.velocitat[0]
+                            elif self.velocitat[0] < 0 and x.velocitat[0] <= 0:
                                 self.posició[0] = x.posició[0] + x.amplada
                                 self.velocitat[0] *= -0.4
+                                if self.magnitud_velocitat > 0.5:    
+                                    x.velocitat[0] += -self.velocitat[0]
                         if valor >= x.posició[1] + x.alçada - self.posició[1]:
                             if self.velocitat[1] < 0 and x.velocitat[1] > 0: 
                                 self.posició[1] = x.posició[1] + x.alçada   
                                 self.velocitat[1] *= -0.4
                                 x.velocitat[1] *= -0.4
-                            elif self.velocitat[1] > 0 and x.velocitat[1] > 0:  
+                            elif self.velocitat[1] >= 0 and x.velocitat[1] > 0:  
                                 x.posició[1] = self.posició[1] - x.alçada  
                                 x.velocitat[1] *= -0.4
-                            elif self.velocitat[1] < 0 and x.velocitat[1] < 0:
+                                if x.magnitud_velocitat > 0.5:    
+                                    self.velocitat[1] += -x.velocitat[1]
+                            elif self.velocitat[1] < 0 and x.velocitat[1] <= 0:
                                 self.posició[1] = x.posició[1] + x.alçada
                                 self.velocitat[1] *= -0.4
+                                if self.magnitud_velocitat > 0.5:    
+                                    x.velocitat[1] += -self.velocitat[1]
                     elif x.dintre(self.posició[0], self.posició[1] + self.alçada) == True:
                         valor = x.posició[0] + x.amplada - self.posició[0]
                         if valor <= self.posició[1] + self.alçada - x.posició[1]:
@@ -683,23 +753,31 @@ class caixa(pygame.sprite.Sprite):
                                 self.posició[0] = x.posició[0] + x.amplada
                                 self.velocitat[0] *= -0.4
                                 x.velocitat[0] *= -0.4
-                            elif self.velocitat[0] > 0 and x.velocitat[0] > 0:    
+                            elif self.velocitat[0] >= 0 and x.velocitat[0] > 0:    
                                 x.posició[0] = self.posició[0] - x.amplada
                                 x.velocitat[0] *= -0.4
-                            elif self.velocitat[0] < 0 and x.velocitat[0] < 0:
+                                if x.magnitud_velocitat > 0.5:    
+                                    self.velocitat[0] += -x.velocitat[0]
+                            elif self.velocitat[0] < 0 and x.velocitat[0] <= 0:
                                 self.posició[0] = x.posició[0] + x.amplada
                                 self.velocitat[0] *= -0.4
+                                if self.magnitud_velocitat > 0.5:    
+                                    x.velocitat[0] += -self.velocitat[0]
                         if valor >= self.posició[1] + self.alçada - x.posició[1]:
                             if self.velocitat[1] > 0 and x.velocitat[1] < 0:    
                                 self.posició[1] = x.posició[1] -self.alçada
                                 self.velocitat[1] *= -0.4
                                 x.velocitat[1] *= -0.4
-                            elif self.velocitat[1] < 0 and x.velocitat[1] < 0:    
+                            elif self.velocitat[1] <= 0 and x.velocitat[1] < 0:    
                                 x.posició[1] = self.posició[1] + self.alçada
                                 x.velocitat[1] *= -0.4
-                            elif self.velocitat[1] > 0 and x.velocitat[1] > 0:
+                                if x.magnitud_velocitat > 0.5:    
+                                    self.velocitat[1] += -x.velocitat[1]
+                            elif self.velocitat[1] > 0 and x.velocitat[1] >= 0:
                                 self.posició[1] = x.posició[1] -self.alçada
                                 self.velocitat[1] *= -0.4
+                                if self.magnitud_velocitat > 0.5:    
+                                    x.velocitat[1] += -self.velocitat[1]
                     elif x.dintre(self.posició[0] +self.amplada, self.posició[1] + self.alçada) == True:
                         valor = (self.posició[0] + self.amplada) - x.posició[0]
                         if valor <= self.posició[1] + self.alçada - x.posició[1]:
@@ -707,23 +785,31 @@ class caixa(pygame.sprite.Sprite):
                                 self.posició[0] = x.posició[0]-self.amplada
                                 self.velocitat[0] *= -0.4
                                 x.velocitat[0] *= -0.4
-                            elif self.velocitat[0] < 0 and x.velocitat[0] < 0:    
+                            elif self.velocitat[0] <= 0 and x.velocitat[0] < 0:    
                                 x.posició[0] = self.posició[0] + self.amplada
                                 x.velocitat[0] *= -0.4
-                            elif self.velocitat[0] > 0 and x.velocitat[0] > 0:
+                                if x.magnitud_velocitat > 0.5:    
+                                    self.velocitat[0] += -x.velocitat[0]
+                            elif self.velocitat[0] > 0 and x.velocitat[0] >= 0:
                                 self.posició[0] = x.posició[0]-self.amplada
                                 self.velocitat[0] *= -0.4
+                                if self.magnitud_velocitat > 0.5:    
+                                    x.velocitat[0] += -self.velocitat[0]
                         if valor >= self.posició[1] + self.alçada - x.posició[1]:
                             if self.velocitat[1] > 0 and x.velocitat[1] < 0:    
                                 self.posició[1] = x.posició[1] -self.alçada
                                 self.velocitat[1] *= -0.4
                                 x.velocitat[1] *= -0.4
-                            elif self.velocitat[1] < 0 and x.velocitat[1] < 0:    
+                            elif self.velocitat[1] <= 0 and x.velocitat[1] < 0:    
                                 x.posició[1] = self.posició[1] + self.alçada
                                 x.velocitat[1] *= -0.4
-                            elif self.velocitat[1] > 0 and x.velocitat[1] > 0:
+                                if x.magnitud_velocitat > 0.5:
+                                    self.velocitat[1] += -x.velocitat[1]
+                            elif self.velocitat[1] > 0 and x.velocitat[1] >= 0:
                                 self.posició[1] = x.posició[1] -self.alçada
                                 self.velocitat[1] *= -0.4
+                                if self.magnitud_velocitat > 0.5:    
+                                    x.velocitat[1] += -self.velocitat[1]
             
     def reinici(self):
         self.posició = [self.posició_inicial[0], self.posició_inicial[1]]
