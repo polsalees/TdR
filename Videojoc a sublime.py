@@ -236,7 +236,7 @@ class ocells(pygame.sprite.Sprite):
                     x.velocitat[0] = 0
                 x.magnitud_velocitat = math.sqrt(x.velocitat[0]**2 + x.velocitat[1]**2)
                 self.magnitud_velocitat = math.sqrt(self.velocitat[0]**2 + self.velocitat[1]**2)    
-                if self.magnitud_velocitat > 18 and x.movible:
+                if self.magnitud_velocitat > 8 and x.movible:
                     llista_objectes_pantalla.remove(x)
                     self.velocitat = [self.velocitat[0]*0.4, self.velocitat[1]*0.4] 
                 else:
