@@ -15,10 +15,11 @@ rosa = (255, 0, 255)
 groc = (255, 255, 0)
 taronja = (255, 165, 0)
 marró = (128, 64, 0)
+marró_fosc = (84, 56, 34)
 fons = (80, 80, 255)
 
 # Definim la gravetat
-gravetat = 0.05
+gravetat = 0.1
 
 # Preparar la pantalla
 pantalla_amplada, pantalla_alçada = 1920, 1038
@@ -60,7 +61,7 @@ class ocells(pygame.sprite.Sprite):
         self.velocitat = [0,0]
         self.potencia = 0
         self.angle = 0
-        self.angle_cercle = 0
+        self.angle_rampa = 0
         self.aire = False
         self.color = color
         self.zona = False
@@ -77,6 +78,7 @@ class ocells(pygame.sprite.Sprite):
         self.linea_direció_moviment = 0
         self.estela_velocitat = [0,0]
         llista_ocells.append(self) 
+        self.colisionat = False
     
     def calcul_posició_primer_xoc (self):
         if self.tocat_objecte == False:
@@ -119,15 +121,15 @@ class ocells(pygame.sprite.Sprite):
     def calcul_xoc(self, puntx, punty, coordenada, x):   
         if math.sqrt((self.posició[0] - puntx) **2 + (self.posició[1] - punty) ** 2) <= self.radi:
             self.angle_velocitat = self.calcul_angle_velocitat()
-            self.angle_cercle = self.calcul_angle_cercle(puntx, punty)
-            if (self.angle_velocitat // 90) != (self.angle_cercle // 90) and self.magnitud_velocitat > 0:   
+            self.angle_rampa = self.calcul_angle_cercle(puntx, punty)
+            if (self.angle_velocitat // 90) != (self.angle_rampa // 90) and self.magnitud_velocitat > 0:   
                 while math.sqrt((self.posició[0] - puntx) **2 + (self.posició[1] - punty) ** 2) <= self.radi and self.magnitud_velocitat > 0:    
-                    self.posició[0] += self.magnitud_velocitat * math.cos(math.radians(self.angle_cercle)) * 0.1
-                    self.posició[1] += -self.magnitud_velocitat * math.sin(math.radians(self.angle_cercle)) * 0.1
-                if self.angle_cercle <= 180:
-                    nou_angle_velocitat = 180 -self.angle_velocitat + 2*self.angle_cercle
+                    self.posició[0] += self.magnitud_velocitat * math.cos(math.radians(self.angle_rampa)) * 0.1
+                    self.posició[1] += -self.magnitud_velocitat * math.sin(math.radians(self.angle_rampa)) * 0.1
+                if self.angle_rampa <= 180:
+                    nou_angle_velocitat = 180 -self.angle_velocitat + 2*self.angle_rampa
                 else:    
-                    nou_angle_velocitat = -180 - self.angle_velocitat + 2*self.angle_cercle
+                    nou_angle_velocitat = -180 - self.angle_velocitat + 2*self.angle_rampa
                 if coordenada == "x":    
                     self.velocitat[0] = self.magnitud_velocitat * math.cos(math.radians(nou_angle_velocitat)) 
                     self.velocitat[1] = -self.magnitud_velocitat * math.sin(math.radians(nou_angle_velocitat))*0.4
@@ -138,35 +140,22 @@ class ocells(pygame.sprite.Sprite):
                 self.velocitat[0] += x.velocitat[0]*0.4 
                 self.velocitat[1] += x.velocitat[1]*0.4
             if x.movible == True:
-                angle_direcció_rectangle = self.angle_cercle + 180
+                x.angle_rampa = self.angle_rampa + 180
                 if math.sqrt(x.magnitud_velocitat**2) <= gravetat:
                     x.magnitud_velocitat = 0
-                if angle_direcció_rectangle >= 360:
-                    angle_direcció_rectangle -= 360
-                if x.velocitat[0] != 0:
-                    angle_velocitat = -1*math.degrees(math.atan(x.velocitat[1]/x.velocitat[0]))
-                else:
-                    if x.velocitat[1] != 0:
-                        angle_velocitat = 90
-                    else:
-                        angle_velocitat = 0
-                if angle_velocitat == 0:
-                    if x.velocitat[0] >= 0:
-                        angle_velocitat -=180
-                if angle_velocitat <= 0:
-                    angle_velocitat +=180
-                if x.velocitat[1] > 0:
-                    angle_velocitat +=180
-                if (angle_velocitat // 90) != (angle_direcció_rectangle // 90) and x.magnitud_velocitat > 0:    
+                if x.angle_rampa >= 360:
+                    x.angle_rampa -= 360
+                x.angle_velocitat = x.calcul_angle_velocitat()
+                if (x.angle_velocitat // 90) != (x.angle_rampa // 90) and x.magnitud_velocitat > 0:    
                     while math.sqrt((self.posició[0] - puntx) **2 + (self.posició[1] - punty) ** 2) <= self.radi and x.magnitud_velocitat > 0:    
-                        puntx += x.magnitud_velocitat * math.cos(math.radians(angle_direcció_rectangle)) * 0.1
-                        punty += -x.magnitud_velocitat * math.sin(math.radians(angle_direcció_rectangle)) * 0.1
-                        x.posició[0] += x.magnitud_velocitat * math.cos(math.radians(angle_direcció_rectangle)) * 0.1
-                        x.posició[1] += -x.magnitud_velocitat * math.sin(math.radians(angle_direcció_rectangle)) * 0.1
-                    if angle_direcció_rectangle <= 180:
-                        nou_angle_velocitat_rectangle = 180 -angle_velocitat + 2*angle_direcció_rectangle
+                        puntx += x.magnitud_velocitat * math.cos(math.radians(x.angle_rampa)) * 0.1
+                        punty += -x.magnitud_velocitat * math.sin(math.radians(x.angle_rampa)) * 0.1
+                        x.posició[0] += x.magnitud_velocitat * math.cos(math.radians(x.angle_rampa)) * 0.1
+                        x.posició[1] += -x.magnitud_velocitat * math.sin(math.radians(x.angle_rampa)) * 0.1
+                    if x.angle_rampa <= 180:
+                        nou_angle_velocitat_rectangle = 180 -x.angle_velocitat + 2*x.angle_rampa
                     else:    
-                        nou_angle_velocitat_rectangle = -180 - angle_velocitat + 2*angle_direcció_rectangle
+                        nou_angle_velocitat_rectangle = -180 - x.angle_velocitat + 2*x.angle_rampa
                     if coordenada == "x":    
                         x.velocitat[0] = x.magnitud_velocitat * math.cos(math.radians(nou_angle_velocitat_rectangle)) 
                         x.velocitat[1] = -x.magnitud_velocitat * math.sin(math.radians(nou_angle_velocitat_rectangle))*0.4
@@ -187,138 +176,122 @@ class ocells(pygame.sprite.Sprite):
                 nou_angle_velocitat = 0
                 if x in llista_ocells:     
                     x.calcul_posició_primer_xoc()
-                self.angle_cercle = self.calcul_angle_cercle(x.posició[0], x.posició[1])
+                self.angle_rampa = self.calcul_angle_cercle(x.posició[0], x.posició[1])
                 self.angle_velocitat = self.calcul_angle_velocitat()
+                x.angle_velocitat = x.calcul_angle_velocitat()
+                if math.sqrt((self.velocitat[1])**2) <= gravetat:
+                    self.velocitat[1] = 0
+                if math.sqrt((self.velocitat[0])**2) <= gravetat:
+                    self.velocitat[0] = 0
+                if math.sqrt((x.velocitat[1])**2) <= gravetat:
+                    x.velocitat[1] = 0
+                if math.sqrt((x.velocitat[0])**2) <= gravetat:
+                    x.velocitat[0] = 0
                 self.magnitud_velocitat = math.sqrt(((self.velocitat[0]) **2 + (self.velocitat[1]) ** 2))
                 x.magnitud_velocitat = math.sqrt(((x.velocitat[0]) **2 + (x.velocitat[1]) ** 2))
-                x.angle_velocitat = x.calcul_angle_velocitat()
-                x.angle_cercle = self.angle_cercle + 180
-                if x.angle_cercle >= 360:
-                    x.angle_cercle -= 360
-                if self.magnitud_velocitat != 0 and x.magnitud_velocitat != 0 and self.angle != 180:
-                    if self.angle_velocitat // 90 != self.angle_cercle//90:
-                        if x.angle_velocitat // 90 != x.angle_cercle//90:
-                            while (self.radi + x.radi) >= math.sqrt(((self.posició[0] - x.posició[0]) **2 + (self.posició[1] - x.posició[1]) ** 2)):
-                                x.posició[0] += x.magnitud_velocitat * math.cos(math.radians(x.angle_cercle)) * 0.1
-                                x.posició[1] += -x.magnitud_velocitat * math.sin(math.radians(x.angle_cercle)) * 0.1
-                                self.posició[0] += self.magnitud_velocitat * math.cos(math.radians(self.angle_cercle)) * 0.1
-                                self.posició[1] += -self.magnitud_velocitat * math.sin(math.radians(self.angle_cercle)) * 0.1
-                        else:
-                            while (self.radi + x.radi) >= math.sqrt(((self.posició[0] - x.posició[0]) **2 + (self.posició[1] - x.posició[1]) ** 2)):
-                                self.posició[0] += self.magnitud_velocitat * math.cos(math.radians(self.angle_cercle)) * 0.1
-                                self.posició[1] += -self.magnitud_velocitat * math.sin(math.radians(self.angle_cercle)) * 0.1
+                x.angle_rampa = self.angle_rampa + 180
+                if x.angle_rampa >= 360:
+                    x.angle_rampa -= 360
+                velocitat_inicial = [self.velocitat[0], self.velocitat[1]]
+                if math.sqrt((self.angle_velocitat - self.angle_rampa)**2) >= 90 and self.magnitud_velocitat != 0:    
+                    if self.angle_rampa < 180:
+                        nou_angle_velocitat = 180 - self.angle_velocitat + 2*self.angle_rampa
+                    if self.angle_rampa > 180:
+                        nou_angle_velocitat = -180 - self.angle_velocitat + 2*self.angle_rampa  
+                    if self.angle_rampa != 180:    
+                        self.velocitat[0] = self.magnitud_velocitat * math.cos(math.radians(nou_angle_velocitat))*(0.4+0.59*math.sqrt(math.sin(math.radians(self.angle_rampa))**2))
+                        self.velocitat[1] = -self.magnitud_velocitat * math.sin(math.radians(nou_angle_velocitat))*(0.4+0.59*math.sqrt(math.cos(math.radians(self.angle_rampa))**2))
                     else:
-                         while (self.radi + x.radi) >= math.sqrt(((self.posició[0] - x.posició[0]) **2 + (self.posició[1] - x.posició[1]) ** 2)):
-                            x.posició[0] += x.magnitud_velocitat * math.cos(math.radians(x.angle_cercle)) * 0.1
-                            x.posició[1] += -x.magnitud_velocitat * math.sin(math.radians(x.angle_cercle)) * 0.1
-                if self.magnitud_velocitat == 0 and x.magnitud_velocitat !=0:
-                    while (self.radi + x.radi) >= math.sqrt(((self.posició[0] - x.posició[0]) **2 + (self.posició[1] - x.posició[1]) ** 2)):
-                            x.posició[0] += x.magnitud_velocitat * math.cos(math.radians(x.angle_cercle)) * 0.1
-                            x.posició[1] += -x.magnitud_velocitat * math.sin(math.radians(x.angle_cercle)) * 0.1
-                if x.magnitud_velocitat == 0 and self.magnitud_velocitat != 0:
-                    while (self.radi + x.radi) >= math.sqrt(((self.posició[0] - x.posició[0]) **2 + (self.posició[1] - x.posició[1]) ** 2)):
-                            self.posició[0] += self.magnitud_velocitat * math.cos(math.radians(self.angle_cercle)) * 0.1
-                            self.posició[1] += -self.magnitud_velocitat * math.sin(math.radians(self.angle_cercle)) * 0.1
-                if (self.angle_velocitat // 90) != (self.angle_cercle // 90) or self.magnitud_velocitat==0:    
-                    if self.angle_cercle <= 180:
-                        nou_angle_velocitat = 180 - self.angle_velocitat + 2*self.angle_cercle
-                    if self.angle_cercle > 180:
-                        nou_angle_velocitat = -180 - self.angle_velocitat + 2*self.angle_cercle  
-                    self.velocitat[0] = self.magnitud_velocitat * math.cos(math.radians(nou_angle_velocitat)) *0.4
-                    self.velocitat[1] = -self.magnitud_velocitat * math.sin(math.radians(nou_angle_velocitat)) *0.4
+                        self.velocitat[0] *= -0.4
                 else:
                     self.velocitat[0] += x.velocitat[0]*0.4 
                     self.velocitat[1] += x.velocitat[1]*0.4
-                if (x.angle_velocitat // 90) != (x.angle_cercle // 90) or x.magnitud_velocitat==0:        
-                    if x.angle_cercle <= 180:
-                        nou_angle_velocitat_2 = 180 - x.angle_velocitat + 2*x.angle_cercle
-                    if x.angle_cercle > 180:
-                        nou_angle_velocitat_2 = -180 - x.angle_velocitat + 2*x.angle_cercle   
-                    x.velocitat[0] = x.magnitud_velocitat * math.cos(math.radians(nou_angle_velocitat_2)) *0.4
-                    x.velocitat[1] = -x.magnitud_velocitat * math.sin(math.radians(nou_angle_velocitat_2)) *0.4 
+                if math.sqrt((x.angle_velocitat - x.angle_rampa)**2) >= 90 and x.magnitud_velocitat != 0:        
+                    if x.angle_rampa < 180:
+                        nou_angle_velocitat_2 = 180 - x.angle_velocitat + 2*x.angle_rampa
+                    if x.angle_rampa > 180:
+                        nou_angle_velocitat_2 = -180 - x.angle_velocitat + 2*x.angle_rampa   
+                    if x.angle_rampa != 180:    
+                        x.velocitat[0] = x.magnitud_velocitat * math.cos(math.radians(nou_angle_velocitat))*(0.4+0.59*math.sqrt(math.sin(math.radians(x.angle_rampa))**2))
+                        x.velocitat[1] = -x.magnitud_velocitat * math.sin(math.radians(nou_angle_velocitat_2))*(0.4+0.59*math.sqrt(math.cos(math.radians(x.angle_rampa))**2))
+                    else:
+                        x.velocitat[0] *= -0.4  
                 else:
-                    x.velocitat[0] += -self.velocitat[0]
-                    x.velocitat[1] += -self.velocitat[1]
+                    x.velocitat[0] += velocitat_inicial[0] * 0.4
+                    x.velocitat[1] += velocitat_inicial[1] * 0.4
         if x in llista_objectes_rectangulars:
-            if self.posició[0] > (x.posició[0]-self.radi) and self.posició[0] < (x.posició[0] + x.amplada + self.radi) and self.posició[1] > (x.posició[1]-self.radi) and self.posició[1] < (x.posició[1] + x.alçada + self.radi):
+            x.amplada += 2*self.radi
+            x.alçada += 2*self.radi
+            x.distancia_esquines_centre = math.sqrt((x.amplada*0.5)**2 +(x.alçada*0.5)**2)
+            x.calcul_esquines()
+            if x.dintre(self.posició):
                 self.calcul_posició_primer_xoc()
+                if math.sqrt((self.velocitat[1])**2) <= gravetat:
+                    self.velocitat[1] = 0
+                if math.sqrt((self.velocitat[0])**2) <= gravetat:
+                    self.velocitat[0] = 0
+                if math.sqrt((x.velocitat[1])**2) <= gravetat:
+                    x.velocitat[1] = 0
+                if math.sqrt((x.velocitat[0])**2) <= gravetat:
+                    x.velocitat[0] = 0
                 x.magnitud_velocitat = math.sqrt(x.velocitat[0]**2 + x.velocitat[1]**2)
                 self.magnitud_velocitat = math.sqrt(self.velocitat[0]**2 + self.velocitat[1]**2)    
-                if self.magnitud_velocitat > 8 and x.movible:
+                if self.magnitud_velocitat > 18 and x.movible:
                     llista_objectes_pantalla.remove(x)
                     self.velocitat = [self.velocitat[0]*0.4, self.velocitat[1]*0.4] 
                 else:
-                    if x.magnitud_velocitat > 8 and x.movible:
-                        llista_objectes_pantalla.remove(x)
-                    if (self.posició[0] - x.posició[0]) < 0:     
-                        if self.posició[1] > (x.posició[1] + x.alçada):
-                            self.calcul_xoc(x.posició[0], x.posició[1] + x.alçada, "x", x)
-                        elif self.posició[1] < x.posició[1]:
-                            self.calcul_xoc(x.posició[0], x.posició[1], "x", x)
-                        else:    
-                            if self.velocitat[0] > 0:
-                                self.posició[0] = x.posició[0]-self.radi                                  
+                    x.angle_velocitat = x.calcul_angle_velocitat()
+                    self.angle_velocitat = self.calcul_angle_velocitat()
+                    self.angle_rampa = x.calcul_angle_rampa(self.posició)
+                    if self.angle_rampa >= 360:
+                        self.angle_rampa -= 360
+                    x.angle_rampa = self.angle_rampa + 180
+                    if x.angle_rampa >= 360:
+                        x.angle_rampa -= 360
+                    if x.movible == False:
+                        self.posició = [self.posició_antiga[0], self.posició_antiga[1]]
+                        if self.angle_rampa < 180:
+                            nou_angle_velocitat = 180 - self.angle_velocitat + 2*self.angle_rampa
+                        if self.angle_rampa > 180:
+                            nou_angle_velocitat = -180 - self.angle_velocitat + 2*self.angle_rampa  
+                        if self.angle_rampa != 180:    
+                            self.velocitat[0] = self.magnitud_velocitat * math.cos(math.radians(nou_angle_velocitat))*(0.4+0.59*math.sqrt(math.sin(math.radians(self.angle_rampa))**2))
+                            self.velocitat[1] = -self.magnitud_velocitat * math.sin(math.radians(nou_angle_velocitat))*(0.4+0.59*math.sqrt(math.cos(math.radians(self.angle_rampa))**2))
+                        else:
+                            self.velocitat[0] *= -0.4
+                    else:
+                        velocitat_inicial = [self.velocitat[0], self.velocitat[1]]
+                        if math.sqrt((self.angle_velocitat - self.angle_rampa)**2) >= 90 and self.magnitud_velocitat != 0:    
+                            if self.angle_rampa < 180:
+                                nou_angle_velocitat = 180 - self.angle_velocitat + 2*self.angle_rampa
+                            if self.angle_rampa > 180:
+                                nou_angle_velocitat = -180 - self.angle_velocitat + 2*self.angle_rampa  
+                            if self.angle_rampa != 180:    
+                                self.velocitat[0] = self.magnitud_velocitat * math.cos(math.radians(nou_angle_velocitat))*(0.4+0.59*math.sqrt(math.sin(math.radians(self.angle_rampa))**2))
+                                self.velocitat[1] = -self.magnitud_velocitat * math.sin(math.radians(nou_angle_velocitat))*(0.4+0.59*math.sqrt(math.cos(math.radians(self.angle_rampa))**2))
+                            else:
                                 self.velocitat[0] *= -0.4
-                            elif x.magnitud_velocitat > 1:
-                                self.velocitat[0] += x.velocitat[0]*0.4
-                            if x.movible == True: 
-                                if x.velocitat[0] < 0:
-                                    x.posició[0] = self.posició[0]+self.radi
-                                    x.velocitat[0] *= -0.4
-                                elif self.magnitud_velocitat > 1:
-                                    x.velocitat[0] += -self.velocitat[0]*0.6
-                    if (self.posició[0] - (x.posició[0] + x.amplada)) > 0:   
-                        if self.posició[1] > (x.posició[1] + x.alçada):
-                            self.calcul_xoc(x.posició[0] + x.amplada, x.posició[1] + x.alçada, "x", x)
-                        elif self.posició[1] < x.posició[1]:
-                            self.calcul_xoc(x.posició[0] + x.amplada, x.posició[1], "x", x)
-                        else:    
-                            if self.velocitat[0] < 0:
-                                self.posició[0] = x.posició[0] + x.amplada+self.radi     
-                                self.velocitat[0] *= -0.4
-                            elif x.magnitud_velocitat > 1:
-                                self.velocitat[0] += x.velocitat[0]*0.4
-                            if x.movible == True :
-                                if x.velocitat[0] > 0:    
-                                    x.posició[0] = self.posició[0] - x.amplada-self.radi
-                                    x.velocitat[0] *= -0.4
-                                elif self.magnitud_velocitat > 1:
-                                    x.velocitat[0] += -self.velocitat[0]*0.6
-                    if (self.posició[1] - x.posició[1]) < 0:     
-                        if self.posició[0] > (x.posició[0] + x.amplada):
-                            self.calcul_xoc(x.posició[0] + x.amplada, x.posició[1], "y", x)
-                        elif self.posició[0] < x.posició[0]:
-                            self.calcul_xoc(x.posició[0], x.posició[1], "y", x)
-                        else:    
-                            if self.velocitat[1] > 0:      
-                                self.posició[1] = x.posició[1] -self.radi
-                                self.velocitat[1] *= -0.4
-                            elif x.magnitud_velocitat > 1:
-                                self.velocitat[1] += x.velocitat[1]*0.4
-                            if x.movible == True:
-                                if x.velocitat[1] < 0:     
-                                    x.posició[1] = self.posició[1] + self.radi
-                                    x.velocitat[1] *= -0.4
-                                elif self.magnitud_velocitat > 1:
-                                    x.velocitat[1] += -self.velocitat[1]*0.6
-                    if (self.posició[1] - (x.posició[1]+x.alçada)) > 0:     
-                        if self.posició[0] > (x.posició[0] + x.amplada):
-                            self.calcul_xoc(x.posició[0] + x.amplada, x.posició[1] + x.alçada, "y", x)
-                        elif self.posició[0] < x.posició[0]:
-                            self.calcul_xoc(x.posició[0], x.posició[1] + x.alçada, "y", x)
-                        else:    
-                            if self.velocitat[1] < 0:    
-                                self.posició[1] = x.posició[1] + x.alçada + self.radi
-                                self.velocitat[1] *= -0.4
-                            elif x.magnitud_velocitat > 1:
-                                self.velocitat[1] += x.velocitat[1]*0.4
-                            if x.movible == True:
-                                if x.velocitat[1] > 0:     
-                                    x.posició[1] = self.posició[1] - x.alçada - self.radi
-                                    x.velocitat[1] *= -0.4
-                                elif self.magnitud_velocitat > 1:
-                                    x.velocitat[1] += -self.velocitat[1]*0.6
-                             
+                        else:
+                            self.velocitat[0] += x.velocitat[0]*0.2
+                            self.velocitat[1] += x.velocitat[1]*0.2
+                        
+                        if math.sqrt((x.angle_velocitat - x.angle_rampa)**2) >= 90 and x.magnitud_velocitat != 0:        
+                            if x.angle_rampa < 180:
+                                nou_angle_velocitat_2 = 180 - x.angle_velocitat + 2*x.angle_rampa
+                            if x.angle_rampa > 180:
+                                nou_angle_velocitat_2 = -180 - x.angle_velocitat + 2*x.angle_rampa  
+                            if x.angle_rampa != 180:    
+                                x.velocitat[0] = x.magnitud_velocitat * math.cos(math.radians(nou_angle_velocitat_2))*(0.4+0.59*math.sqrt(math.sin(math.radians(x.angle_rampa))**2))
+                                x.velocitat[1] = -x.magnitud_velocitat * math.sin(math.radians(nou_angle_velocitat_2))*(0.4+0.59*math.sqrt(math.cos(math.radians(x.angle_rampa))**2))
+                            else:
+                                x.velocitat[0] *= -0.4
+                        else:
+                            x.velocitat[0] += velocitat_inicial[0]*0.2
+                            x.velocitat[1] += velocitat_inicial[1]*0.2   
+            x.amplada -= 2*self.radi
+            x.alçada -= 2*self.radi
+            x.distancia_esquines_centre = math.sqrt((x.amplada*0.5)**2 +(x.alçada*0.5)**2)
+            x.calcul_esquines()                 
     
     def calcul_linea_direció(self):
         n = 0 
@@ -388,6 +361,7 @@ class ocells(pygame.sprite.Sprite):
                     if self.estela_radi > 3:
                         self.estela_radi = 2
     def update(self):     
+        self.posició_antiga = [self.posició[0], self.posició[1]]
         if self.linea_direció:
             self.calcul_linea_direció()    
         if self.llançat and self.tocat_objecte == False:
@@ -395,43 +369,29 @@ class ocells(pygame.sprite.Sprite):
         if self.posició[1] < (pantalla_alçada-self.radi) and self.llançat or self.velocitat[1] < 0:
             self.aire = True
         if self.aire:  
-            if self.angle_cercle >= 0 and self.angle_cercle < 90:    
-                self.velocitat[1] += gravetat*math.cos(math.radians(self.angle_cercle))
-                self.velocitat[0] += gravetat*math.sin(math.radians(self.angle_cercle))
-            elif self.angle_cercle > 90 and self.angle_cercle < 180:
-                self.velocitat[1] -= gravetat*math.cos(math.radians(self.angle_cercle))
-                self.velocitat[0] -= gravetat*math.sin(math.radians(self.angle_cercle))
-            elif self.angle_cercle >= 180:
+            if self.angle_rampa >= 0 and self.angle_rampa < 90:    
+                self.velocitat[1] += gravetat*math.cos(math.radians(self.angle_rampa))
+                self.velocitat[0] += gravetat*math.sin(math.radians(self.angle_rampa))
+            elif self.angle_rampa > 90 and self.angle_rampa < 180:
+                self.velocitat[1] -= gravetat*math.cos(math.radians(self.angle_rampa))
+                self.velocitat[0] -= gravetat*math.sin(math.radians(self.angle_rampa))
+            elif self.angle_rampa >= 180:
                 self.velocitat[1] += gravetat
-        if self.velocitat[1] < gravetat and self.velocitat[1] > 0 and self.tocat_objecte:
+        if math.sqrt((self.velocitat[1])**2) < gravetat:
             self.velocitat[1] = 0
-        if self.velocitat[1] > gravetat and self.velocitat[1] < 0 and self.tocat_objecte:
-            self.velocitat[1] = 0
+        if math.sqrt((self.velocitat[0])**2) < gravetat:
+            self.velocitat[0] = 0
         self.posició[0] += self.velocitat[0]
         self.posició[1] += self.velocitat[1]
-        if self.velocitat[1] == 0 and self.velocitat[0] != 0:
-            self.frenada = True
-        else:
-            self.frenada = False
-        if self.frenada:
-            if self.velocitat[0] > 0:
-                self.velocitat[0] -= 0.01
-                if self.velocitat[0] <= 0.01:
-                    self.velocitat[0] = 0
-                    self.frenada = False
-            elif self.velocitat[0] < 0:
-                self.velocitat[0] += 0.01
-                if self.velocitat[0] >= -0.01:
-                    self.velocitat[0] = 0
-                    self.frenada = False
         if self.llançat and self.velocitat[0] == 0:
             if self.velocitat[1] == 0 or self.velocitat[1] == gravetat:    
                 self.cooldown += 1
         else:
             self.cooldown = 0
-        self.angle_cercle = 0
+        self.angle_rampa = 0
         if self.cooldown >= 500:     
             llista_objectes_pantalla.remove(self)
+        self.colisionat = False
 
     def dibuixar(self):
         pygame.draw.circle(pantalla, self.color, self.posició, self.radi)
@@ -579,7 +539,6 @@ class linea(pygame.sprite.Sprite):
     def __init__(self, x):
         self.costat = 200 + 2*x.radi
         self.superficie_rectangle = pygame.Surface((self.costat, self.costat))
-        self.superficie_rectangle.set_colorkey(fons)
         self.superficie = self.superficie_rectangle.copy()
         self.superficie.set_colorkey(fons)
         self.rect = self.superficie.get_rect()
@@ -603,7 +562,7 @@ def porcs():
 
 #Caixes 
 class caixa(pygame.sprite.Sprite):
-    def __init__(self, posició_x, posició_y, alçada, amplada, movible):
+    def __init__(self, posició_x, posició_y, alçada, amplada, movible, angle):
         pygame.sprite.Sprite.__init__(self)
         self.alçada = alçada
         self.amplada = amplada
@@ -613,219 +572,261 @@ class caixa(pygame.sprite.Sprite):
         self.movible = movible
         llista_objectes_rectangulars.append(self)
         self.frenada = False
+        self.superficie_rectangle = pygame.Surface((self.amplada, self.alçada))
+        self.rectangle = self.superficie_rectangle.get_rect()
+        self.rectangle.center = (self.posició[0] + 0.5*self.amplada, self.posició[1] + 0.5*self.alçada)
+        self.superficie_rectangle.set_colorkey(fons)
+        self.angle = angle
+        self.angle_inicial = angle
+        self.distancia_esquines_centre = math.sqrt((self.amplada*0.5)**2 +(self.alçada*0.5)**2)
+        self.esquina1 = (self.rectangle.center[0]+math.sin(math.radians(self.angle) - math.atan2(self.amplada, self.alçada)-2*math.atan2(self.alçada, self.amplada))*self.distancia_esquines_centre, self.rectangle.center[1]+math.cos(math.radians(self.angle) - math.atan2(self.amplada,self.alçada)-2*math.atan2(self.alçada, self.amplada))*self.distancia_esquines_centre) 
+        self.esquina2 = (self.rectangle.center[0]+math.sin(math.radians(self.angle) + math.atan2(self.amplada, self.alçada)+2*math.atan2(self.alçada, self.amplada))*self.distancia_esquines_centre, self.rectangle.center[1]+math.cos(math.radians(self.angle) + math.atan2(self.amplada,self.alçada)+2*math.atan2(self.alçada, self.amplada))*self.distancia_esquines_centre) 
+        self.esquina3 = (self.rectangle.center[0]+math.sin(math.radians(self.angle) - math.atan2(self.amplada, self.alçada))*self.distancia_esquines_centre, self.rectangle.center[1]+math.cos(math.radians(self.angle) - math.atan2(self.amplada,self.alçada))*self.distancia_esquines_centre) 
+        self.esquina4 = (self.rectangle.center[0]+math.sin(math.radians(self.angle) + math.atan2(self.amplada, self.alçada))*self.distancia_esquines_centre, self.rectangle.center[1]+math.cos(math.radians(self.angle) + math.atan2(self.amplada,self.alçada))*self.distancia_esquines_centre)
+        self.llista_esquines =[self.esquina1, self.esquina2, self.esquina3, self.esquina4]
+        self.superficie_rectangle.fill(marró)
+        if self.amplada < self.alçada:    
+            pygame.draw.rect(self.superficie_rectangle, marró_fosc , ((0,0), (self.amplada, self.alçada)), 10 - (100//self.amplada))
+        else:
+            pygame.draw.rect(self.superficie_rectangle, marró_fosc , ((0,0), (self.amplada, self.alçada)), 10 - (100//self.alçada))
+        self.angle_rampa = 270 
+        self.colisionat = False
+    
+    def calcul_esquines(self):
+        self.esquina1 = (self.rectangle.center[0]+math.sin(math.radians(self.angle) - math.atan2(self.amplada, self.alçada)-2*math.atan2(self.alçada, self.amplada))*self.distancia_esquines_centre, self.rectangle.center[1]+math.cos(math.radians(self.angle) - math.atan2(self.amplada,self.alçada)-2*math.atan2(self.alçada, self.amplada))*self.distancia_esquines_centre) 
+        self.esquina2 = (self.rectangle.center[0]+math.sin(math.radians(self.angle) + math.atan2(self.amplada, self.alçada)+2*math.atan2(self.alçada, self.amplada))*self.distancia_esquines_centre, self.rectangle.center[1]+math.cos(math.radians(self.angle) + math.atan2(self.amplada,self.alçada)+2*math.atan2(self.alçada, self.amplada))*self.distancia_esquines_centre) 
+        self.esquina3 = (self.rectangle.center[0]+math.sin(math.radians(self.angle) - math.atan2(self.amplada, self.alçada))*self.distancia_esquines_centre, self.rectangle.center[1]+math.cos(math.radians(self.angle) - math.atan2(self.amplada,self.alçada))*self.distancia_esquines_centre) 
+        self.esquina4 = (self.rectangle.center[0]+math.sin(math.radians(self.angle) + math.atan2(self.amplada, self.alçada))*self.distancia_esquines_centre, self.rectangle.center[1]+math.cos(math.radians(self.angle) + math.atan2(self.amplada,self.alçada))*self.distancia_esquines_centre)
+        self.llista_esquines =[self.esquina1, self.esquina2, self.esquina3, self.esquina4] 
     
     def update(self):
         if self.movible == True:
-            self.velocitat[1] += gravetat
-            if self.velocitat[1] < gravetat and self.velocitat[1] > 0:
-                        self.velocitat[1] = 0
-            if self.velocitat[1] > -gravetat and self.velocitat[1] < 0:
-                        self.velocitat[1] = 0
-            if self.velocitat[1] == 0 and self.velocitat[0] != 0:
-                self.frenada = True
-            else:
-                self.frenada = False 
-            if self.frenada:
-                if self.velocitat[0] > 0:
-                    self.velocitat[0] -= 0.005
-                    if self.velocitat[0] <= 0.005:
-                        self.velocitat[0] = 0
-                        self.frenada = False
-                elif self.velocitat[0] < 0:
-                    self.velocitat[0] += 0.005
-                    if self.velocitat[0] >= -0.005:
-                        self.velocitat[0] = 0
-                        self.frenada = False
+            self.posició_antiga = [self.posició[0], self.posició[1]]
+            self.angle += 0
+            if self.angle >= 360:
+                self.angle = 180
+            if self.angle_rampa >= 0 and self.angle_rampa < 90:    
+                self.velocitat[1] += gravetat*math.cos(math.radians(self.angle_rampa))
+                self.velocitat[0] += gravetat*math.sin(math.radians(self.angle_rampa))
+            elif self.angle_rampa > 90 and self.angle_rampa < 180:
+                self.velocitat[1] -= gravetat*math.cos(math.radians(self.angle_rampa))
+                self.velocitat[0] -= gravetat*math.sin(math.radians(self.angle_rampa))
+            elif self.angle_rampa >= 180:
+                self.velocitat[1] += gravetat
+            if math.sqrt((self.velocitat[1])**2) < gravetat:
+                self.velocitat[1] = 0
+            if math.sqrt((self.velocitat[0])**2) < gravetat:
+                self.velocitat[0] = 0
             self.posició[0] += self.velocitat[0]
             self.posició[1] += self.velocitat[1]
+            self.angle_rampa = 270
+            self.rectangle.center = (self.posició[0] + 0.5*self.amplada, self.posició[1] + 0.5*self.alçada)
+            self.calcul_esquines()
+        self.colisionat = False
         
     def dibuixar(self):
-        pygame.draw.rect(pantalla, marró , (self.posició, (self.amplada, self.alçada)))
-
-    def dintre(self, puntX, puntY):
-        if puntX >= self.posició[0] and puntX <= (self.posició[0] + self.amplada) and puntY >= self.posició[1] and puntY <= (self.posició[1] + self.alçada):
-            return True
-        else:
-            return False
-
+        self.rectangle.center = (self.posició[0] + 0.5*self.amplada, self.posició[1] + 0.5*self.alçada)
+        self.rectangle_nou = pygame.transform.rotate(self.superficie_rectangle, self.angle)
+        self.rectangle = self.rectangle_nou.get_rect()
+        self.rectangle.center = (self.posició[0] + 0.5*self.amplada, self.posició[1] + 0.5*self.alçada)
+        pantalla.blit(self.rectangle_nou, self.rectangle)
+    
+    def calcul_angle_velocitat(self):
+            if self.velocitat[0] != 0:
+                x = -1*math.degrees(math.atan(self.velocitat[1]/self.velocitat[0]))
+            else:
+                if self.velocitat[1] != 0:
+                    x = 90
+                else:
+                    x = 0
+            if x == 0:
+                if self.velocitat[0] >= 0:
+                    x -=180
+            if x <= 0:
+                x +=180
+            if self.velocitat[1] > 0:
+                x +=180
+            return x
+    
+    def dintre(self, punt):
+        if self.angle >= 270: 
+            if math.atan2(punt[0]-self.esquina1[0], punt[1]-self.esquina1[1]) >= math.atan2(self.esquina3[0]-self.esquina1[0], self.esquina3[1]- self.esquina1[1]) and math.atan2(punt[0]-self.esquina2[0], punt[1]-self.esquina2[1]) <= math.atan2(self.esquina4[0]-self.esquina2[0], self.esquina4[1]-self.esquina2[1]) and math.atan2(punt[0]-self.esquina1[0], punt[1]-self.esquina1[1]) <= math.atan2(self.esquina2[0]-self.esquina1[0], self.esquina2[1]- self.esquina1[1]) and math.atan2(punt[0]-self.esquina3[0], punt[1]-self.esquina3[1]) >= math.atan2(self.esquina4[0]-self.esquina3[0], self.esquina4[1]- self.esquina3[1]):
+                x = True
+            else:
+                x = False
+        else:    
+            if math.atan2(punt[0]-self.esquina3[0], punt[1]-self.esquina3[1]) >= math.atan2(self.esquina4[0]-self.esquina3[0], self.esquina4[1]- self.esquina3[1]) and math.atan2(punt[0]-self.esquina1[0], punt[1]-self.esquina1[1]) <= math.atan2(self.esquina2[0]-self.esquina1[0], self.esquina2[1]-self.esquina1[1]) and math.atan2(punt[0]-self.esquina3[0], punt[1]-self.esquina3[1]) <= math.atan2(self.esquina1[0]-self.esquina3[0], self.esquina1[1]- self.esquina3[1]) and math.atan2(punt[0]-self.esquina4[0], punt[1]-self.esquina4[1]) >= math.atan2(self.esquina2[0]-self.esquina4[0], self.esquina2[1]- self.esquina4[1]):
+                x = True
+            else:
+                x = False
+        return x
+    
+    def calcul_angle_rampa(self, esquina):
+        s = 0
+        if (esquina[0]-self.rectangle.center[0]) != 0:    
+            s = -1*math.degrees(math.atan((esquina[1]-self.rectangle.center[1])/ (esquina[0]-self.rectangle.center[0])))
+        if s == 0:
+            if (esquina[1]-self.rectangle.center[1]) and esquina[0] - self.rectangle.center[0] > 0:
+                s -=180
+            if (esquina[0]-self.rectangle.center[0]) == 0:
+                s +=90
+        if s <= 0:
+            s +=180
+        if esquina[1]-self.rectangle.center[1] > 0:
+            s +=180
+        y = self.angle-s
+        if math.sqrt((y)**2) < (math.degrees(math.atan2(self.alçada, self.amplada))-0.1):
+            z = self.angle
+        elif y < (math.degrees(math.atan2(self.alçada, self.amplada) + 2*math.atan2(self.amplada, self.alçada))-0.1) and y > (math.degrees(math.atan2(self.alçada, self.amplada))+0.1):
+            z = self.angle + 270
+        elif y > -(math.degrees(math.atan2(self.alçada, self.amplada) + 2*math.atan2(self.amplada, self.alçada))+0.1) and y < -(math.degrees(math.atan2(self.alçada, self.amplada))-0.1):
+            z = self.angle + 90
+        elif math.sqrt((y)**2) > (math.degrees(math.atan2(self.alçada, self.amplada) + 2*math.atan2(self.amplada, self.alçada))+0.1):
+            z = self.angle + 180
+        elif y >= math.degrees(math.atan2(self.alçada, self.amplada)-0.1) and y <= math.degrees(math.atan2(self.alçada, self.amplada)+0.1):
+            z = self.angle + 315
+        elif y >= (math.degrees(math.atan2(self.alçada, self.amplada) + 2*math.atan2(self.amplada, self.alçada))-0.1) and y <= (math.degrees(math.atan2(self.alçada, self.amplada) + 2*math.atan2(self.amplada, self.alçada))+0.1):
+            z = self.angle + 225
+        elif y <= -(math.degrees(math.atan2(self.alçada, self.amplada) + 2*math.atan2(self.amplada, self.alçada)) +0.1) and y >= -(math.degrees(math.atan2(self.alçada, self.amplada) + 2*math.atan2(self.amplada, self.alçada)) -0.1):
+            z = self.angle + 135
+        elif y <= -(math.degrees(math.atan2(self.alçada, self.amplada))+0.1) and y >= -(math.degrees(math.atan2(self.alçada, self.amplada))+0.1):
+            z = self.angle + 45
+        return z
     def colisió(self, x):
         if x in llista_objectes_rectangulars:
-            if (x.dintre(self.posició[0] +self.amplada, self.posició[1]) == True or x.dintre(self.posició[0] + self.amplada, self.posició[1] + self.alçada) == True or x.dintre(self.posició[0], self.posició[1]) == True or x.dintre(self.posició[0], self.posició[1] + self.alçada) == True) and (x.movible or self.movible):
+            if (x.dintre(self.esquina1) or x.dintre(self.esquina2) or x.dintre(self.esquina3) or x.dintre(self.esquina4) or x.dintre(self.rectangle.center) or self.dintre(x.esquina1) or self.dintre(x.esquina2) or self.dintre(x.esquina3) or self.dintre(x.esquina4) or self.dintre(x.rectangle.center)) and (x.movible or self.movible):
+                fself = -1
+                fx = -1
+                for i in llista_objectes_pantalla:
+                    if i in llista_objectes_rectangulars:
+                        if (i.dintre(self.esquina1) or i.dintre(i.esquina2) or i.dintre(self.esquina3) or i.dintre(self.esquina4) or i.dintre(self.rectangle.center) or self.dintre(i.esquina1) or self.dintre(i.esquina2) or self.dintre(i.esquina3) or self.dintre(i.esquina4) or self.dintre(i.rectangle.center)) and i.movible and i != self:
+                            fself +=1
+                        if (x.dintre(i.esquina1) or x.dintre(i.esquina2) or x.dintre(i.esquina3) or x.dintre(i.esquina4) or x.dintre(i.rectangle.center) or i.dintre(x.esquina1) or i.dintre(x.esquina2) or i.dintre(x.esquina3) or i.dintre(x.esquina4) or i.dintre(x.rectangle.center)) and i.movible and i!=x:
+                            fx +=1
+                if math.sqrt((self.velocitat[1])**2) <= gravetat:
+                    self.velocitat[1] = 0
+                if math.sqrt((self.velocitat[0])**2) <= gravetat:
+                    self.velocitat[0] = 0
+                if math.sqrt((x.velocitat[1])**2) <= gravetat:
+                    x.velocitat[1] = 0
+                if math.sqrt((x.velocitat[0])**2) <= gravetat:
+                    x.velocitat[0] = 0
                 x.magnitud_velocitat = math.sqrt(x.velocitat[0]**2 + x.velocitat[1]**2)
                 self.magnitud_velocitat = math.sqrt(self.velocitat[0]**2 + self.velocitat[1]**2)
-                if x.movible == False:
-                    if (self.posició[0] - x.posició[0]) < 0 and not self.velocitat[0] <= 0:     
-                        self.posició[0] = x.posició[0]-self.amplada
-                        self.velocitat[0] *= -0.4
-                    if ((self.posició[0] + self.amplada) - (x.posició[0] + x.amplada)) > 0  and not self.velocitat[0] >= 0:      
-                        self.posició[0] = x.posició[0] + x.amplada
-                        self.velocitat[0] *= -0.4
-                    if (self.posició[1] - x.posició[1]) < 0 and not self.velocitat[1] <= 0:        
-                        self.posició[1] = x.posició[1] - self.alçada
-                        self.velocitat[1] *= -0.4
-                    if ((self.posició[1] + self.alçada) - (x.posició[1]+x.alçada)) > 0 and not self.velocitat[1] >= 0:     
-                        self.posició[1] = x.posició[1] + x.alçada
-                        self.velocitat[1] *= -0.4
-                
-                elif self.movible == False:
-                    if (x.posició[0] - self.posició[0]) < 0 and not x.velocitat[0] <= 0:     
-                        x.posició[0] = self.posició[0]-x.amplada
-                        x.velocitat[0] *= -0.4
-                    if ((x.posició[0] + x.amplada) - (self.posició[0] + self.amplada)) > 0  and not x.velocitat[0] >= 0:      
-                        x.posició[0] = self.posició[0] + self.amplada
-                        x.velocitat[0] *= -0.4
-                    if (x.posició[1] - self.posició[1]) < 0 and not x.velocitat[1] <= 0:        
-                        x.posició[1] = self.posició[1] - x.alçada
-                        x.velocitat[1] *= -0.4
-                    if ((x.posició[1] + x.alçada) - (self.posició[1]+self.alçada)) > 0 and not x.velocitat[1] >= 0:     
-                        x.posició[1] = self.posició[1] + self.alçada
-                        x.velocitat[1] *= -0.4
-
+                x.angle_velocitat = x.calcul_angle_velocitat()
+                self.angle_velocitat = self.calcul_angle_velocitat() 
+                n = 0
+                if (x.dintre(self.esquina1) or x.dintre(self.esquina2) or x.dintre(self.esquina3) or x.dintre(self.esquina4)or x.dintre(self.rectangle.center)):    
+                    for i in self.llista_esquines:
+                        if x.dintre(i):
+                            n+=1 
+                    if x.dintre(self.rectangle.center) or n >= 2:
+                        self.angle_rampa=x.calcul_angle_rampa(self.rectangle.center)
+                    elif x.dintre(self.esquina1):
+                        self.angle_rampa=x.calcul_angle_rampa(self.esquina1)
+                    elif x.dintre(self.esquina2):
+                        self.angle_rampa=x.calcul_angle_rampa(self.esquina2)
+                    elif x.dintre(self.esquina3):
+                        self.angle_rampa=x.calcul_angle_rampa(self.esquina3)
+                    elif x.dintre(self.esquina4):
+                        self.angle_rampa=x.calcul_angle_rampa(self.esquina4)
+                    if self.angle_rampa >= 360:
+                        self.angle_rampa -= 360
+                    x.angle_rampa = self.angle_rampa + 180
+                    if x.angle_rampa >= 360:
+                        x.angle_rampa -= 360
                 else:
-                    if x.dintre(self.posició[0] + self.amplada, self.posició[1]) == True:
-                        valor = ((self.posició[0] + self.amplada) - x.posició[0])
-                        if valor <= (x.posició[1] + x.alçada - self.posició[1]):
-                            if self.velocitat[0] > 0 and x.velocitat[0] < 0:    
-                                self.posició[0] = x.posició[0]-self.amplada
-                                self.velocitat[0] *= -0.4
-                                x.velocitat[0] *= -0.4
-                            elif self.velocitat[0] <= 0 and x.velocitat[0] < 0:    
-                                x.posició[0] = self.posició[0] + self.amplada
-                                x.velocitat[0] *= -0.4
-                                if x.magnitud_velocitat > 0.5:    
-                                    self.velocitat[0] += -x.velocitat[0]
-                            elif self.velocitat[0] > 0 and x.velocitat[0] >= 0:
-                                self.posició[0] = x.posició[0]-self.amplada
-                                self.velocitat[0] *= -0.4
-                                if self.magnitud_velocitat > 0.5:    
-                                    x.velocitat[0] += -self.velocitat[0]
-                        if valor >= (x.posició[1] + x.alçada - self.posició[1]):
-                            if self.velocitat[1] < 0 and x.velocitat[1] > 0: 
-                                self.posició[1] = x.posició[1] + x.alçada   
-                                self.velocitat[1] *= -0.4
-                                x.velocitat[1] *= -0.4
-                            elif self.velocitat[1] >= 0 and x.velocitat[1] > 0:  
-                                x.posició[1] = self.posició[1] - x.alçada  
-                                x.velocitat[1] *= -0.4
-                                if x.magnitud_velocitat > 0.5:    
-                                    self.velocitat[1] += -x.velocitat[1]
-                            elif self.velocitat[1] < 0 and x.velocitat[1] <= 0:
-                                self.posició[1] = x.posició[1] + x.alçada
-                                self.velocitat[1] *= -0.4
-                                if self.magnitud_velocitat > 0.5:    
-                                    x.velocitat[1] += -self.velocitat[1]
-                    elif x.dintre(self.posició[0], self.posició[1]) == True:
-                        valor = x.posició[0] + x.amplada - self.posició[0]
-                        if valor <= x.posició[1] + x.alçada - self.posició[1]:
-                            if self.velocitat[0] < 0 and x.velocitat[0] > 0:    
-                                self.posició[0] = x.posició[0] + x.amplada
-                                self.velocitat[0] *= -0.4
-                                x.velocitat[0] *= -0.4
-                            elif self.velocitat[0] >= 0 and x.velocitat[0] > 0:    
-                                x.posició[0] = self.posició[0] - x.amplada
-                                x.velocitat[0] *= -0.4
-                                if x.magnitud_velocitat > 0.5:    
-                                    self.velocitat[0] += -x.velocitat[0]
-                            elif self.velocitat[0] < 0 and x.velocitat[0] <= 0:
-                                self.posició[0] = x.posició[0] + x.amplada
-                                self.velocitat[0] *= -0.4
-                                if self.magnitud_velocitat > 0.5:    
-                                    x.velocitat[0] += -self.velocitat[0]
-                        if valor >= x.posició[1] + x.alçada - self.posició[1]:
-                            if self.velocitat[1] < 0 and x.velocitat[1] > 0: 
-                                self.posició[1] = x.posició[1] + x.alçada   
-                                self.velocitat[1] *= -0.4
-                                x.velocitat[1] *= -0.4
-                            elif self.velocitat[1] >= 0 and x.velocitat[1] > 0:  
-                                x.posició[1] = self.posició[1] - x.alçada  
-                                x.velocitat[1] *= -0.4
-                                if x.magnitud_velocitat > 0.5:    
-                                    self.velocitat[1] += -x.velocitat[1]
-                            elif self.velocitat[1] < 0 and x.velocitat[1] <= 0:
-                                self.posició[1] = x.posició[1] + x.alçada
-                                self.velocitat[1] *= -0.4
-                                if self.magnitud_velocitat > 0.5:    
-                                    x.velocitat[1] += -self.velocitat[1]
-                    elif x.dintre(self.posició[0], self.posició[1] + self.alçada) == True:
-                        valor = x.posició[0] + x.amplada - self.posició[0]
-                        if valor <= self.posició[1] + self.alçada - x.posició[1]:
-                            if self.velocitat[0] < 0 and x.velocitat[0] > 0:    
-                                self.posició[0] = x.posició[0] + x.amplada
-                                self.velocitat[0] *= -0.4
-                                x.velocitat[0] *= -0.4
-                            elif self.velocitat[0] >= 0 and x.velocitat[0] > 0:    
-                                x.posició[0] = self.posició[0] - x.amplada
-                                x.velocitat[0] *= -0.4
-                                if x.magnitud_velocitat > 0.5:    
-                                    self.velocitat[0] += -x.velocitat[0]
-                            elif self.velocitat[0] < 0 and x.velocitat[0] <= 0:
-                                self.posició[0] = x.posició[0] + x.amplada
-                                self.velocitat[0] *= -0.4
-                                if self.magnitud_velocitat > 0.5:    
-                                    x.velocitat[0] += -self.velocitat[0]
-                        if valor >= self.posició[1] + self.alçada - x.posició[1]:
-                            if self.velocitat[1] > 0 and x.velocitat[1] < 0:    
-                                self.posició[1] = x.posició[1] -self.alçada
-                                self.velocitat[1] *= -0.4
-                                x.velocitat[1] *= -0.4
-                            elif self.velocitat[1] <= 0 and x.velocitat[1] < 0:    
-                                x.posició[1] = self.posició[1] + self.alçada
-                                x.velocitat[1] *= -0.4
-                                if x.magnitud_velocitat > 0.5:    
-                                    self.velocitat[1] += -x.velocitat[1]
-                            elif self.velocitat[1] > 0 and x.velocitat[1] >= 0:
-                                self.posició[1] = x.posició[1] -self.alçada
-                                self.velocitat[1] *= -0.4
-                                if self.magnitud_velocitat > 0.5:    
-                                    x.velocitat[1] += -self.velocitat[1]
-                    elif x.dintre(self.posició[0] +self.amplada, self.posició[1] + self.alçada) == True:
-                        valor = (self.posició[0] + self.amplada) - x.posició[0]
-                        if valor <= self.posició[1] + self.alçada - x.posició[1]:
-                            if self.velocitat[0] > 0 and x.velocitat[0] < 0:    
-                                self.posició[0] = x.posició[0]-self.amplada
-                                self.velocitat[0] *= -0.4
-                                x.velocitat[0] *= -0.4
-                            elif self.velocitat[0] <= 0 and x.velocitat[0] < 0:    
-                                x.posició[0] = self.posició[0] + self.amplada
-                                x.velocitat[0] *= -0.4
-                                if x.magnitud_velocitat > 0.5:    
-                                    self.velocitat[0] += -x.velocitat[0]
-                            elif self.velocitat[0] > 0 and x.velocitat[0] >= 0:
-                                self.posició[0] = x.posició[0]-self.amplada
-                                self.velocitat[0] *= -0.4
-                                if self.magnitud_velocitat > 0.5:    
-                                    x.velocitat[0] += -self.velocitat[0]
-                        if valor >= self.posició[1] + self.alçada - x.posició[1]:
-                            if self.velocitat[1] > 0 and x.velocitat[1] < 0:    
-                                self.posició[1] = x.posició[1] -self.alçada
-                                self.velocitat[1] *= -0.4
-                                x.velocitat[1] *= -0.4
-                            elif self.velocitat[1] <= 0 and x.velocitat[1] < 0:    
-                                x.posició[1] = self.posició[1] + self.alçada
-                                x.velocitat[1] *= -0.4
-                                if x.magnitud_velocitat > 0.5:
-                                    self.velocitat[1] += -x.velocitat[1]
-                            elif self.velocitat[1] > 0 and x.velocitat[1] >= 0:
-                                self.posició[1] = x.posició[1] -self.alçada
-                                self.velocitat[1] *= -0.4
-                                if self.magnitud_velocitat > 0.5:    
-                                    x.velocitat[1] += -self.velocitat[1]
-            
+                    for i in x.llista_esquines:
+                        if self.dintre(i):
+                            n+=1 
+                    if self.dintre(x.rectangle.center) or n >= 2:
+                        x.angle_rampa=self.calcul_angle_rampa(x.rectangle.center)
+                    elif self.dintre(x.esquina1):
+                        x.angle_rampa=self.calcul_angle_rampa(x.esquina1)
+                    elif self.dintre(x.esquina2):
+                        x.angle_rampa=self.calcul_angle_rampa(x.esquina2)
+                    elif self.dintre(x.esquina3):
+                        x.angle_rampa=self.calcul_angle_rampa(x.esquina3)
+                    elif self.dintre(x.esquina4):
+                        x.angle_rampa=self.calcul_angle_rampa(x.esquina4)
+                    if x.angle_rampa >= 360:
+                        x.angle_rampa -= 360
+                    self.angle_rampa = x.angle_rampa + 180
+                    if self.angle_rampa >= 360:
+                        self.angle_rampa -= 360
+                if x.movible == False:
+                    self.posició = [self.posició_antiga[0], self.posició_antiga[1]]
+                    if self.angle_rampa < 180:
+                        nou_angle_velocitat = 180 - self.angle_velocitat + 2*self.angle_rampa
+                    if self.angle_rampa > 180:
+                        nou_angle_velocitat = -180 - self.angle_velocitat + 2*self.angle_rampa  
+                    if self.angle_rampa != 180:    
+                        self.velocitat[0] = self.magnitud_velocitat * math.cos(math.radians(nou_angle_velocitat))*(0.4+0.59*math.sqrt(math.sin(math.radians(self.angle_rampa))**2))
+                        self.velocitat[1] = -self.magnitud_velocitat * math.sin(math.radians(nou_angle_velocitat))*(0.4+0.59*math.sqrt(math.cos(math.radians(self.angle_rampa))**2))
+                    else:
+                        self.velocitat[0] *= -0.4
+                elif self.movible == False:
+                    x.posició = [x.posició_antiga[0], x.posició_antiga[1]] 
+                    if x.angle_rampa < 180:
+                        nou_angle_velocitat = 180 - x.angle_velocitat + 2*x.angle_rampa
+                    if x.angle_rampa > 180:
+                        nou_angle_velocitat = -180 - x.angle_velocitat + 2*x.angle_rampa  
+                    if x.angle_rampa != 180:    
+                        x.velocitat[0] = x.magnitud_velocitat * math.cos(math.radians(nou_angle_velocitat))*(0.4+0.59*math.sqrt(math.sin(math.radians(x.angle_rampa))**2))
+                        x.velocitat[1] = -x.magnitud_velocitat * math.sin(math.radians(nou_angle_velocitat))*(0.4+0.59*math.sqrt(math.cos(math.radians(x.angle_rampa))**2))
+                    else:
+                        x.velocitat[0] *= -0.4
+                else:
+                    velocitat_inicial = [self.velocitat[0], self.velocitat[1]]
+                    if math.sqrt((self.angle_velocitat - self.angle_rampa)**2) >= 90 and self.magnitud_velocitat != 0:    
+                        if self.angle_rampa < 180:
+                            nou_angle_velocitat = 180 - self.angle_velocitat + 2*self.angle_rampa
+                        if self.angle_rampa > 180:
+                            nou_angle_velocitat = -180 - self.angle_velocitat + 2*self.angle_rampa  
+                        if self.angle_rampa != 180:    
+                            self.velocitat[0] = self.magnitud_velocitat * math.cos(math.radians(nou_angle_velocitat))*(0.4+0.59*math.sqrt(math.sin(math.radians(self.angle_rampa))**2))
+                            self.velocitat[1] = -self.magnitud_velocitat * math.sin(math.radians(nou_angle_velocitat))*(0.4+0.59*math.sqrt(math.cos(math.radians(self.angle_rampa))**2))
+                        else:
+                            self.velocitat[0] *= -0.4
+                    else:
+                        self.velocitat[0] += x.velocitat[0]*0.4*(0.5**fself)
+                        self.velocitat[1] += x.velocitat[1]*0.4*(0.5**fself)
+                    
+                    if math.sqrt((x.angle_velocitat - x.angle_rampa)**2) >= 90 and x.magnitud_velocitat != 0:        
+                        if x.angle_rampa < 180:
+                            nou_angle_velocitat_2 = 180 - x.angle_velocitat + 2*x.angle_rampa
+                        if x.angle_rampa > 180:
+                            nou_angle_velocitat_2 = -180 - x.angle_velocitat + 2*x.angle_rampa  
+                        if x.angle_rampa != 180:    
+                            x.velocitat[0] = x.magnitud_velocitat * math.cos(math.radians(nou_angle_velocitat_2))*(0.4+0.59*math.sqrt(math.sin(math.radians(x.angle_rampa))**2))
+                            x.velocitat[1] = -x.magnitud_velocitat * math.sin(math.radians(nou_angle_velocitat_2))*(0.4+0.59*math.sqrt(math.cos(math.radians(x.angle_rampa))**2))
+                        else:
+                            x.velocitat[0] *= -0.4
+                    else:
+                        x.velocitat[0] += velocitat_inicial[0]*0.4*(0.5**fx)
+                        x.velocitat[1] += velocitat_inicial[1]*0.4*(0.5**fx)
+                
+
     def reinici(self):
         self.posició = [self.posició_inicial[0], self.posició_inicial[1]]
         self.velocitat = [0,0]
         self.frenada = False
+        self.angle = self.angle_inicial
+        self.rectangle.center = (self.posició[0] + 0.5*self.amplada, self.posició[1] + 0.5*self.alçada)
+        self.angle_rampa = 270
 
-paret_dreta = caixa(pantalla_amplada, -500, pantalla_alçada + 500, 100, False)
-paret_esquerra = caixa(-100, -500, pantalla_alçada + 500, 100, False)
-terra = caixa(0, pantalla_alçada, 100, pantalla_amplada, False)
-caixa2 = caixa(pantalla_amplada - 293, 300, 75, 75, True)
-caixa3 = caixa(pantalla_amplada - 143, 300, 75, 75, True)
-caixa4 = caixa(pantalla_amplada - 240, -50, 100, 20, True)
-caixa5 = caixa(pantalla_amplada - 140, -50, 100, 20, True)
-caixa6 = caixa(pantalla_amplada - 305, -100, 20, 250, True)
-caixa7 = caixa(pantalla_amplada - 230, -300, 100, 100, True)
-caixa1 = caixa(pantalla_amplada - 330, 200, 20, 300, True)
+paret_dreta = caixa(pantalla_amplada, -500, pantalla_alçada + 500, 100, False, 180)
+paret_esquerra = caixa(-100, -500, pantalla_alçada + 500, 100, False, 180)
+terra = caixa(0, pantalla_alçada, 100, pantalla_amplada, False, 180)
+caixa2 = caixa(pantalla_amplada - 293, 300, 75, 75, True, 180)
+caixa3 = caixa(pantalla_amplada - 143, 300, 75, 75, True, 180)
+caixa4 = caixa(pantalla_amplada - 240, -50, 100, 20, True, 180)
+caixa5 = caixa(pantalla_amplada - 140, -50, 100, 20, True, 180)
+caixa6 = caixa(pantalla_amplada - 305, -100, 20, 250, True, 180)
+caixa7 = caixa(pantalla_amplada - 230, -300, 100, 100, True, 180)
+caixa1 = caixa(pantalla_amplada - 330, 200, 20, 300, True, 180)
+paret_inclinada = caixa(pantalla_amplada-60, pantalla_alçada-120, 200, 20, False, 315)
+
 
 # Selecció de nivell
 def selecció_nivell():
@@ -960,12 +961,17 @@ def GameLoop():
             for self in llista_objectes_pantalla:
                 if self in llista_ocells:
                     for i in llista_objectes_pantalla:
-                        if i != self and i.posició != posició_inicial and self.posició != posició_inicial: 
-                            self.colisió(i)
+                        if i in llista_objectes_rodons:    
+                            if i != self and i.posició != posició_inicial and self.posició != posició_inicial and i.colisionat==False: 
+                                self.colisió(i)
+                        else:    
+                            if i != self and i.posició != posició_inicial and self.posició != posició_inicial: 
+                                self.colisió(i)
                 if self in llista_objectes_rectangulars:
                     for i in llista_objectes_pantalla:
-                        if i != self: 
+                        if i != self and i.colisionat == False and i in llista_objectes_rectangulars: 
                             self.colisió(i)
+                self.colisionat = True
             for i in  llista_objectes_pantalla:
                 i.dibuixar()
             linea_ocells(nivell[0], nivell[1], nivell[2], nivell[3], nivell[4], nivell[5])
