@@ -631,8 +631,9 @@ def selecció_nivell():
     selecció_nivell_acabada = False
     sortir_selecció = False
     cercle_pos = 0  # Variable per fer seguiment de la posició del cercle vermell
-    cercle_radi = 20  # Radi del cercle vermell
+    cercle_radi = 25  # Radi del cercle vermell
     cercle_color = (255, 0, 0)  # Color vermell (RGB)
+    cercle_transparència = 150  # Valor d'alfa per la transparència (0 a 255)
 
     while not selecció_nivell_acabada:
         for event in pygame.event.get():
@@ -683,7 +684,9 @@ def selecció_nivell():
             pantalla.blit(num_text, (num_x, num_y))
             
         cercle_x, cercle_y = posicions[cercle_pos]
-        pygame.draw.circle(pantalla, cercle_color, (cercle_x, cercle_y), cercle_radi)
+        cercle_superficie = pygame.Surface((cercle_radi * 2, cercle_radi * 2), pygame.SRCALPHA)
+        pygame.draw.circle(cercle_superficie, cercle_color + (cercle_transparència,), (cercle_radi, cercle_radi), cercle_radi)
+        pantalla.blit(cercle_superficie, (cercle_x - cercle_radi, cercle_y - cercle_radi))
         
         pygame.display.flip()
         
@@ -691,7 +694,6 @@ def selecció_nivell():
         return None
     else:
         return nivell_seleccionat
-
 
 # Menú principal
 def menú():
