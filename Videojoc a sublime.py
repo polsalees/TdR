@@ -626,19 +626,28 @@ caixa1 = caixa(pantalla_amplada - 330, 200, 20, 300, True, 180)
 paret_inclinada = caixa(pantalla_amplada-60, pantalla_alçada-120, 200, 20, False, 315)
 
 
-# Selecció de nivell
 def selecció_nivell():
     nivell_seleccionat = 1
     selecció_nivell_acabada = False
+    sortir_selecció = False
+    cercle_pos = 0  # Variable per fer seguiment de la posició del cercle vermell
+    cercle_radi = 20  # Radi del cercle vermell
+    cercle_color = (255, 0, 0)  # Color vermell (RGB)
+
     while not selecció_nivell_acabada:
         for event in pygame.event.get():
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_RIGHT and nivell_seleccionat < 12:
                     nivell_seleccionat += 1
+                    cercle_pos += 1  # Actualitza la posició del cercle a la dreta
                 elif event.key == pygame.K_LEFT and nivell_seleccionat > 1:
                     nivell_seleccionat -= 1
+                    cercle_pos -= 1  # Actualitza la posició del cercle a l'esquerra
                 elif event.key == pygame.K_SPACE:
                     selecció_nivell_acabada = True
+                elif event.key == pygame.K_ESCAPE:
+                    selecció_nivell_acabada = True
+                    sortir_selecció = True
         
         pantalla.fill(fons)
         
@@ -672,10 +681,17 @@ def selecció_nivell():
             num_x = pos[0] - num_text.get_width() // 2
             num_y = pos[1] - num_text.get_height() // 2
             pantalla.blit(num_text, (num_x, num_y))
-
+            
+        cercle_x, cercle_y = posicions[cercle_pos]
+        pygame.draw.circle(pantalla, cercle_color, (cercle_x, cercle_y), cercle_radi)
+        
         pygame.display.flip()
+        
+    if sortir_selecció:
+        return None
+    else:
+        return nivell_seleccionat
 
-    return nivell_seleccionat
 
 # Menú principal
 def menú():
