@@ -1,6 +1,5 @@
 import pygame
 import math
-import time
 # Iniciar programa
 pygame.init()
 
@@ -518,22 +517,33 @@ caixa7 = caixa([pantalla_amplada - 230, -300], 100, 100, True, 0)
 caixa1 = caixa([pantalla_amplada - 330, 200], 20, 300, True, 0)
 paret_inclinada = caixa([pantalla_amplada-60, pantalla_alçada-120], 200, 20, False, 135)
 
-# Selecció de nivell
 def selecció_nivell():
     nivell_seleccionat = 1
     selecció_nivell_acabada = False
+    sortir_selecció = False
+    cercle_pos = 0  # Variable per fer seguiment de la posició del cercle vermell
+    cercle_color = vermell  # Color vermell (RGB)
+    cercle_transparència = 150  # Valor d'alfa per la transparència (0 a 255)
     while not selecció_nivell_acabada:
         for event in pygame.event.get():
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_RIGHT and nivell_seleccionat < 12:
                     nivell_seleccionat += 1
+                    cercle_pos += 1  # Actualitza la posició del cercle a la dreta
                 elif event.key == pygame.K_LEFT and nivell_seleccionat > 1:
                     nivell_seleccionat -= 1
+                    cercle_pos -= 1  # Actualitza la posició del cercle a la dreta
                 elif event.key == pygame.K_SPACE:
                     selecció_nivell_acabada = True
+                elif event.key == pygame.K_ESCAPE:
+                    selecció_nivell_acabada = True
+                    sortir_selecció = True
         
         pantalla.fill(fons)
-        
+        if cercle_pos > 8:
+            cercle_radi = 70
+        else:  
+            cercle_radi = 60
         font = pygame.font.Font(None, 150)
         text1 = font.render("Nivells", True, taronja)
 
@@ -557,17 +567,22 @@ def selecció_nivell():
               (pantalla_amplada * 4 // 5, pantalla_alçada * 4 // 5)]
 
         font_gran = pygame.font.Font(None, 150)  # Mida de la font més gran
-
+        cercle_x, cercle_y = posicions[cercle_pos]
+        cercle_superficie = pygame.Surface((cercle_radi * 2, cercle_radi * 2), pygame.SRCALPHA)
+        pygame.draw.circle(cercle_superficie, cercle_color + (cercle_transparència,), (cercle_radi, cercle_radi), cercle_radi)
+        pantalla.blit(cercle_superficie, (cercle_x - cercle_radi, cercle_y - cercle_radi -5))
         for i, text in enumerate(textos):
             pos = posicions[i]
             num_text = font_gran.render(str(i+1), True, taronja)
             num_x = pos[0] - num_text.get_width() // 2
             num_y = pos[1] - num_text.get_height() // 2
             pantalla.blit(num_text, (num_x, num_y))
-
         pygame.display.flip()
 
-    return nivell_seleccionat
+    if sortir_selecció:
+        return None
+    else:
+        return nivell_seleccionat
 
 # Menú principal
 def menú():
