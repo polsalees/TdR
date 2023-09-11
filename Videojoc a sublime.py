@@ -61,7 +61,6 @@ class ocells():
     def __init__(self, radi, color):
         global gravetat
         self.radi = radi
-        self.posició = [posició_inicial[0], posició_inicial[1]]
         self.velocitat = pygame.math.Vector2(0,0)
         self.angle = 0
         self.angle_rampa = 0
@@ -83,17 +82,18 @@ class ocells():
         self.colisionat = False
         self.superficie_ocell = pygame.Surface((2*self.radi, 2*self.radi), pygame.SRCALPHA)
         self.rectangle = self.superficie_ocell.get_rect()
-        self.rectangle.center = (self.posició[0], self.posició[1])
+        self.rectangle.center = (posició_inicial[0], posició_inicial[1])
         pygame.draw.circle(self.superficie_ocell, self.color, (self.radi, self.radi), self.radi)
         self.mask = pygame.mask.from_surface(self.superficie_ocell)
+        self.center = self.rectangle.center
     
     def calcul_posició_primer_xoc (self):
         if self.tocat_objecte == False:
-            self.posició_primer_xoc = [self.posició[0], self.posició[1]]
+            self.posició_primer_xoc = self.rectangle.center
             self.tocat_objecte = True
     
     def calcul_angle_cercle(self, pos):
-        vector_angle = pygame.math.Vector2(pos[0]-self.posició[0], pos[1]-self.posició[1])
+        vector_angle = pygame.math.Vector2(pos[0]-self.rectangle.center[0], pos[1]-self.rectangle.center[1])
         s = vector_angle.angle_to((-1,0)) + 180
         if s >= 360:
             s -=360
@@ -104,7 +104,7 @@ class ocells():
         if x in llista_objectes_rodons:    
             if x in llista_ocells:     
                 x.calcul_posició_primer_xoc()
-            self.angle_rampa = self.calcul_angle_cercle(x.posició)
+            self.angle_rampa = self.calcul_angle_cercle(x.rectangle.center)
             x.angle_rampa = self.angle_rampa + 180
             if x.angle_rampa >= 360:
                 x.angle_rampa -= 360
@@ -116,7 +116,7 @@ class ocells():
             if diferencia_angle_x > 180:
                 diferencia_angle_x = 360 - diferencia_angle_x    
             if diferencia_angle_self > 90 and self.velocitat.length() > 0 :    
-                self.posició = [self.posició_antiga[0], self.posició_antiga[1]]
+                self.center = [self.posició_antiga[0], self.posició_antiga[1]]
                 nou_angle_velocitat = 180+2*self.velocitat.angle_to((-1,0)) - 2*self.angle_rampa 
                 self.velocitat.rotate_ip(nou_angle_velocitat)
                 self.velocitat[0] *=0.3 + 0.59*math.sqrt(math.sin(math.radians(x.angle_rampa))**2)
@@ -125,7 +125,7 @@ class ocells():
                 self.velocitat[0] += x.velocitat[0]*0.4
                 self.velocitat[1] += x.velocitat[1]*0.4           
             if diferencia_angle_x > 90 and x.velocitat.length() > 0:
-                x.posició = [x.posició_antiga[0], x.posició_antiga[1]]
+                x.center = [x.posició_antiga[0], x.posició_antiga[1]]
                 nou_angle_velocitat_2 = 180 + 2*x.velocitat.angle_to((-1,0)) - 2*x.angle_rampa 
                 x.velocitat.rotate_ip(nou_angle_velocitat_2)
                 x.velocitat[0] *=0.3 + 0.59*math.sqrt(math.sin(math.radians(x.angle_rampa))**2)
@@ -138,9 +138,9 @@ class ocells():
                 llista_objectes_pantalla.remove(x)
                 self.velocitat *= 0.4
             else:
-                self.angle_rampa = x.calcul_angle_rampa(self.posició)
+                self.angle_rampa = x.calcul_angle_rampa(self.rectangle.center)
                 if x.movible == False:
-                    self.posició = [self.posició_antiga[0], self.posició_antiga[1]]
+                    self.center = [self.posició_antiga[0], self.posició_antiga[1]]
                     nou_angle_velocitat =180 + 2*self.velocitat.angle_to((-1,0)) - 2*self.angle_rampa
                     self.velocitat.rotate_ip(nou_angle_velocitat)
                     self.velocitat[0] *=0.3 + 0.59*math.sqrt(math.sin(math.radians(self.angle_rampa))**2)
@@ -157,7 +157,7 @@ class ocells():
                     if diferencia_angle_x > 180:
                         diferencia_angle_x = 360 - diferencia_angle_x    
                     if diferencia_angle_self > 90 and self.velocitat.length() > 0 :    
-                        self.posició = [self.posició_antiga[0], self.posició_antiga[1]]
+                        self.center = [self.posició_antiga[0], self.posició_antiga[1]]
                         nou_angle_velocitat = 180+2*self.velocitat.angle_to((-1,0)) - 2*self.angle_rampa 
                         self.velocitat.rotate_ip(nou_angle_velocitat)
                         self.velocitat[0] *=0.3 + 0.59*math.sqrt(math.sin(math.radians(x.angle_rampa))**2)
@@ -166,7 +166,7 @@ class ocells():
                         self.velocitat[0] += x.velocitat[0]*0.4
                         self.velocitat[1] += x.velocitat[1]*0.4           
                     if diferencia_angle_x > 90 and x.velocitat.length() > 0:
-                        x.posició = [x.posició_antiga[0], x.posició_antiga[1]]
+                        x.center = [x.posició_antiga[0], x.posició_antiga[1]]
                         nou_angle_velocitat_2 = 180 + 2*x.velocitat.angle_to((-1,0)) - 2*x.angle_rampa 
                         x.velocitat.rotate_ip(nou_angle_velocitat_2)
                         x.velocitat[0] *=0.3 + 0.59*math.sqrt(math.sin(math.radians(x.angle_rampa))**2)
@@ -206,7 +206,7 @@ class ocells():
         self.estela_radi = 2
         self.estela_posició = [posició_inicial[0],posició_inicial[1]]
         self.estela_velocitat = [self.velocitat_sortida[0] , self.velocitat_sortida[1]]      
-        while self.estela_posició[0] < self.posició[0]or self.estela_posició[0] < self.posició_primer_xoc[0]:
+        while self.estela_posició[0] < self.rectangle.center[0]or self.estela_posició[0] < self.posició_primer_xoc[0]:
             pygame.draw.circle(pantalla, blanc, self.estela_posició, self.estela_radi)
             self.estela_posició[0] += self.estela_velocitat[0]*6
             self.estela_posició[1] += self.estela_velocitat[1]*6 + gravetat*21
@@ -216,7 +216,7 @@ class ocells():
                 self.estela_radi = 2
     
     def update(self):     
-        self.posició_antiga = [self.posició[0], self.posició[1]]
+        self.posició_antiga = self.rectangle.center
         if self.linea_direció:
             self.calcul_linea_direció()    
         if self.llançat and self.tocat_objecte == False:
@@ -227,8 +227,6 @@ class ocells():
             self.velocitat[1] = 0
         if abs(self.velocitat[0]) < gravetat:
             self.velocitat[0] = 0
-        self.posició[0] += self.velocitat[0]
-        self.posició[1] += self.velocitat[1]
         if self.llançat and self.velocitat[0] == 0:
             if self.velocitat[1] == 0 or self.velocitat[1] == gravetat:    
                 self.cooldown += 1
@@ -237,10 +235,11 @@ class ocells():
         if self.cooldown >= 500:     
             llista_objectes_pantalla.remove(self)
         self.colisionat = False
-        self.rectangle.center = (self.posició[0], self.posició[1])
+        self.rectangle.center += self.velocitat
+        self.center = self.rectangle.center
 
     def dibuixar(self):
-        self.rectangle.center = (self.posició[0], self.posició[1])
+        self.rectangle.center = self.center
         pantalla.blit(self.superficie_ocell, self.rectangle)
 
     def llançament(self):
@@ -265,7 +264,7 @@ class ocells():
         self.aire = False
         self.velocitat *= 0
         self.llançat = False
-        self.posició = [posició_inicial[0], posició_inicial[1]]
+        self.rectangle.center = [posició_inicial[0], posició_inicial[1]]
         self.zona = False
         self.cooldown = 0
         self.tocat_objecte = False
@@ -359,7 +358,6 @@ class caixa():
             pygame.draw.rect(self.superficie_rectangle, marró_fosc , ((0,0), (self.amplada, self.alçada)), 10 - (100//self.amplada))
         else:
             pygame.draw.rect(self.superficie_rectangle, marró_fosc , ((0,0), (self.amplada, self.alçada)), 10 - (100//self.alçada))
-        self.angle_rampa = 90 
         self.colisionat = False
         self.rectangle_nou = pygame.transform.rotate(self.superficie_rectangle, self.angle)
         self.rectangle = self.rectangle_nou.get_rect()
@@ -367,12 +365,14 @@ class caixa():
         self.mask = pygame.mask.from_surface(self.rectangle_nou)
         self.velocitat_angle = 0
         self.x = self.mask.outline(5)
-        self.posició_antiga = [self.rectangle.center[0], self.rectangle.center[1]]
-        self.center = self.rectangle.center 
+        self.conjut_de_velocitats_1 = []
+        self.conjut_de_velocitats_2 = []
+        self.vector_centre1 = pygame.math.Vector2(-0.25*amplada, 0)
+        self.vector_centre2 = pygame.math.Vector2(0.25*amplada, 0)
+        self.colisionats = []
     
     def update(self):
         if self.movible == True:
-            self.posició_antiga = [self.rectangle.center[0], self.rectangle.center[1]]
             self.angle += self.velocitat_angle
             if self.angle >= 360:
                 self.angle -= 360
@@ -392,33 +392,83 @@ class caixa():
                 imagen_centro = (self.pivot_pantalla[0]- offset_rotado.x, self.pivot_pantalla[1]- offset_rotado.y)
                 self.rectangle_nou = pygame.transform.rotate(self.superficie_rectangle, self.angle)
                 self.rectangle = self.rectangle_nou.get_rect(center = imagen_centro)
+                pivote_real = (pygame.math.Vector2(self.pivot)-(0.5*self.amplada, 0.5*self.alçada)).rotate(-self.angle) + self.rectangle.center
+                error = self.pivot_pantalla - pivote_real
+                self.rectangle.center += error
                 self.mask = pygame.mask.from_surface(self.rectangle_nou)
-            self.center = self.rectangle.center
+        self.velocitat_angle_ax = self.velocitat_angle
         self.colisionat = False
         self.z = 0
         
     def dibuixar(self):
-        self.rectangle.center = self.center
+        if self.colisionats != [] and self.movible:
+            if self.conjut_de_velocitats_1 != []:
+                self.velocitat*=0    
+                for i in self.conjut_de_velocitats_1:
+                    self.velocitat += i
+                self.velocitat /= len(self.conjut_de_velocitats_1)
+            for i in self.conjut_de_velocitats_2:
+                self.velocitat += i
+            self.conjut_de_velocitats_1.clear()
+            self.conjut_de_velocitats_2.clear()
+        if self.velocitat_angle != 0 or (self.colisionats != [] and self.movible):
+            self.rectangle_2 = self.superficie_rectangle.get_rect(topleft = (self.pivot_pantalla[0]- self.pivot[0], self.pivot_pantalla[1]- self.pivot[1]))
+            offset = pygame.math.Vector2(self.pivot_pantalla) - self.rectangle_2.center
+            offset_rotado = offset.rotate(-self.angle)
+            imagen_centro = (self.pivot_pantalla[0]- offset_rotado.x, self.pivot_pantalla[1]- offset_rotado.y)
+            self.rectangle_nou = pygame.transform.rotate(self.superficie_rectangle, self.angle)
+            self.rectangle = self.rectangle_nou.get_rect(center = imagen_centro)
+            pivote_real = (pygame.math.Vector2(self.pivot)-(0.5*self.amplada, 0.5*self.alçada)).rotate(-self.angle) + self.rectangle.center
+            error = self.pivot_pantalla - pivote_real
+            self.rectangle.center += error
+            self.mask = pygame.mask.from_surface(self.rectangle_nou)
+        self.colisionats.clear()
         pantalla.blit(self.rectangle_nou, self.rectangle)
+
     
     def calcul_angle_rampa(self, pos):
-        vector_angle = pygame.math.Vector2(pos[0]-self.rectangle.center[0], pos[1]-self.rectangle.center[1])
-        s = vector_angle.angle_to((-1,0))
-        if s >= 180:
-            s = s-180
+        if self.amplada < self.alçada*2:    
+            vector_angle = pygame.math.Vector2(pos[0]-self.rectangle.center[0], pos[1]-self.rectangle.center[1])
+            s = vector_angle.angle_to((-1,0))
+            if s >= 180:
+                s = s-180
+            else:
+                s = s + 180 
+            y = self.angle-s
+            if abs(y) < (math.degrees(math.atan2(self.alçada, self.amplada))) or abs(y) > (360-(math.degrees(math.atan2(self.alçada, self.amplada))) +self.angle):
+                z = self.angle
+            elif (y > -(math.degrees(math.atan2(self.alçada, self.amplada) + 2*math.atan2(self.amplada, self.alçada))) and y < 0) or (y-360)> -(math.degrees(math.atan2(self.alçada, self.amplada) + 2*math.atan2(self.amplada, self.alçada))):
+                z = self.angle + 90
+            elif (y < (math.degrees(math.atan2(self.alçada, self.amplada) + 2*math.atan2(self.amplada, self.alçada))) and y > 0) or (y+360)< (math.degrees(math.atan2(self.alçada, self.amplada) + 2*math.atan2(self.amplada, self.alçada))):
+                z = self.angle + 270
+            elif abs(y) > (math.degrees(math.atan2(self.alçada, self.amplada) + 2*math.atan2(self.amplada, self.alçada))):
+                z = self.angle +180
+            else:
+                z = 0
         else:
-            s = s + 180 
-        y = self.angle-s
-        if abs(y) < (math.degrees(math.atan2(self.alçada, self.amplada))) or abs(y) > (360-(math.degrees(math.atan2(self.alçada, self.amplada))) +self.angle):
-            z = self.angle
-        elif (y > -(math.degrees(math.atan2(self.alçada, self.amplada) + 2*math.atan2(self.amplada, self.alçada))) and y < 0) or (y-360)> -(math.degrees(math.atan2(self.alçada, self.amplada) + 2*math.atan2(self.amplada, self.alçada))):
-            z = self.angle + 90
-        elif (y < (math.degrees(math.atan2(self.alçada, self.amplada) + 2*math.atan2(self.amplada, self.alçada))) and y > 0) or (y+360)< (math.degrees(math.atan2(self.alçada, self.amplada) + 2*math.atan2(self.amplada, self.alçada))):
-            z = self.angle + 270
-        elif abs(y) > (math.degrees(math.atan2(self.alçada, self.amplada) + 2*math.atan2(self.amplada, self.alçada))):
-            z = self.angle +180
-        else:
-            z = 0
+            pos_centre1 = self.vector_centre1.rotate(-self.angle)+ self.rectangle.center
+            pos_centre2 = self.vector_centre2.rotate(-self.angle)+ self.rectangle.center
+            vector_angle1 = pygame.math.Vector2(pos[0]-pos_centre1[0], pos[1]-pos_centre1[1])
+            vector_angle2 = pygame.math.Vector2(pos[0]-pos_centre2[0], pos[1]-pos_centre2[1])
+            s1 = vector_angle1.angle_to((-1,0))
+            s2 = vector_angle2.angle_to((-1,0))
+            y1 = self.angle-s1
+            angle2 = self.angle + 180
+            if angle2>= 360:
+                angle2-=360
+            y2 = angle2-s2
+            z11 = math.degrees(math.atan2(self.alçada, 0.5*self.amplada))
+            z22 = 90 - z11
+            if math.sqrt((y2)**2) < (z11) or math.sqrt((y2)**2) > (360-(z11)):
+                 z = self.angle
+            elif math.sqrt((y1)**2) < (z11) or math.sqrt((y1)**2) > (360-(z11)):
+                 z = self.angle + 180
+            elif (y1 < 180 and y1 > 0) or (y1 < -180 and y1 < 0):
+                z = self.angle + 90
+            elif (y1 > 180 and y1 > 0) or (y1 > -180 and y1 < 0):
+                z = self.angle + 270
+            else:
+                z = 0
         if z >= 360:
             z -= 360
         if z >= 180:
@@ -428,183 +478,380 @@ class caixa():
         return z
     
     def colisió(self, x):
-        if self.angle != self.angle_inicial:
-            self.x = self.mask.outline(5)
-            if (self.angle//45)%2 == 0:    
-                self.x.reverse()
-        if x.angle != x.angle_inicial:
-            x.x = x.mask.outline(5)
-            if (x.angle//45)%2 == 0:    
-                x.x.reverse()
+        self.colisionats.append(x)
+        x.colisionats.append(self)
         rotar = True
+        dx = self.mask.overlap_area(x.mask,(x.rectangle.x-self.rectangle.x +1, x.rectangle.y-self.rectangle.y)) - self.mask.overlap_area(x.mask,(x.rectangle.x-self.rectangle.x-1, x.rectangle.y-self.rectangle.y))
+        dy = self.mask.overlap_area(x.mask,(x.rectangle.x-self.rectangle.x, x.rectangle.y-self.rectangle.y +1)) - self.mask.overlap_area(x.mask,(x.rectangle.x-self.rectangle.x, x.rectangle.y-self.rectangle.y-1))
+        z = pygame.math.Vector2.from_polar((-1, math.degrees(math.atan2(dy,dx))))
         if self.angle%90 == 0:
             esquina1, esquina2, esquina3, esquina4 = self.rectangle.topleft, self.rectangle.topright, self.rectangle.bottomleft,self.rectangle.bottomright
-            esquina1 = [esquina1, esquina1]
-            esquina2 = [esquina2, esquina2]
-            esquina3 = [esquina3, esquina3]
-            esquina4 = [esquina4, esquina4]
         else:
-            esquina1, esquina2, esquina3, esquina4 = min(self.x, key = lambda i: i[1]),  max(self.x, key = lambda i: i[0]), min(self.x, key = lambda i: i[0]),  max(self.x, key = lambda i: i[1])
-            if (self.angle//45)%2 == 0:
-                for i in self.x:
-                    if i[1] == esquina1[1] and i[0] > esquina1[0]:
-                        esquina1 = i 
-            esquina1 += pygame.math.Vector2(self.rectangle.topleft)
-            esquina2 += pygame.math.Vector2(self.rectangle.topleft)
-            esquina3 += pygame.math.Vector2(self.rectangle.topleft)
-            esquina4 += pygame.math.Vector2(self.rectangle.topleft)
-            esquina1 = [esquina1, esquina1 + (0,-5)]
-            esquina2 = [esquina2, esquina2 + (5, 0)]
-            esquina3 = [esquina3, esquina3 + (-5,0)]
-            esquina4 = [esquina4, esquina4 + (0, 5)]
+            esquina1, esquina2, esquina3, esquina4 = pygame.math.Vector2(-0.5*self.amplada,-0.5*self.alçada).rotate(-self.angle) + self.rectangle.center,  pygame.math.Vector2(0.5*self.amplada,-0.5*self.alçada).rotate(-self.angle) + self.rectangle.center, pygame.math.Vector2(-0.5*self.amplada,0.5*self.alçada).rotate(-self.angle) + self.rectangle.center,  pygame.math.Vector2(0.5*self.amplada,0.5*self.alçada).rotate(-self.angle) + self.rectangle.center
+            esquinas = [esquina1, esquina2, esquina3, esquina4]
+            esquina1 = min(esquinas, key = lambda i: i[1])
+            esquina2 = max(esquinas, key = lambda i: i[0])
+            esquina3 = min(esquinas, key = lambda i: i[0])
+            esquina4 = max(esquinas, key = lambda i: i[1])
         esquines = [esquina1, esquina2, esquina3, esquina4]
         if x.angle%90 == 0:
-            xesquina1, xesquina2, xesquina3, xesquina4 = x.rectangle.topleft, x.rectangle.topright, x.rectangle.bottomleft,x.rectangle.bottomright
-            xesquina1 = [xesquina1, xesquina1]
-            xesquina2 = [xesquina2, xesquina2]
-            xesquina3 = [xesquina3, xesquina3]
-            xesquina4 = [xesquina4, xesquina4]
+            xesquina1, xesquina2, xesquina3, xesquina4 = x.rectangle.topleft, x.rectangle.topright, x.rectangle.bottomleft, x.rectangle.bottomright
         else:
-            xesquina1, xesquina2, xesquina3, xesquina4 = min(x.x, key = lambda i: i[1]),  max(x.x, key = lambda i: i[0]), min(x.x, key = lambda i: i[0]),  max(x.x, key = lambda i: i[1])
-            if (x.angle//45)%2 == 0:
-                for i in x.x:
-                    if i[1] == xesquina1[1] and i[0] > xesquina1[0]:
-                        xesquina1 = i 
-            xesquina1 += pygame.math.Vector2(x.rectangle.topleft)
-            xesquina2 += pygame.math.Vector2(x.rectangle.topleft)
-            xesquina3 += pygame.math.Vector2(x.rectangle.topleft)
-            xesquina4 += pygame.math.Vector2(x.rectangle.topleft)
-            xesquina1 = [xesquina1, xesquina1 + (0,-5)]
-            xesquina2 = [xesquina2, xesquina2 + (5, 0)]
-            xesquina3 = [xesquina3, xesquina3 + (-5,0)]
-            xesquina4 = [xesquina4, xesquina4 + (0, 5)]
+            xesquina1, xesquina2, xesquina3, xesquina4 = pygame.math.Vector2(-0.5*x.amplada,-0.5*x.alçada).rotate(-x.angle) + x.rectangle.center,  pygame.math.Vector2(0.5*x.amplada,-0.5*x.alçada).rotate(-x.angle) + x.rectangle.center, pygame.math.Vector2(-0.5*x.amplada,0.5*x.alçada).rotate(-x.angle) + x.rectangle.center,  pygame.math.Vector2(0.5*x.amplada,0.5*x.alçada).rotate(-x.angle) + x.rectangle.center
+            xesquinas = [xesquina1, xesquina2, xesquina3, xesquina4]
+            xesquina1 = min(xesquinas, key = lambda i: i[1])
+            xesquina2 = max(xesquinas, key = lambda i: i[0])
+            xesquina3 = min(xesquinas, key = lambda i: i[0])
+            xesquina4 = max(xesquinas, key = lambda i: i[1])
         xesquines = [xesquina1, xesquina2, xesquina3, xesquina4]
         n= 0
         ns = 0
         for i in esquines:
-            if x.rectangle.collidepoint(i[1]):
-                i[1] = list(i[1])
-                i[1][0] -= x.rectangle.topleft[0]
-                i[1][1] -= x.rectangle.topleft[1]
-                if x.mask.get_at(i[1]) == 1:
+            if x.rectangle.collidepoint(i):
+                i = list(i)
+                i[0] -= x.rectangle.topleft[0]
+                i[1] -= x.rectangle.topleft[1]
+                if x.mask.get_at(i) == 1:
                     n+=1
-                    ns += 1               
-                    posició_xoc_s = i[0]
-                    posició_xoc_x = i[0]
+                    ns += 1
+                    i[0] += x.rectangle.topleft[0]
+                    i[1] += x.rectangle.topleft[1]               
+                    posició_xoc_s = i
+                    posició_xoc_x = i
                     rampa_s = x
                     rampa_x = x
         nx = 0
         for i in xesquines:
-            if self.rectangle.collidepoint(i[1]):
-                i[1] = list(i[1])
-                i[1][0] -= self.rectangle.topleft[0]
-                i[1][1] -= self.rectangle.topleft[1]
-                if self.mask.get_at(i[1]) == 1:
+            if self.rectangle.collidepoint(i):
+                i = list(i)
+                i[0] -= self.rectangle.topleft[0]
+                i[1] -= self.rectangle.topleft[1]
+                if self.mask.get_at(i) == 1:
                     n+=1
                     nx +=1
+                    i[0] += self.rectangle.topleft[0]
+                    i[1] += self.rectangle.topleft[1]
                     if n == 1:    
-                        posició_xoc_s = i[0]
-                        posició_xoc_x = i[0]
+                        posició_xoc_s = i
+                        posició_xoc_x = i
                     else:
-                        posició_xoc_s = i[0]                        
+                        posició_xoc_s = i                      
                     rampa_s = self
                     rampa_x = self
         if n>=2:    
             rampa_x = x
             rampa_s = self
+            mask_xoc = self.mask.overlap_mask(x.mask,(x.rectangle.x- self.rectangle.x, x.rectangle.y- self.rectangle.y))        
+            rectangle_xoc = mask_xoc.get_bounding_rects()
+            posició_xoc = rectangle_xoc[0].center + pygame.math.Vector2(self.rectangle.topleft)
             if ns == 2 or nx == 2:
                 rampa_s = x
                 rampa_x = self
-                mask_xoc = self.mask.overlap_mask(x.mask,(x.rectangle.x- self.rectangle.x, x.rectangle.y- self.rectangle.y))        
-                rectangle_xoc = mask_xoc.get_bounding_rects()
-                posició_xoc_s = rectangle_xoc[0].center + pygame.math.Vector2(self.rectangle.topleft)
-                posició_xoc_x = posició_xoc_s 
+                posició_xoc_s = posició_xoc
+                posició_xoc_x = posició_xoc_s
                 rotar = False
-        if rotar == True and x.movible == False:
+        elif ns == 1:
+            mask_xoc = self.mask.overlap_mask(x.mask,(x.rectangle.x- self.rectangle.x, x.rectangle.y- self.rectangle.y))        
+            rectangle_xoc = mask_xoc.get_bounding_rects()
+            posició_xoc_x = rectangle_xoc[0].center + pygame.math.Vector2(self.rectangle.topleft)
+            posició_xoc = posició_xoc_x
+        elif nx == 1:
+            mask_xoc = self.mask.overlap_mask(x.mask,(x.rectangle.x- self.rectangle.x, x.rectangle.y- self.rectangle.y))        
+            rectangle_xoc = mask_xoc.get_bounding_rects()
+            posició_xoc_s = rectangle_xoc[0].center + pygame.math.Vector2(self.rectangle.topleft)
+            posició_xoc = posició_xoc_s
+        elif n == 0:
+            rampa_s = x
+            rampa_x = self
+            mask_xoc = self.mask.overlap_mask(x.mask,(x.rectangle.x- self.rectangle.x, x.rectangle.y- self.rectangle.y))        
+            rectangle_xoc = mask_xoc.get_bounding_rects()
+            posició_xoc_s = rectangle_xoc[0].center + pygame.math.Vector2(self.rectangle.topleft)
+            posició_xoc_x = posició_xoc_s
+            posició_xoc = posició_xoc_s
+        if rotar == True:
             if self.z == 0:
                 self.velocitat_angle = 0
                 self.z = 1
             if x.z == 0:
                 x.z = 1
                 x.velocitat_angle = 0
-        centre1 = ((esquina1[0][0]-esquina2[0][0])/2 + esquina2[0][0], (esquina1[0][1]-esquina2[0][1])/2 + esquina2[0][1], pygame.math.Vector2(esquina1[0][0]-esquina2[0][0],esquina1[0][1]-esquina2[0][1])*0.5)
-        centre2 = ((esquina1[0][0]-esquina3[0][0])/2 + esquina3[0][0], (esquina1[0][1]-esquina3[0][1])/2 + esquina3[0][1], pygame.math.Vector2(esquina3[0][0]-esquina1[0][0],esquina3[0][1]-esquina1[0][1])*0.5)
-        centre3 = ((esquina4[0][0]-esquina2[0][0])/2 + esquina2[0][0], (esquina4[0][1]-esquina2[0][1])/2 + esquina2[0][1], pygame.math.Vector2(esquina2[0][0]-esquina4[0][0],esquina2[0][1]-esquina4[0][1])*0.5)
-        centre4 = ((esquina4[0][0]-esquina3[0][0])/2 + esquina3[0][0], (esquina4[0][1]-esquina3[0][1])/2 + esquina3[0][1], pygame.math.Vector2(esquina4[0][0]-esquina3[0][0],esquina4[0][1]-esquina3[0][1])*0.5)
+        centre1 = ((esquina1[0]-esquina2[0])/2 + esquina2[0], (esquina1[1]-esquina2[1])/2 + esquina2[1], pygame.math.Vector2(esquina1[0]-esquina2[0],esquina1[1]-esquina2[1])*0.5)
+        centre2 = ((esquina1[0]-esquina3[0])/2 + esquina3[0], (esquina1[1]-esquina3[1])/2 + esquina3[1], pygame.math.Vector2(esquina3[0]-esquina1[0],esquina3[1]-esquina1[1])*0.5)
+        centre3 = ((esquina4[0]-esquina2[0])/2 + esquina2[0], (esquina4[1]-esquina2[1])/2 + esquina2[1], pygame.math.Vector2(esquina2[0]-esquina4[0],esquina2[1]-esquina4[1])*0.5)
+        centre4 = ((esquina4[0]-esquina3[0])/2 + esquina3[0], (esquina4[1]-esquina3[1])/2 + esquina3[1], pygame.math.Vector2(esquina4[0]-esquina3[0],esquina4[1]-esquina3[1])*0.5)
         centres = [centre1, centre2, centre3, centre4]
         if rampa_s == self:    
-            self.angle_rampa = rampa_s.calcul_angle_rampa(posició_xoc_s) + 180
+            self.angle_rampa = rampa_s.calcul_angle_rampa(posició_xoc) + 180
         else:
-            self.angle_rampa = rampa_s.calcul_angle_rampa(posició_xoc_s)
+            self.angle_rampa = rampa_s.calcul_angle_rampa(posició_xoc)
+        velocitat = self.velocitat.copy()
         if x.movible == False:
-            self.center = [self.posició_antiga[0], self.posició_antiga[1]]
-            if rotar == True:    
-                if nx != 0 or posició_xoc_s[1] < self.rectangle.center[1]:
-                    self.pivot_pantalla = posició_xoc_s
-                    self.pivot =((pygame.math.Vector2(posició_xoc_s[0]- self.center[0], posició_xoc_s[1]- self.center[1])).rotate(self.angle) + self.center) - pygame.math.Vector2(self.center[0]-0.5*self.amplada, self.center[1]-0.5*self.alçada)    
-                    for i in centres:
-                        vector = pygame.math.Vector2(posició_xoc_s[0]-i[0],posició_xoc_s[1]-i[1])
-                        i2_negatiu = i[2].rotate(180)
-                        if vector.length() <= i[2].length() and (abs(i[2].angle_to((-1,0)) - vector.angle_to((-1,0))) < 15 or abs(i2_negatiu.angle_to((-1,0)) - vector.angle_to((-1,0)))<15):
-                            if abs(i[2].angle_to((-1,0)) - vector.angle_to((-1,0))) <  abs(i2_negatiu.angle_to((-1,0)) - vector.angle_to((-1,0))):
-                                self.velocitat_angle += vector.length() * self.velocitat.length()/(0.5*self.amplada)
-                            else:
-                                self.velocitat_angle -= vector.length() * self.velocitat.length()/(0.5*self.amplada)
-                else:
-                    self.pivot_pantalla = self.center
-                    self.pivot = (0.5*self.amplada, self.alçada*0.5)
-                if posició_xoc_s[1] > self.rectangle.center[1]:
+            while self.mask.overlap(x.mask,(x.rectangle.x-self.rectangle.x, x.rectangle.y-self.rectangle.y)):
+                self.rectangle.center-=z
+            if nx != 0:
+                self.pivot_pantalla = posició_xoc_s
+                self.pivot =((pygame.math.Vector2(posició_xoc_s[0]- self.rectangle.center[0], posició_xoc_s[1]- self.rectangle.center[1])).rotate(self.angle) + self.rectangle.center) - pygame.math.Vector2(self.rectangle.center[0]-0.5*self.amplada, self.rectangle.center[1]-0.5*self.alçada)    
+                for i in centres:
+                    vector = pygame.math.Vector2(posició_xoc_s[0]-i[0],posició_xoc_s[1]-i[1])
+                    i2_negatiu = i[2].rotate(180)
+                    if vector.length() <= i[2].length() and (abs(i[2].angle_to((-1,0)) - vector.angle_to((-1,0))) < 15 or abs(i2_negatiu.angle_to((-1,0)) - vector.angle_to((-1,0)))<15):
+                        if abs(i[2].angle_to((-1,0)) - vector.angle_to((-1,0))) <  abs(i2_negatiu.angle_to((-1,0)) - vector.angle_to((-1,0))):
+                            self.velocitat_angle += vector.length() * self.velocitat.length()/(0.5*self.amplada)
+                        else:
+                            self.velocitat_angle -= vector.length() * self.velocitat.length()/(0.5*self.amplada)
+            if rotar == False or nx == 0:
+                self.pivot_pantalla = self.rectangle.center
+                self.pivot = (0.5*self.amplada, self.alçada*0.5)
+            if self.velocitat.length() < 1:
+                self.pivot_pantalla = posició_xoc_s
+                self.pivot =((pygame.math.Vector2(posició_xoc_s[0]- self.rectangle.center[0], posició_xoc_s[1]- self.rectangle.center[1])).rotate(self.angle) + self.rectangle.center) - pygame.math.Vector2(self.rectangle.center[0]-0.5*self.amplada, self.rectangle.center[1]-0.5*self.alçada)    
+            if round(x.angle)%90 != round(self.angle)%90 or nx!=0:    
+                if (self.angle%90 == 0 and posició_xoc_s[1] >= self.rectangle.bottom) or (nx!= 0 and esquina4[1] > posició_xoc_s[1] and ((esquina2[1] < posició_xoc_s[1] and esquina2[0] > posició_xoc_s[0] and esquina4[0] < posició_xoc_s[0])or(esquina3[1] < posició_xoc_s[1] and esquina3[0] < posició_xoc_s[0] and esquina4[0] > posició_xoc_s[0]))) or posició_xoc_s == esquina4:
                     meitat1 = 0
                     meitat2 = 0
-                    for i in self.x:
+                    for i in self.mask.outline():
                         i = list(i)
-                        i[0] += self.rectangle.topleft[0]
+                        i[0] += self.rectangle.left
                         if i[0] > posició_xoc_s[0]:
                             meitat1+=1
                         elif i[0] < posició_xoc_s[0]:
-                            meitat2+=1    
-                    if meitat1 > meitat2:
-                        self.velocitat_angle -= abs((self.velocitat[1] + gravetat) * meitat1*math.cos(math.radians(self.angle)))/((meitat2+1)*(self.amplada*0.5))
-                    elif meitat1 < meitat2:
-                        self.velocitat_angle += abs((self.velocitat[1] + gravetat) * meitat2*math.cos(math.radians(self.angle)))/((meitat1+1)*(self.amplada*0.5))
+                            meitat2+=1
+                    if meitat1 > meitat2 + 3:
+                        if abs(centre3[2].length() - 0.5*self.amplada) < abs(centre3[2].length() - 0.5*self.alçada):
+                            self.velocitat_angle -= abs(self.velocitat[1] * meitat1*0.5)/(meitat2+meitat1)
+                        else:
+                            self.velocitat_angle -= abs(self.velocitat[1] * meitat1*0.5*self.alçada)/((meitat2+meitat1)*self.amplada)
+                    elif meitat1 + 3 < meitat2:
+                        if abs(centre4[2].length() - 0.5*self.amplada) < abs(centre4[2].length() - 0.5*self.alçada):
+                            self.velocitat_angle += abs(self.velocitat[1] * meitat2*0.5)/(meitat1+meitat2)
+                        else:
+                            self.velocitat_angle += abs(self.velocitat[1] * meitat2*0.5*self.alçada)/((meitat1+meitat2)*self.amplada)
+            else:
+                self.angle = round(self.angle)
             nou_angle_velocitat =180 + 2*self.velocitat.angle_to((-1,0)) - 2*self.angle_rampa
-            self.velocitat.rotate_ip(nou_angle_velocitat)
-            self.velocitat[0] *=0.3 + 0.59*abs(math.sin(math.radians(self.angle_rampa)))
-            self.velocitat[1] *=0.3 + 0.59*abs(math.cos(math.radians(self.angle_rampa)))
+            velocitat.rotate_ip(nou_angle_velocitat)
+            velocitat[0] *=0.3 + 0.59*abs(math.sin(math.radians(self.angle_rampa)))
+            velocitat[1] *=0.3 + 0.59*abs(math.cos(math.radians(self.angle_rampa)))
+            self.conjut_de_velocitats_1.append(velocitat)
         else:
             if rampa_x == x:    
-                x.angle_rampa = rampa_x.calcul_angle_rampa(posició_xoc_x) + 180
+                x.angle_rampa = rampa_x.calcul_angle_rampa(posició_xoc) + 180
             else:
-                x.angle_rampa = rampa_x.calcul_angle_rampa(posició_xoc_x)
+                x.angle_rampa = rampa_x.calcul_angle_rampa(posició_xoc)
             if x.angle_rampa >= 360:
                 x.angle_rampa -=360
             if self.angle_rampa >= 360:
                 self.angle_rampa -=360
-            velocitat_inicial = self.velocitat.copy()
+            xcentre1 = ((xesquina1[0]-xesquina2[0])/2 + xesquina2[0], (xesquina1[1]-xesquina2[1])/2 + xesquina2[1], pygame.math.Vector2(xesquina1[0]-xesquina2[0],xesquina1[1]-xesquina2[1])*0.5)
+            xcentre2 = ((xesquina1[0]-xesquina3[0])/2 + xesquina3[0], (xesquina1[1]-xesquina3[1])/2 + xesquina3[1], pygame.math.Vector2(xesquina3[0]-xesquina1[0],xesquina3[1]-xesquina1[1])*0.5)
+            xcentre3 = ((xesquina4[0]-xesquina2[0])/2 + xesquina2[0], (xesquina4[1]-xesquina2[1])/2 + xesquina2[1], pygame.math.Vector2(xesquina2[0]-xesquina4[0],xesquina2[1]-xesquina4[1])*0.5)
+            xcentre4 = ((xesquina4[0]-xesquina3[0])/2 + xesquina3[0], (xesquina4[1]-xesquina3[1])/2 + xesquina3[1], pygame.math.Vector2(xesquina4[0]-xesquina3[0],xesquina4[1]-xesquina3[1])*0.5)
+            xcentres = [xcentre1, xcentre2, xcentre3, xcentre4]
             diferencia_angle_self = abs(self.velocitat.angle_to((-1,0)) - self.angle_rampa)
             if diferencia_angle_self > 180:
                 diferencia_angle_self = 360 - diferencia_angle_self
             diferencia_angle_x = abs(x.velocitat.angle_to((-1,0)) - x.angle_rampa)
             if diferencia_angle_x > 180:
-                diferencia_angle_x = 360 - diferencia_angle_x     
-            if diferencia_angle_self > 90 and self.velocitat.length() > 0 :    
-                self.centre = [self.posició_antiga[0], self.posició_antiga[1]]
-                nou_angle_velocitat = 180+2*self.velocitat.angle_to((-1,0)) - 2*self.angle_rampa 
-                self.velocitat.rotate_ip(nou_angle_velocitat)
-                self.velocitat[0] *=0.3 + 0.59*abs(math.sin(math.radians(x.angle_rampa)))
-                self.velocitat[1] *=0.3 + 0.59*abs(math.cos(math.radians(x.angle_rampa)))
-            elif diferencia_angle_x >= 90 and x.velocitat.length() >= 2:
-                self.velocitat[0] += x.velocitat[0]*0.4*(0.5**0)
-                self.velocitat[1] += x.velocitat[1]*0.4*(0.5**0)            
+                diferencia_angle_x = 360 - diferencia_angle_x
+            esperar = False
+            suma_velocitat_per_rotació_x = (0,0)
+            esperarx = False
+            suma_velocitat_per_rotació = (0,0)
+            antic_centre = self.rectangle.center
+            antic_centre_x = x.rectangle.center
+            if diferencia_angle_self > 90 and self.velocitat.length() > 0:
+                suma_velocitat_per_rotació_x = self.velocitat 
+                while self.mask.overlap(x.mask,(x.rectangle.x-self.rectangle.x, x.rectangle.y-self.rectangle.y)):
+                    self.rectangle.center-=z
+                nou_centre = self.rectangle.center
+                self.rectangle.center = antic_centre 
+                for i in llista_objectes_pantalla:
+                    if i in llista_objectes_rectangulars and i != self:
+                        if i not in self.colisionats and i.movible: 
+                            if self.mask.overlap(i.mask,(i.rectangle.x-self.rectangle.x, i.rectangle.y-self.rectangle.y)):
+                                self.rectangle.center = nou_centre
+                                if not self.mask.overlap(i.mask,(i.rectangle.x-self.rectangle.x, i.rectangle.y-self.rectangle.y)):
+                                    esperar = True
+                                self.rectangle.center = antic_centre
+                if esperar == False:
+                    self.rectangle.center = nou_centre
+            elif diferencia_angle_x > 90 and x.velocitat.length() > 0:   
+                while self.mask.overlap(x.mask,(x.rectangle.x-self.rectangle.x, x.rectangle.y-self.rectangle.y)):
+                    x.rectangle.center+=z
+                nou_centre = x.rectangle.center
+                x.rectangle.center = antic_centre_x 
+                for i in llista_objectes_pantalla:
+                    if i in llista_objectes_rectangulars and i != x:
+                        if i not in x.colisionats and i.movible: 
+                            if x.mask.overlap(i.mask,(i.rectangle.x-x.rectangle.x, i.rectangle.y-x.rectangle.y)):
+                                x.rectangle.center = nou_centre
+                                if not x.mask.overlap(i.mask,(i.rectangle.x-x.rectangle.x, i.rectangle.y-x.rectangle.y)):
+                                    esperarx = True
+                                x.rectangle.center = antic_centre_x
+                if esperarx == False:
+                    x.rectangle.center = nou_centre
             if diferencia_angle_x > 90 and x.velocitat.length() > 0:
-                x.centre = [x.posició_antiga[0], x.posició_antiga[1]]
+                suma_velocitat_per_rotació = self.velocitat
+            vector_colisió = pygame.math.Vector2(100000,100000)
+            posició_xoc_s_2 = posició_xoc_s - pygame.math.Vector2(antic_centre)
+            posició_xoc_x_2 = posició_xoc_x - pygame.math.Vector2(antic_centre_x)
+            if nx != 0:
+                self.pivot_pantalla = posició_xoc_s_2 + self.rectangle.center
+                self.pivot =(posició_xoc_s_2.rotate(self.angle) + antic_centre) - pygame.math.Vector2(antic_centre[0]-0.5*self.amplada, antic_centre[1]-0.5*self.alçada)    
+                for i in centres:
+                    vector = pygame.math.Vector2(posició_xoc_s[0]-i[0],posició_xoc_s[1]-i[1])
+                    i2_negatiu = i[2].rotate(180)
+                    if vector.length() < i[2].length() and vector.length() < vector_colisió.length():
+                        colisió_centre = i
+                        vector_colisió = vector
+                        vector_negatiu = i2_negatiu
+                if abs(colisió_centre[2].angle_to((-1,0)) - vector_colisió.angle_to((-1,0))) <  abs(vector_negatiu.angle_to((-1,0)) - vector_colisió.angle_to((-1,0))):
+                    self.velocitat_angle += vector_colisió.length()*math.cos(math.radians(colisió_centre[2].angle_to((-1,0)) - vector_colisió.angle_to((-1,0)))) * (self.velocitat- suma_velocitat_per_rotació).length()/(0.5*self.amplada)
+                else:
+                    self.velocitat_angle -= vector_colisió.length()*math.cos(math.radians(vector_negatiu.angle_to((-1,0)) - vector_colisió.angle_to((-1,0)))) * (self.velocitat-suma_velocitat_per_rotació).length()/(0.5*self.amplada)
+            if rotar == False or nx == 0:
+                self.pivot_pantalla = self.rectangle.center
+                self.pivot = (0.5*self.amplada, self.alçada*0.5)
+            if self.velocitat.length() < 1:
+                self.pivot_pantalla = posició_xoc_s_2 + self.rectangle.center
+                self.pivot =(posició_xoc_s_2.rotate(self.angle) + antic_centre) - pygame.math.Vector2(antic_centre[0]-0.5*self.amplada, antic_centre[1]-0.5*self.alçada)
+            if round(x.angle)%90 != round(self.angle)%90 or nx!=0:
+                if (self.angle%90 == 0 and posició_xoc_s[1]+self.velocitat.length()+1 >= self.rectangle.bottom) or (nx!= 0 and esquina4[1] > posició_xoc_s[1] and ((esquina2[1] < posició_xoc_s[1] and esquina2[0] > posició_xoc_s[0] and esquina4[0] < posició_xoc_s[0])or(esquina3[1] < posició_xoc_s[1] and esquina3[0] < posició_xoc_s[0] and esquina4[0] > posició_xoc_s[0]))) or posició_xoc_s == esquina4:
+                    meitat1 = 0
+                    meitat2 = 0
+                    meitat3 = 0
+                    for i in self.mask.outline():
+                        i = list(i)
+                        i[0] += self.rectangle.left
+                        if i[0] > posició_xoc_s[0]:
+                            meitat1+=1
+                        elif i[0] < posició_xoc_s[0]:
+                            meitat2+=1
+                        else:
+                            meitat3 += 1
+                    total = meitat2 + meitat3 + meitat1
+                    if meitat1 > meitat2+3:
+                        meitat1/= 10
+                        meitat1 = round(meitat1)
+                        meitat1*=10
+                        if nx == 0:    
+                            if abs(centre3[2].length() - 0.5*self.amplada) < abs(centre3[2].length() - 0.5*self.alçada):
+                                self.velocitat_angle -= abs((self.velocitat[1]) * meitat1*0.5)/(total)
+                            else:
+                                self.velocitat_angle -= abs((self.velocitat[1]) * meitat1*0.5*self.alçada)/((total)*self.amplada)
+                        else:
+                            if abs(colisió_centre[2].length() - 0.5*self.amplada) < abs(colisió_centre[2].length() - 0.5*self.alçada):
+                                self.velocitat_angle -= abs((self.velocitat[1]) * meitat1*0.5)/(total)
+                            else:
+                                self.velocitat_angle -= abs((self.velocitat[1]) * meitat1*0.5*self.alçada)/((total)*self.amplada)
+                    elif meitat1+3 < meitat2:
+                        meitat2/= 10
+                        meitat2 = round(meitat2)
+                        meitat2*=10
+                        if nx == 0:    
+                            if abs(centre4[2].length() - 0.5*self.amplada) < abs(centre4[2].length() - 0.5*self.alçada):
+                                self.velocitat_angle += abs((self.velocitat[1]) * meitat2*0.5)/(total)
+                            else:
+                                self.velocitat_angle += abs((self.velocitat[1]) * meitat2*0.5*self.alçada)/((total)*self.amplada)
+                        else:
+                            if abs(colisió_centre[2].length() - 0.5*self.amplada) < abs(colisió_centre[2].length() - 0.5*self.alçada):
+                                self.velocitat_angle += abs((self.velocitat[1]) * meitat2*0.5)/(total)
+                            else:
+                                self.velocitat_angle += abs((self.velocitat[1]) * meitat2*0.5*self.alçada)/((total)*self.amplada)
+            else:
+                self.angle = round(self.angle)
+                self.velocitat_angle = 0
+            xvector_colisió = pygame.math.Vector2(100000,100000)
+            if ns != 0:
+                x.pivot_pantalla = posició_xoc_x_2 + x.rectangle.center
+                x.pivot =(posició_xoc_x_2.rotate(x.angle) + antic_centre_x) - pygame.math.Vector2(antic_centre_x[0]-0.5*x.amplada, antic_centre_x[1]-0.5*x.alçada)  
+                for i in xcentres:
+                    vector = pygame.math.Vector2(posició_xoc_x[0]-i[0],posició_xoc_x[1]-i[1])
+                    i2_negatiu = i[2].rotate(180)
+                    if vector.length() <= i[2].length() and vector.length() < xvector_colisió.length():
+                        xcolisió_centre = i
+                        xvector_colisió = vector
+                        xvector_negatiu = i2_negatiu
+                if abs(xcolisió_centre[2].angle_to((-1,0)) - xvector_colisió.angle_to((-1,0))) <  abs(xvector_negatiu.angle_to((-1,0)) - xvector_colisió.angle_to((-1,0))):
+                    x.velocitat_angle += xvector_colisió.length()*math.cos(math.radians(xcolisió_centre[2].angle_to((-1,0)) - xvector_colisió.angle_to((-1,0)))) * (x.velocitat-self.velocitat).length()/(0.5*x.amplada)
+                else:
+                    x.velocitat_angle -= xvector_colisió.length()*math.cos(math.radians(xvector_negatiu.angle_to((-1,0)) - xvector_colisió.angle_to((-1,0)))) * (x.velocitat-self.velocitat).length()/(0.5*x.amplada)
+            if rotar == False or ns==0:
+                x.pivot_pantalla = x.rectangle.center
+                x.pivot = (0.5*x.amplada, x.alçada*0.5)
+            if x.velocitat.length() < 1:
+                x.pivot_pantalla = posició_xoc_x_2 + x.rectangle.center
+                x.pivot =(posició_xoc_x_2.rotate(x.angle) + antic_centre_x) - pygame.math.Vector2(antic_centre_x[0]-0.5*x.amplada, antic_centre_x[1]-0.5*x.alçada)    
+            if round(x.angle)%90 != round(self.angle)%90 or ns!=0:        
+                if (x.angle%90 == 0 and posició_xoc_x[1] >= x.rectangle.bottom) or (ns!= 0 and xesquina4[1] > posició_xoc_x[1] and ((xesquina2[1] < posició_xoc_x[1] and xesquina2[0] > posició_xoc_x[0] and xesquina4[0] < posició_xoc_x[0])or(xesquina3[1] < posició_xoc_x[1] and xesquina3[0] < posició_xoc_x[0] and xesquina4[0] > posició_xoc_x[0]))) or posició_xoc_x == xesquina4:
+                    xmeitat1 = 0
+                    xmeitat2 = 0
+                    xmeitat3 = 0
+                    for i in x.mask.outline():
+                        i = list(i)
+                        i[0] += x.rectangle.left
+                        if i[0] > posició_xoc_x[0]:
+                            xmeitat1+=1
+                        elif i[0] < posició_xoc_x[0]:
+                            xmeitat2+=1
+                        else:
+                            xmeitat3+=1
+                    xtotal = xmeitat1 + xmeitat2 + xmeitat3 
+                    if xmeitat1 > xmeitat2+3:
+                        xmeitat1/= 10
+                        xmeitat1 = round(xmeitat2)
+                        xmeitat1*=10
+                        if ns == 0:    
+                            if abs(xcentre3[2].length() - 0.5*x.amplada) < abs(xcentre3[2].length() - 0.5*x.alçada):
+                                x.velocitat_angle -= abs((x.velocitat[1]) * xmeitat1*0.5)/xtotal
+                            else:
+                                x.velocitat_angle -= abs((x.velocitat[1]) * xmeitat1*0.5*x.alçada)/(xtotal*x.amplada)
+                        else:
+                            if abs(xcolisió_centre[2].length() - 0.5*x.amplada) < abs(xcolisió_centre[2].length() - 0.5*x.alçada):
+                                x.velocitat_angle -= abs((x.velocitat[1]) * xmeitat1*0.5)/xtotal
+                            else:
+                                x.velocitat_angle -= abs((x.velocitat[1]) * xmeitat1*0.5*x.alçada)/(xtotal*x.amplada)
+                    elif 3+xmeitat1 < xmeitat2:
+                        xmeitat2/= 10
+                        xmeitat2 = round(xmeitat2)
+                        xmeitat2*=10
+                        if ns == 0:    
+                            if abs(xcentre4[2].length() - 0.5*x.amplada) < abs(xcentre4[2].length() - 0.5*x.alçada):
+                                x.velocitat_angle += abs((x.velocitat[1]) * xmeitat2*0.5)/xtotal
+                            else:
+                                x.velocitat_angle += abs((x.velocitat[1]) * xmeitat2*0.5*x.alçada)/(xtotal*x.amplada)
+                        else:
+                            if abs(xcolisió_centre[2].length() - 0.5*x.amplada) < abs(xcolisió_centre[2].length() - 0.5*x.alçada):
+                                x.velocitat_angle += abs((x.velocitat[1]) * xmeitat2*0.5)/xtotal
+                            else:
+                                x.velocitat_angle += abs((x.velocitat[1]) * xmeitat2*0.5*x.alçada)/(xtotal*x.amplada) 
+            else:
+                x.angle = round(x.angle)
+            if diferencia_angle_self > 90 and self.velocitat.length() > 0 :    
+                nou_angle_velocitat = 180+2*self.velocitat.angle_to((-1,0)) - 2*self.angle_rampa 
+                velocitat.rotate_ip(nou_angle_velocitat)
+                velocitat[0] *=0.3 + 0.59*abs(math.sin(math.radians(self.angle_rampa)))
+                velocitat[1] *=0.3 + 0.59*abs(math.cos(math.radians(self.angle_rampa)))
+                self.conjut_de_velocitats_1.append(velocitat)
+            elif diferencia_angle_x >= 90 and x.velocitat.length() >= 2:
+                velocitat*=0
+                velocitat[0] += x.velocitat[0]*0.4*(0.5**0)
+                velocitat[1] += x.velocitat[1]*0.4*(0.5**0)
+                self.conjut_de_velocitats_2.append(velocitat)
+            velocitat2 = x.velocitat.copy()            
+            if diferencia_angle_x > 90 and x.velocitat.length() > 0:
                 nou_angle_velocitat_2 = 180 + 2*x.velocitat.angle_to((-1,0)) - 2*x.angle_rampa 
-                x.velocitat.rotate_ip(nou_angle_velocitat_2)
-                x.velocitat[0] *=0.3 + 0.59*abs(math.sin(math.radians(x.angle_rampa)))
-                x.velocitat[1] *=0.3 + 0.59*abs(math.cos(math.radians(x.angle_rampa)))
-            elif diferencia_angle_self >= 90 and velocitat_inicial.length() >= 2 :
-                x.velocitat[0] += velocitat_inicial[0]*0.4*(0.5**0)
-                x.velocitat[1] += velocitat_inicial[1]*0.4*(0.5**0)
+                velocitat2.rotate_ip(nou_angle_velocitat_2)
+                velocitat2[0] *=0.3 + 0.59*abs(math.sin(math.radians(x.angle_rampa)))
+                velocitat2[1] *=0.3 + 0.59*abs(math.cos(math.radians(x.angle_rampa)))
+                x.conjut_de_velocitats_1.append(velocitat2)
+            elif diferencia_angle_self >= 90 and self.velocitat.length() >= 2 :
+                velocitat2*=0
+                velocitat2[0] += self.velocitat[0]*0.4*(0.5**0)
+                velocitat2[1] += self.velocitat[1]*0.4*(0.5**0)
+                x.conjut_de_velocitats_2.append(velocitat2)
+            self.velocitat_angle = round(self.velocitat_angle,4)
+            x.velocitat_angle = round(x.velocitat_angle,4)
 
     def reinici(self):
         self.velocitat *= 0
@@ -621,14 +868,13 @@ class caixa():
 paret_dreta = caixa((pantalla_amplada + 50, (-500+pantalla_alçada)/2), pantalla_alçada + 500, 100, False, 0)
 paret_esquerra = caixa((-50, (-500+pantalla_alçada)/2), pantalla_alçada + 500, 100, False, 0)
 terra = caixa([pantalla_amplada/2, pantalla_alçada + 50], 100, pantalla_amplada, False, 0)
-caixa2 = caixa([pantalla_amplada - 255, 337], 75, 75, True, 0)
-caixa3 = caixa([pantalla_amplada - 105, 337], 75, 75, True, 0)
-caixa4 = caixa([pantalla_amplada - 230, 0], 20, 100, True, 90)
-caixa5 = caixa([pantalla_amplada - 130, 0], 20, 100, True, 90)
-caixa6 = caixa([pantalla_amplada - 180, -90], 20, 250, True, 0)
-caixa7 = caixa([pantalla_amplada - 180, -250], 100, 100, True, 0)
-caixa1 = caixa([pantalla_amplada - 180, 210], 20, 300, True, 0)
-paret_inclinada = caixa([pantalla_amplada-50, pantalla_alçada-20], 200, 20, False, 135)
+caixa2 = caixa([pantalla_amplada - 255, pantalla_alçada-48], 75, 75, True, 0)
+caixa3 = caixa([pantalla_amplada - 105, pantalla_alçada-48], 75, 75, True, 0)
+caixa4 = caixa([pantalla_amplada - 230, pantalla_alçada-175], 20, 100, True, 90)
+caixa5 = caixa([pantalla_amplada - 130, pantalla_alçada-175], 20, 100, True, 90)
+caixa6 = caixa([pantalla_amplada - 180, pantalla_alçada-245], 20, 250, True, 0)
+caixa7 = caixa([pantalla_amplada - 180, pantalla_alçada-315], 100, 100, True, 0)
+caixa1 = caixa([pantalla_amplada - 180, pantalla_alçada-105], 20, 300, True, 0)
 
 # Selecció de nivell
 def selecció_nivell():
