@@ -46,6 +46,7 @@ llista_ocells = []
 llista_porcs = []
 #Posició inicial ocells
 posició_inicial = [200, pantalla_alçada-240]
+nombre_porcs = 0
 
 #Creació funcions basiques
 def calcular_angle():
@@ -56,6 +57,7 @@ def distancia_ocell_ratoli():
     amplada = math.sqrt(((pygame.mouse.get_pos()[0] - posició_inicial[0]) **2 + (pygame.mouse.get_pos()[1] - posició_inicial[1]) ** 2))
     return amplada
 def colisió_cercles(self,x):
+    global nombre_porcs
     if self in llista_ocells:    
         self.calcul_posició_primer_xoc()
     if self.c == 0:
@@ -64,9 +66,11 @@ def colisió_cercles(self,x):
         if self.velocitat.length()*self.massa/x.massa > 4 and x in llista_porcs and self in llista_ocells:
             x.destrucció()
             self.velocitat *= 0.4
+            nombre_porcs -=1
         elif x.velocitat.length()*x.massa/self.massa > 4 and self in llista_porcs and x in llista_ocells:
             self.destrucció()
-            x.velocitat *= 0.4        
+            x.velocitat *= 0.4 
+            nombre_porcs -=1       
         else:
             if x.c == 0:
                 x.c = 1    
@@ -121,7 +125,8 @@ def colisió_cercles(self,x):
             x.destrucció()
             self.velocitat *= 0.4
         elif self in llista_porcs and (self.velocitat.length()>5 or x.velocitat.length()>5):
-            llista_objectes_pantalla.remove(self)
+            x.destrucció()
+            nombre_porcs-=1
             x.velocitat *=0.4
         else:
             if x.angle%90 == 0:
@@ -435,12 +440,12 @@ class ocells():
             self.velocitat[1] = 0
         if abs(self.velocitat[0]) < gravetat:
             self.velocitat[0] = 0
-        if self.llançat and self.velocitat[0] == 0:
-            if self.velocitat[1] == 0 or self.velocitat[1] == gravetat:    
+        if self.llançat:
+            if self.velocitat.length()<gravetat*2:    
                 self.cooldown += 1
         else:
             self.cooldown = 0
-        if self.cooldown >= 500:     
+        if self.cooldown >= 300:     
             llista_objectes_pantalla.remove(self)
         self.colisionat = False
         self.posició_real += self.velocitat
@@ -1869,7 +1874,24 @@ def menú():
         pantalla.blit(text, (pantalla_amplada // 2 - text.get_width() // 2, pantalla_alçada // 2 - text.get_height() // 2))
 
         pygame.display.flip()
+def pantalla_final(tipo):
+    if tipo == True:
+        texto = "You Win"
+    else:
+        texto = "You Lose"
+    while True:
+        for event in pygame.event.get():
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    return False
+                if event.key == pygame.K_SPACE:
+                    return False
+        pantalla.fill(fons)
 
+        font = pygame.font.Font(None, 300)
+        text = font.render(texto, True, taronja)
+        pantalla.blit(text, (pantalla_amplada // 2 - text.get_width() // 2, pantalla_alçada // 2 - text.get_height() // 2))
+        pygame.display.flip()
 #Definim reinici al sortir del nivell
 def reinici():
     global llista_objectes_pantalla
@@ -1882,6 +1904,7 @@ def reinici():
 # Game GameLoop
 def GameLoop():
     global nivell_actual
+    global nombre_porcs
     zona_ocell = False
     mantenint_ocell = False
     partida = False
@@ -1897,6 +1920,7 @@ def GameLoop():
             partida = True
             n = 0
         else:
+            perdut = True
             if n==0:
                 if nivell_actual == 1:
                     sprites.extend(nivell1)
@@ -1904,6 +1928,9 @@ def GameLoop():
                 if nivell_actual == 2:
                     sprites.extend(nivell2)
                     llista_objectes_pantalla.extend(nivell2)
+                for i in llista_objectes_pantalla:
+                    if i in llista_porcs:
+                        nombre_porcs+=1
                 n =1
             ocell_actual =  llista_ocells_llançats[següent_ocell(nivell[0], nivell[1], nivell[2], nivell[3], nivell[4], nivell[5])]
             if len(llista_ocells_llançats) > 1:
@@ -1931,6 +1958,8 @@ def GameLoop():
                 ocell_anterior.estela()
             for i in  llista_objectes_pantalla:
                 i.update()
+                if i in llista_ocells and i !=  no_ocell:
+                    perdut = False
             llista_objectes_pantalla.sort(key=lambda i: i.rectangle.center[1])
             for self in llista_objectes_pantalla:
                 if self in llista_ocells:
@@ -1978,6 +2007,12 @@ def GameLoop():
                 i.dibuixar()
             linea_ocells(nivell[0], nivell[1], nivell[2], nivell[3], nivell[4], nivell[5],)
             pygame.draw.line(pantalla, marró, punt_t1, punt_t2, width = 20)
+            if nombre_porcs == 0:
+                pantalla_final(True)
+                partida = False
+            if perdut == True:
+                pantalla_final(False)
+                partida = False
         # Recarregar la pantalla
         pygame.display.flip()
     # Sortir del joc
