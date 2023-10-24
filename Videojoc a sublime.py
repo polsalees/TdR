@@ -17,6 +17,7 @@ cian = (0, 255, 255)
 rosa = (255, 0, 255)
 groc = (255, 255, 0)
 taronja = (255, 165, 0)
+taronja2 = (205, 115, 0)
 marró = (128, 64, 0)
 marró2 = (118, 54, 0)
 marró_fosc = (84, 56, 34)
@@ -104,7 +105,10 @@ def colisió_cercles(self,x):
                     angle_zx = 360-x.angle_rampa + 180
                 z_x = pygame.math.Vector2.from_polar((1, angle_zx))
                 while self.mask.overlap(x.mask,(x.rectangle.x-self.rectangle.x, x.rectangle.y-self.rectangle.y)):
-                    x.rectangle.center+=z_x   
+                    x.rectangle.center+=z_x
+            else:
+                while self.mask.overlap(x.mask,(x.rectangle.x-self.rectangle.x, x.rectangle.y-self.rectangle.y)):
+                    self.rectangle.center+=z
             if diferencia_angle_self > 90 and self.velocitat.length() > 0 :    
                 nou_angle_velocitat = 180+2*self.velocitat.angle_to((-1,0)) - 2*self.angle_rampa 
                 self.velocitat.rotate_ip(nou_angle_velocitat)
@@ -126,7 +130,7 @@ def colisió_cercles(self,x):
         if self.velocitat.length()*self.massa/x.massa > 4 and x.movible and self in llista_ocells:
             x.destrucció()
             self.velocitat *= 0.4
-        elif self in llista_porcs and (self.velocitat.length()>5 or x.velocitat.length()>5):
+        elif self in llista_porcs and (self.velocitat.length()>10*self.massa/50 or x.velocitat.length()*x.massa/self.massa>20):
             nombre_porcs-=1
             x.velocitat *=0.4
         else:
@@ -220,6 +224,9 @@ def colisió_cercles(self,x):
                             x.centre_no_rotar[1] += x.rectangle.center[1] - antic_centre_x[1]
                             x.centre_no_rotar[2] += x.rectangle.center[0] - antic_centre_x[0]
                             x.centre_no_rotar[3] += x.rectangle.center[1] - antic_centre_x[1]
+                    else:
+                        while self.mask.overlap(x.mask,(x.rectangle.x-self.rectangle.x, x.rectangle.y-self.rectangle.y)):
+                            self.rectangle.center+=z
                     xcentre1 = ((xesquina1[0]-xesquina2[0])/2 + xesquina2[0], (xesquina1[1]-xesquina2[1])/2 + xesquina2[1], pygame.math.Vector2(xesquina1[0]-xesquina2[0],xesquina1[1]-xesquina2[1])*0.5)
                     xcentre2 = ((xesquina1[0]-xesquina3[0])/2 + xesquina3[0], (xesquina1[1]-xesquina3[1])/2 + xesquina3[1], pygame.math.Vector2(xesquina3[0]-xesquina1[0],xesquina3[1]-xesquina1[1])*0.5)
                     xcentre4 = ((xesquina4[0]-xesquina2[0])/2 + xesquina2[0], (xesquina4[1]-xesquina2[1])/2 + xesquina2[1], pygame.math.Vector2(xesquina2[0]-xesquina4[0],xesquina2[1]-xesquina4[1])*0.5)
@@ -353,6 +360,7 @@ def colisió_cercles(self,x):
 class ocells():
     def __init__(self, radi, color):
         global gravetat
+        self.animació = False
         self.radi = radi
         self.velocitat = pygame.math.Vector2(0,0)
         self.angle = 0
@@ -381,6 +389,9 @@ class ocells():
         self.c = 0
         self.posició_real = posició_inicial
         self.massa = self.radi**2 *3.14
+        self.activat = False
+        self.n = 0
+        self.llista_estela = []
     
     def calcul_posició_primer_xoc (self):
         if self.tocat_objecte == False:
@@ -425,22 +436,16 @@ class ocells():
             self.linea_direció_moviment +=0.5
     
     def estela(self): 
-        self.estela_radi = 2
-        self.estela_posició = [posició_inicial[0],posició_inicial[1]]
-        self.estela_velocitat = [self.velocitat_sortida[0] , self.velocitat_sortida[1]]      
-        while (self.estela_posició[0] < self.rectangle.center[0] and self.tocat_objecte == False) or self.estela_posició[0] < self.posició_primer_xoc[0]:
-            pygame.draw.circle(pantalla, blanc, self.estela_posició, self.estela_radi)
-            self.estela_posició[0] += self.estela_velocitat[0]*6
-            self.estela_posició[1] += self.estela_velocitat[1]*6 + gravetat*21
-            self.estela_velocitat[1] += 6*gravetat
-            self.estela_radi += 1
-            if self.estela_radi > 3:
-                self.estela_radi = 2
+        for i in self.llista_estela:
+            pygame.draw.circle(pantalla, blanc, i[0] ,i[1])
     
     def update(self):
         if self.linea_direció:
             self.calcul_linea_direció()    
         if self.llançat and self.tocat_objecte == False:
+            self.n+=1
+            if self.n%5 == 0:
+                self.llista_estela.append((self.rectangle.center,2))
             self.estela()
         if self.aire:  
             self.posició_real += self.velocitat
@@ -455,17 +460,32 @@ class ocells():
                 self.cooldown += 1
         else:
             self.cooldown = 0
-        if self.cooldown >= 180:     
+        if self.cooldown >= 100:     
             llista_objectes_pantalla.remove(self)
         self.colisionat = False
         if self.llançat:    
             self.rectangle.center = self.posició_real
+            if self.rectangle.center[0]>pantalla_amplada or self.rectangle.center[0]<0 or self.rectangle.center[1]>pantalla_alçada:
+                llista_objectes_pantalla.remove(self)
+        if self.animació:
+            if self.n%5 == 0:    
+                n=pygame.math.Vector2(5,5)
+                for i in self.objecte_animació:
+                    i[0] -= 2
+                    i[1] +=n
+                    n.rotate_ip(90)
+                if self.objecte_animació[0][0] <=1:
+                    self.animació =False
+            self.n+=1
 
     def dibuixar(self):
         if self.c == 1:
             self.posició_real = self.rectangle.center
             self.c = 0
         pantalla.blit(self.superficie_ocell, self.rectangle)
+        if self.animació:
+            for i in self.objecte_animació:
+                pygame.draw.circle(pantalla,self.color_animació,i[1],i[0])
 
     def llançament(self):
         self.rectangle.center = posició_inicial
@@ -485,11 +505,93 @@ class ocells():
     def zona_llançament(self):
         self.zona = self.rectangle.collidepoint(pygame.mouse.get_pos())
         return self.zona
-
+    def habilitat(self):
+        if self.activat == False and self.color != vermell:
+            self.llista_estela.append((self.rectangle.center, 10))
+            self.n = 0    
+            if self.color == groc:
+                self.activar_animació(blanc,1) 
+                self.velocitat[0] *= 2.5
+            elif self.color == cian:
+               self.activar_animació(blanc,1) 
+               self.copia1 = self.copy()
+               self.copia2 = self.copy() 
+               self.copia1.llançat = True
+               self.copia2.llançat = True
+               self.copia1.aire = True
+               self.copia2.aire = True
+               self.copia1.tocat_objecte = True
+               self.copia2.tocat_objecte = True
+               self.copia1.posició_real = self.rectangle.center+pygame.math.Vector2(25,10)
+               self.copia2.posició_real = self.rectangle.center+pygame.math.Vector2(25,-10)
+               llista_objectes_pantalla.append(self.copia1) 
+               llista_objectes_pantalla.append(self.copia2)
+               sprites.append(self.copia1)
+               sprites.append(self.copia2)
+               self.copia1.velocitat = self.velocitat.rotate(20)
+               self.copia2.velocitat = self.velocitat.rotate(-20)
+               self.copia1.llista_estela.append(self.llista_estela) 
+               self.copia2.llista_estela.append(self.llista_estela) 
+            else:
+                if self.color == negre:    
+                    self.activar_animació(taronja2,1.5)
+                else:
+                    self.activar_animació(negre,1.5)
+                for i in llista_objectes_pantalla:
+                    if i != self:
+                        if i in llista_porcs:    
+                            if i.porc:    
+                                distancia_explosió = pygame.math.Vector2(self.rectangle.center) - i.rectangle.center
+                                potencia = 200 - distancia_explosió.length() + self.radi
+                                if potencia >0:
+                                    angle = self.calcul_angle_cercle(i.rectangle.center) +180
+                                    if angle <= 180:    
+                                        angle = 180- angle
+                                    else:
+                                        angle = 360-angle + 180
+                                    if self.color == blanc:
+                                        angle +=180
+                                        potencia *=2
+                                    i.velocitat += pygame.math.Vector2.from_polar((potencia*50/i.massa, angle))
+                        elif i in llista_ocells:    
+                            if i.llançat:    
+                                distancia_explosió = pygame.math.Vector2(self.rectangle.center) - i.rectangle.center
+                                potencia = 200 - distancia_explosió.length() + self.radi
+                                if potencia >0:
+                                    angle = self.calcul_angle_cercle(i.rectangle.center)
+                                    if angle <= 180:    
+                                        angle = 180- angle
+                                    else:
+                                        angle = 360-angle +180
+                                    if self.color == blanc:
+                                        angle +=180
+                                        potencia *=2
+                                    i.velocitat += pygame.math.Vector2.from_polar((potencia*50/i.massa, angle))
+                        if i in llista_objectes_rectangulars:    
+                            if i.caixa and i.movible:    
+                                distancia_explosió = pygame.math.Vector2(self.rectangle.center) - i.rectangle.center
+                                potencia = 200 - distancia_explosió.length() + self.radi
+                                if potencia >0:
+                                    angle = self.calcul_angle_cercle(i.rectangle.center) + 180
+                                    if angle <= 180:    
+                                        angle = 180- angle
+                                    else:
+                                        angle = 360-angle + 180
+                                    if self.color == blanc:
+                                        angle +=180
+                                        potencia *=2
+                                    i.velocitat += pygame.math.Vector2.from_polar((potencia*50/i.massa, angle))
+            self.activat = True
+    def copy(self):
+        x = ocells(self.radi, self.color)
+        return x
     def reinici(self):
+        self.activat = False
         self.aire = False
         self.velocitat *= 0
         self.llançat = False
+        self.llista_estela.clear()
+        self.n = 0
         self.rectangle.center = [posició_inicial[0], posició_inicial[1]]
         self.posició_real = [posició_inicial[0], posició_inicial[1]]
         self.zona = False
@@ -497,21 +599,29 @@ class ocells():
         self.tocat_objecte = False
         self.linea_direció = False
         self.posició_primer_xoc = [0,0] 
+        self.animació = False
+    
+    def activar_animació(self, color,radi2):
+        radi = self.radi /radi2
+        self.color_animació = color
+        self.animació=True
+        self.objecte_animació = [[radi,self.rectangle.center],[radi,self.rectangle.center],[radi,self.rectangle.center],[radi,self.rectangle.center]]
 
 # Ocells creats 
 vermellet = ocells(18, vermell)
-vermellet2 = ocells(18, vermell)
-vermellet3 = ocells(18, vermell)
 bombardero = ocells(22, negre)
-bombardero2 = ocells(22, negre)
-bombardero3 = ocells(22, negre)
+estrella = ocells(22, blanc)
 pequeñin = ocells(13, cian)
-pequeñin2 = ocells(13, cian)
-pequeñin3 = ocells(13, cian)
 racista = ocells(18, groc)
-racista2 = ocells(18, groc)
-racista3 = ocells(18, groc)
 no_ocell = ocells(0, fons)
+vermellet2 = vermellet.copy()
+vermellet3 = vermellet.copy()
+bombardero2 = bombardero.copy()
+bombardero3 = bombardero.copy()
+pequeñin2 = pequeñin.copy()
+pequeñin3 = pequeñin.copy()
+racista2 = racista.copy()
+racista3 = racista.copy()
 llista_ocells_llançats = [no_ocell]
 llista_objectes_rodons.extend(llista_ocells)
 
@@ -1092,7 +1202,7 @@ class caixa():
             angle_z = 360-self.angle_rampa + 180
         z = pygame.math.Vector2.from_polar((1, angle_z))
         velocitat = self.velocitat.copy()
-        if x.movible == False:
+        if x.movible == False and n != 0:
             antic_centre = self.rectangle.center
             posició_xoc_s_2 = posició_xoc_s - pygame.math.Vector2(antic_centre)
             while self.mask.overlap(x.mask,(x.rectangle.x-self.rectangle.x, x.rectangle.y-self.rectangle.y)):
@@ -1185,7 +1295,7 @@ class caixa():
             velocitat[0] *=0.3 + 0.59*abs(math.sin(math.radians(self.angle_rampa)))
             velocitat[1] *=0.3 + 0.59*abs(math.cos(math.radians(self.angle_rampa)))
             self.conjut_de_velocitats_1.append(velocitat)
-        else:
+        elif n!= 0:
             for i in x.suma_pes:
                 if i[1] == self:
                     x.suma_pes.remove(i)
@@ -1937,7 +2047,7 @@ def GameLoop():
     zona_ocell = False
     mantenint_ocell = False
     partida = False
-    nivell = [bombardero, vermellet, racista2, vermellet2, pequeñin, racista]
+    nivell = [bombardero, pequeñin, estrella, racista2, vermellet2, racista]
     nivell1 = [caixa1,caixa2,caixa3,caixa4,caixa5,caixa6,caixa7,caixa8,caixa9,caixa10,caixa11,caixa12,caixa13,caixa14,terra, paret_dreta, paret_esquerra,porc1, porc2]
     nivell2 = []
     while True:
@@ -1948,6 +2058,7 @@ def GameLoop():
                 break
             partida = True
             n = 0
+            nombre_porcs = 0
         else:
             perdut = True
             if n==0:
@@ -1979,6 +2090,8 @@ def GameLoop():
                         mantenint_ocell = False
                         ocell_actual.linea_direció = False
                         ocell_actual.llançament()
+                    elif ocell_anterior.tocat_objecte == False:
+                        ocell_anterior.habilitat()
             # Netejar la pantalla
             pantalla.fill(fons)
             # Aparèixer porcs, ocells i linea
@@ -2039,7 +2152,7 @@ def GameLoop():
             if nombre_porcs == 0:
                 pantalla_final(True)
                 partida = False
-            if perdut == True and n_2 == 1:
+            if perdut == True:
                 pantalla_final(False)
                 partida = False
 
