@@ -18,10 +18,12 @@ rosa = (255, 0, 255)
 groc = (255, 255, 0)
 taronja = (255, 165, 0)
 taronja2 = (205, 115, 0)
+taronja3 = (165, 75, 0)
 marró = (128, 64, 0)
 marró2 = (118, 54, 0)
 marró_fosc = (84, 56, 34)
 fons = (80, 80, 255)
+gris=(50,50,50)
 
 # Definim la gravetat
 gravetat = 0.05
@@ -134,8 +136,8 @@ def colisió_cercles(self,x):
             nombre_porcs-=1
             x.velocitat *=0.4
         else:
-            if self.velocitat.length()*self.massa/x.massa > 2 and x.movible and self in llista_ocells:
-                x.mig_trencat()
+            if self.velocitat.length()*self.massa/x.massa > 1 and x.movible and self in llista_ocells:
+                x.mig_trencat(self.velocitat.length()*self.massa/x.massa)
             if x.caixa == False:
                 self.velocitat *= 0.4
             else:    
@@ -392,12 +394,14 @@ class ocells():
         self.activat = False
         self.n = 0
         self.llista_estela = []
+        self.llista_copia = []
     
     def calcul_posició_primer_xoc (self):
         if self.tocat_objecte == False:
-            self.posició_primer_xoc = self.rectangle.center
             self.tocat_objecte = True
-    
+            for i in self.llista_copia:
+                i.llista_estela.extend(self.llista_estela)
+            self.llista_copia.clear()
     def calcul_angle_cercle(self, pos):
         vector_angle = pygame.math.Vector2(pos[0]-self.rectangle.center[0], pos[1]-self.rectangle.center[1])
         s = vector_angle.angle_to((-1,0)) + 180
@@ -466,7 +470,9 @@ class ocells():
         if self.llançat:    
             self.rectangle.center = self.posició_real
             if self.rectangle.center[0]>pantalla_amplada or self.rectangle.center[0]<0 or self.rectangle.center[1]>pantalla_alçada:
-                llista_objectes_pantalla.remove(self)
+                self.calcul_posició_primer_xoc()
+                if self.rectangle.center[0]>pantalla_amplada+100 or self.rectangle.center[0]<-100 or self.rectangle.center[1]>pantalla_alçada+100:     
+                    llista_objectes_pantalla.remove(self)
         if self.animació:
             if self.n%5 == 0:    
                 n=pygame.math.Vector2(5,5)
@@ -513,25 +519,35 @@ class ocells():
                 self.activar_animació(blanc,1) 
                 self.velocitat[0] *= 2.5
             elif self.color == cian:
-               self.activar_animació(blanc,1) 
-               self.copia1 = self.copy()
-               self.copia2 = self.copy() 
-               self.copia1.llançat = True
-               self.copia2.llançat = True
-               self.copia1.aire = True
-               self.copia2.aire = True
-               self.copia1.tocat_objecte = True
-               self.copia2.tocat_objecte = True
-               self.copia1.posició_real = self.rectangle.center+pygame.math.Vector2(25,10)
-               self.copia2.posició_real = self.rectangle.center+pygame.math.Vector2(25,-10)
-               llista_objectes_pantalla.append(self.copia1) 
-               llista_objectes_pantalla.append(self.copia2)
-               sprites.append(self.copia1)
-               sprites.append(self.copia2)
-               self.copia1.velocitat = self.velocitat.rotate(20)
-               self.copia2.velocitat = self.velocitat.rotate(-20)
-               self.copia1.llista_estela.append(self.llista_estela) 
-               self.copia2.llista_estela.append(self.llista_estela) 
+                self.activar_animació(blanc,1) 
+                self.copia1 = self.copy()
+                self.copia2 = self.copy() 
+                self.copia1.llançat = True
+                self.copia2.llançat = True
+                self.copia1.aire = True
+                self.copia2.aire = True
+                self.copia1.tocat_objecte = False
+                self.copia2.tocat_objecte = False
+                self.copia1.posició_real = self.rectangle.center+pygame.math.Vector2(25,10)
+                self.copia2.posició_real = self.rectangle.center+pygame.math.Vector2(25,-10)
+                llista_objectes_pantalla.append(self.copia1) 
+                llista_objectes_pantalla.append(self.copia2)
+                sprites.append(self.copia1)
+                sprites.append(self.copia2)
+                self.copia1.velocitat = self.velocitat.rotate(20)
+                self.copia2.velocitat = self.velocitat.rotate(-20)
+                self.copia1.rectangle = self.rectangle.copy()
+                self.copia2.rectangle = self.rectangle.copy()
+                while self.rectangle.colliderect(self.copia1.rectangle):
+                    self.copia1.posició_real += self.copia1.velocitat
+                    self.copia1.rectangle.center = self.copia1.posició_real
+                while self.rectangle.colliderect(self.copia2.rectangle):
+                    self.copia2.posició_real += self.copia2.velocitat
+                    self.copia2.rectangle.center = self.copia2.posició_real
+                self.copia1.posició_real = self.copia1.rectangle.center
+                self.copia2.posició_real = self.copia2.rectangle.center
+                self.copia1.llista_copia.append(self)
+                self.copia2.llista_copia.append(self)
             else:
                 if self.color == negre:    
                     self.activar_animació(taronja2,1.5)
@@ -552,6 +568,10 @@ class ocells():
                                     if self.color == blanc:
                                         angle +=180
                                         potencia *=2
+                                    else:
+                                        potencia +=50
+                                        if potencia > 200:
+                                            potencia = 200
                                     i.velocitat += pygame.math.Vector2.from_polar((potencia*50/i.massa, angle))
                         elif i in llista_ocells:    
                             if i.llançat:    
@@ -566,6 +586,10 @@ class ocells():
                                     if self.color == blanc:
                                         angle +=180
                                         potencia *=2
+                                    else:
+                                        potencia +=50
+                                        if potencia > 200:
+                                            potencia = 200
                                     i.velocitat += pygame.math.Vector2.from_polar((potencia*50/i.massa, angle))
                         if i in llista_objectes_rectangulars:    
                             if i.caixa and i.movible:    
@@ -580,6 +604,10 @@ class ocells():
                                     if self.color == blanc:
                                         angle +=180
                                         potencia *=2
+                                    else:
+                                        potencia +=50
+                                        if potencia > 200:
+                                            potencia = 200
                                     i.velocitat += pygame.math.Vector2.from_polar((potencia*50/i.massa, angle))
             self.activat = True
     def copy(self):
@@ -600,6 +628,7 @@ class ocells():
         self.linea_direció = False
         self.posició_primer_xoc = [0,0] 
         self.animació = False
+        self.llista_copia.clear()
     
     def activar_animació(self, color,radi2):
         radi = self.radi /radi2
@@ -614,14 +643,6 @@ estrella = ocells(22, blanc)
 pequeñin = ocells(13, cian)
 racista = ocells(18, groc)
 no_ocell = ocells(0, fons)
-vermellet2 = vermellet.copy()
-vermellet3 = vermellet.copy()
-bombardero2 = bombardero.copy()
-bombardero3 = bombardero.copy()
-pequeñin2 = pequeñin.copy()
-pequeñin3 = pequeñin.copy()
-racista2 = racista.copy()
-racista3 = racista.copy()
 llista_ocells_llançats = [no_ocell]
 llista_objectes_rodons.extend(llista_ocells)
 
@@ -777,9 +798,10 @@ class porc():
         radi = self.radi/2
         self.porc  = False
         self.animació = [[radi,self.rectangle.center],[radi,self.rectangle.center],[radi,self.rectangle.center],[radi,self.rectangle.center]]
-
-porc1 = porc(20, (pantalla_amplada - 180, pantalla_alçada - 160))
-porc2 = porc(20, (pantalla_amplada - 430, pantalla_alçada - 160))
+    def copy(self, posició):
+        x = porc(self.radi, posició)
+        return x
+porc_estandar = porc(20, (pantalla_amplada - 180, pantalla_alçada - 160))
 #Caixes 
 class caixa():
     def __init__(self, posició, alçada, amplada, movible, angle):
@@ -818,7 +840,7 @@ class caixa():
         self.suma_pes = []
         self.rotacions = []
         self.caixa = True
-        self.trencat = 0
+        self.vida = 4 
     
     def update(self):
         if self.movible == True and self.caixa:
@@ -1870,23 +1892,25 @@ class caixa():
         self.caixa = False
         radi = self.massa/100
         self.animació = [[radi,self.rectangle.center],[radi,self.rectangle.center],[radi,self.rectangle.center],[radi,self.rectangle.center]]
-    def mig_trencat(self):
-        self.trencat +=1
-        if self.trencat == 2:
+    def mig_trencat(self, força):
+        self.vida -= força
+        if self.vida <= 0:
             self.destrucció()
-        else:
+        elif self.vida <=2:
             self.superficie_rectangle.fill(vermell2)
             if self.amplada < self.alçada:    
                 pygame.draw.rect(self.superficie_rectangle, marró_fosc , ((0,0), (self.amplada, self.alçada)), 10 - (100//self.amplada))
             else:
                 pygame.draw.rect(self.superficie_rectangle, marró_fosc , ((0,0), (self.amplada, self.alçada)), 10 - (100//self.alçada))
+    def copy(self, posició):
+        x = caixa(posició,self.alçada, self.amplada,self.movible,self.angle_inicial)
+        return x
     def reinici(self):
         self.superficie_rectangle.fill(marró)
         if self.amplada < self.alçada:    
             pygame.draw.rect(self.superficie_rectangle, marró_fosc , ((0,0), (self.amplada, self.alçada)), 10 - (100//self.amplada))
         else:
             pygame.draw.rect(self.superficie_rectangle, marró_fosc , ((0,0), (self.amplada, self.alçada)), 10 - (100//self.alçada))
-        self.trencat = 0
         self.velocitat *= 0
         self.angle = self.angle_inicial
         self.rectangle_nou = pygame.transform.rotate(self.superficie_rectangle, self.angle)
@@ -1904,23 +1928,12 @@ class caixa():
         self.rotacions.clear()
         self.caixa = True
 
-paret_dreta = caixa((pantalla_amplada + 50, (-500+pantalla_alçada)/2), pantalla_alçada + 500, 100, False, 0)
-paret_esquerra = caixa((-50, (-500+pantalla_alçada)/2), pantalla_alçada + 500, 100, False, 0)
-terra = caixa([pantalla_amplada/2, pantalla_alçada + 50], 100, pantalla_amplada, False, 0)
-caixa2 = caixa([pantalla_amplada - 255, pantalla_alçada-48], 50, 50, True, 0)
-caixa3 = caixa([pantalla_amplada - 105, pantalla_alçada-48], 50, 50, True, 0)
-caixa4 = caixa([pantalla_amplada - 230, pantalla_alçada-175], 20, 70, True, 90)
-caixa5 = caixa([pantalla_amplada - 130, pantalla_alçada-175], 20, 70, True, 90)
-caixa6 = caixa([pantalla_amplada - 180, pantalla_alçada-245], 20, 150, True, 0)
-caixa7 = caixa([pantalla_amplada - 180, pantalla_alçada-315], 60, 60, True, 0)
-caixa1 = caixa([pantalla_amplada - 180, pantalla_alçada-105], 20, 200, True, 0)
-caixa8 = caixa([pantalla_amplada - 505, pantalla_alçada-48], 50, 50, True, 0)
-caixa9 = caixa([pantalla_amplada - 355, pantalla_alçada-48], 50, 50, True, 0)
-caixa10 = caixa([pantalla_amplada - 480, pantalla_alçada-175], 20, 70, True, 90)
-caixa11= caixa([pantalla_amplada - 380, pantalla_alçada-175], 20, 70, True, 90)
-caixa12 = caixa([pantalla_amplada - 430, pantalla_alçada-245], 20, 150, True, 0)
-caixa13 = caixa([pantalla_amplada - 430, pantalla_alçada-315], 60, 60, True, 0)
-caixa14 = caixa([pantalla_amplada - 430, pantalla_alçada-105], 20, 200, True, 0)
+terra = caixa([pantalla_amplada/2, pantalla_alçada + 50], 100, pantalla_amplada+100, False, 0)
+quadrat_petit = caixa([pantalla_amplada - 255, pantalla_alçada-48], 50, 50, True, 0)
+rectangle_petit = caixa([pantalla_amplada - 230, pantalla_alçada-175], 20, 70, True, 90)
+rectangle_normal = caixa([pantalla_amplada - 180, pantalla_alçada-245], 20, 150, True, 0)
+quadrat_gran = caixa([pantalla_amplada - 180, pantalla_alçada-315], 60, 60, True, 0)
+rectangle_gran = caixa([pantalla_amplada - 180, pantalla_alçada-105], 20, 200, True, 0)
 
 # Selecció de nivell
 def selecció_nivell():
@@ -2012,12 +2025,14 @@ def menú():
         pantalla.blit(text, (pantalla_amplada // 2 - text.get_width() // 2, pantalla_alçada // 2 - text.get_height() // 2))
 
         pygame.display.flip()
-def pantalla_final(tipo):
+def pantalla_final(tipo, estrelles):
     if tipo == True:
-        texto = "You Win"
+        texto = "VICTORIA"
     else:
-        texto = "You Lose"
+        texto = "DERROTA"
     while True:
+        color = estrelles
+        n = 3
         for event in pygame.event.get():
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
@@ -2025,10 +2040,26 @@ def pantalla_final(tipo):
                 if event.key == pygame.K_SPACE:
                     return False
         pantalla.fill(fons)
-
+        
         font = pygame.font.Font(None, 300)
         text = font.render(texto, True, taronja)
-        pantalla.blit(text, (pantalla_amplada // 2 - text.get_width() // 2, pantalla_alçada // 2 - text.get_height() // 2))
+        pantalla.blit(text, (pantalla_amplada // 2 - text.get_width() // 2, pantalla_alçada // 3 - text.get_height() // 2))
+        while n >0:
+            if color >0:
+                color_estrella = taronja
+            else:
+                color_estrella = gris
+            z = [pygame.math.Vector2(0, -100),pygame.math.Vector2(0, 50).rotate(72*3) , pygame.math.Vector2(0, -100).rotate(72),pygame.math.Vector2(0, 50).rotate(72*4), pygame.math.Vector2(0, -100).rotate(72*2), pygame.math.Vector2(0, 50), pygame.math.Vector2(0, -100).rotate(72*3),pygame.math.Vector2(0, 50).rotate(72), pygame.math.Vector2(0, -100).rotate(72*4), pygame.math.Vector2(0, 50).rotate(72*2)]
+            x = [pygame.math.Vector2(0, -100),pygame.math.Vector2(0, 50).rotate(72*3) , pygame.math.Vector2(0, -100).rotate(72),pygame.math.Vector2(0, 50).rotate(72*4), pygame.math.Vector2(0, -100).rotate(72*2), pygame.math.Vector2(0, 50), pygame.math.Vector2(0, -100).rotate(72*3),pygame.math.Vector2(0, 50).rotate(72), pygame.math.Vector2(0, -100).rotate(72*4), pygame.math.Vector2(0, 50).rotate(72*2)]
+            for i in z:
+                i*=1.3
+                i +=(pantalla_amplada*(3-n)/3+225,pantalla_alçada-250)
+            for i in x:
+                i += (pantalla_amplada*(3-n)/3+225,pantalla_alçada-250)
+            pygame.draw.polygon(pantalla, taronja3, z)
+            pygame.draw.polygon(pantalla, color_estrella, x)
+            n-=1
+            color-=1
         pygame.display.flip()
 #Definim reinici al sortir del nivell
 def reinici():
@@ -2047,8 +2078,8 @@ def GameLoop():
     zona_ocell = False
     mantenint_ocell = False
     partida = False
-    nivell = [bombardero, pequeñin, estrella, racista2, vermellet2, racista]
-    nivell1 = [caixa1,caixa2,caixa3,caixa4,caixa5,caixa6,caixa7,caixa8,caixa9,caixa10,caixa11,caixa12,caixa13,caixa14,terra, paret_dreta, paret_esquerra,porc1, porc2]
+    nivell = [bombardero.copy(), pequeñin.copy(), estrella.copy(), racista.copy(), vermellet.copy(), racista.copy()]
+    nivell1 = [rectangle_gran, quadrat_petit,quadrat_petit.copy([pantalla_amplada - 105, pantalla_alçada-48]),rectangle_petit,rectangle_petit.copy([pantalla_amplada - 130, pantalla_alçada-175]),rectangle_normal, quadrat_gran,quadrat_petit.copy([pantalla_amplada - 505, pantalla_alçada-48]),quadrat_petit.copy([pantalla_amplada - 355, pantalla_alçada-48]),rectangle_petit.copy([pantalla_amplada - 480, pantalla_alçada-175]),rectangle_petit.copy([pantalla_amplada - 380, pantalla_alçada-175]),rectangle_normal.copy([pantalla_amplada - 430, pantalla_alçada-245]),quadrat_gran.copy([pantalla_amplada - 430, pantalla_alçada-315]),rectangle_gran.copy([pantalla_amplada - 430, pantalla_alçada-105]),terra, porc_estandar, porc_estandar.copy((pantalla_amplada - 430, pantalla_alçada - 160))]
     nivell2 = []
     while True:
         if not partida:
@@ -2059,6 +2090,7 @@ def GameLoop():
             partida = True
             n = 0
             nombre_porcs = 0
+            nombre_porcs_orig = 0
         else:
             perdut = True
             if n==0:
@@ -2071,6 +2103,7 @@ def GameLoop():
                 for i in llista_objectes_pantalla:
                     if i in llista_porcs:
                         nombre_porcs+=1
+                        nombre_porcs_orig += 1
                 n =1
             ocell_actual =  llista_ocells_llançats[següent_ocell(nivell[0], nivell[1], nivell[2], nivell[3], nivell[4], nivell[5])]
             if len(llista_ocells_llançats) > 1:
@@ -2150,12 +2183,15 @@ def GameLoop():
             linea_ocells(nivell[0], nivell[1], nivell[2], nivell[3], nivell[4], nivell[5],)
             pygame.draw.line(pantalla, marró, punt_t1, punt_t2, width = 20)
             if nombre_porcs == 0:
-                pantalla_final(True)
+                z = nombre_porcs_orig - (len(llista_ocells_llançats)-2)
+                z+=3
+                pantalla_final(True,z)
                 partida = False
             if perdut == True:
-                pantalla_final(False)
+                pantalla_final(False,0)
                 partida = False
-
+            pantalla_final(True,2)
+            partida = False
         # Recarregar la pantalla
         pygame.display.flip()
     # Sortir del joc
