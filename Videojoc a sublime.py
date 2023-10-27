@@ -134,7 +134,7 @@ def colisió_cercles(self,x):
         if self.velocitat.length()*self.massa/x.massa > 4 and x.movible and self in llista_ocells:
             x.destrucció()
             self.velocitat *= 0.4
-        elif self in llista_porcs and (self.velocitat.length()>10*self.massa/50 or x.velocitat.length()*x.massa/self.massa>20):
+        elif self in llista_porcs and self.velocitat.length()*100>self.massa and i.movible:
             nombre_porcs-=1
             x.velocitat *=0.4
         else:
@@ -384,6 +384,7 @@ class ocells():
         self.linea_direció_moviment = 0
         self.estela_velocitat = [0,0]
         llista_ocells.append(self) 
+        llista_objectes_rodons.append(self) 
         self.colisionat = False
         self.superficie_ocell = pygame.Surface((2*self.radi, 2*self.radi), pygame.SRCALPHA)
         self.rectangle = self.superficie_ocell.get_rect()
@@ -646,7 +647,6 @@ pequeñin = ocells(13, cian)
 racista = ocells(18, groc)
 no_ocell = ocells(0, fons)
 llista_ocells_llançats = [no_ocell]
-llista_objectes_rodons.extend(llista_ocells)
 
 #Creació ordre d'ocells
 def següent_ocell(ocell1, ocell2, ocell3, ocell4, ocell5, ocell6):
@@ -824,7 +824,6 @@ class caixa():
         self.superficie_rectangle.set_colorkey(fons)
         self.angle = angle
         self.angle_inicial = angle
-        self.superficie_rectangle.fill(marró)
         if tipo == 1:
             self.color_borde = blau_fosc
             self.color = cian
@@ -849,8 +848,8 @@ class caixa():
         self.velocitat_angle = 0
         self.conjut_de_velocitats_1 = []
         self.conjut_de_velocitats_2 = []
-        self.vector_centre1 = pygame.math.Vector2(-0.25*amplada, 0)
-        self.vector_centre2 = pygame.math.Vector2(0.25*amplada, 0)
+        self.vector_centre1 = pygame.math.Vector2(-0.5*amplada+0.5*alçada, 0)
+        self.vector_centre2 = pygame.math.Vector2(0.5*amplada-0.5*alçada, 0)
         self.colisionats = []
         self.rotar = True
         self.n = 0
@@ -989,11 +988,9 @@ class caixa():
             if angle2>= 360:
                 angle2-=360
             y2 = angle2-s2
-            z11 = math.degrees(math.atan2(self.alçada, 0.5*self.amplada))
-            z22 = 90 - z11
-            if math.sqrt((y2)**2) < (z11) or math.sqrt((y2)**2) > (360-(z11)):
+            if abs(y2) < 45 or abs(y2) > 315:
                  z = self.angle
-            elif math.sqrt((y1)**2) < (z11) or math.sqrt((y1)**2) > (360-(z11)):
+            elif abs(y1) < 45 or abs(y1)> 315:
                  z = self.angle + 180
             elif (y1 < 180 and y1 > 0) or (y1 < -180 and y1 < 0):
                 z = self.angle + 90
@@ -1132,11 +1129,11 @@ class caixa():
             rampa_x = self
             rampa_s = self
         if n>=2:    
-            rampa_x = x
-            rampa_s = self
+            rampa_x = self
+            rampa_s = x
             mask_xoc = self.mask.overlap_mask(x.mask,(x.rectangle.x- self.rectangle.x, x.rectangle.y- self.rectangle.y))        
             rectangle_xoc = mask_xoc.get_bounding_rects()
-            posició_xoc = rectangle_xoc[0].center + pygame.math.Vector2(self.rectangle.topleft)
+            posició_xoc = mask_xoc.centroid() + pygame.math.Vector2(self.rectangle.topleft)
             if ns == 2 or nx == 2:
                 rampa_s = x
                 rampa_x = self
@@ -1186,12 +1183,12 @@ class caixa():
         elif ns == 1:
             mask_xoc = self.mask.overlap_mask(x.mask,(x.rectangle.x- self.rectangle.x, x.rectangle.y- self.rectangle.y))        
             rectangle_xoc = mask_xoc.get_bounding_rects()
-            posició_xoc_x = rectangle_xoc[0].center + pygame.math.Vector2(self.rectangle.topleft)
+            posició_xoc_x = mask_xoc.centroid() + pygame.math.Vector2(self.rectangle.topleft)
             posició_xoc = posició_xoc_x
         elif nx == 1:
             mask_xoc = self.mask.overlap_mask(x.mask,(x.rectangle.x- self.rectangle.x, x.rectangle.y- self.rectangle.y))        
             rectangle_xoc = mask_xoc.get_bounding_rects()
-            posició_xoc_s = rectangle_xoc[0].center + pygame.math.Vector2(self.rectangle.topleft)
+            posició_xoc_s = mask_xoc.centroid() + pygame.math.Vector2(self.rectangle.topleft)
             posició_xoc = posició_xoc_s
         elif n == 0:
             rampa_s = x
@@ -1201,8 +1198,6 @@ class caixa():
             posició_xoc_s = rectangle_xoc[0].center + pygame.math.Vector2(self.rectangle.topleft)
             posició_xoc_x = posició_xoc_s
             posició_xoc = posició_xoc_s
-        if n == 3:
-            print(nx, ns,n)
         if self.z == 0:
             self.velocitat_angle = 0
             self.z = 1
@@ -1918,6 +1913,8 @@ class caixa():
         self.rotacions.clear()
         self.caixa = False
         radi = self.massa/100
+        if radi > self.amplada/2:
+            radi = self.amplada/2
         self.animació = [[radi,self.rectangle.center],[radi,self.rectangle.center],[radi,self.rectangle.center],[radi,self.rectangle.center]]
     def mig_trencat(self, força):
         self.vida -= round(força)
@@ -2107,13 +2104,24 @@ def GameLoop():
     partida = False
     nivell = [bombardero.copy(), pequeñin.copy(), estrella.copy(), racista.copy(), vermellet.copy(), racista.copy()]
     nivell1 = [rectangle_gran, quadrat_petit,quadrat_petit.copy([pantalla_amplada - 105, pantalla_alçada-48]),rectangle_petit,rectangle_petit.copy([pantalla_amplada - 130, pantalla_alçada-175]),rectangle_normal, quadrat_gran,quadrat_petit.copy([pantalla_amplada - 505, pantalla_alçada-48]),quadrat_petit.copy([pantalla_amplada - 355, pantalla_alçada-48]),rectangle_petit.copy([pantalla_amplada - 480, pantalla_alçada-175]),rectangle_petit.copy([pantalla_amplada - 380, pantalla_alçada-175]),rectangle_normal.copy([pantalla_amplada - 430, pantalla_alçada-245]),quadrat_gran.copy([pantalla_amplada - 430, pantalla_alçada-315]),rectangle_gran.copy([pantalla_amplada - 430, pantalla_alçada-105]), porc_estandar, porc_estandar.copy((pantalla_amplada - 430, pantalla_alçada - 160))]
-    nivell2 = []
+    nivell2 = [porc_estandar.copy((0,0))]
+    nivell3 = [porc_estandar.copy((0,0))]
+    nivell4 = [porc_estandar.copy((0,0))]
+    nivell5 = [porc_estandar.copy((0,0))]
+    nivell6 = [porc_estandar.copy((0,0))]
+    nivell7 = [porc_estandar.copy((0,0))]
+    nivell8 = [porc_estandar.copy((0,0))]
+    nivell9 = [porc_estandar.copy((0,0))]
+    nivell10 = [porc_estandar.copy((0,0))]
+    nivell11 = [porc_estandar.copy((0,0))]
+    nivell12 = [porc_estandar.copy((0,0))]
+    nivells = {1:nivell1, 2:nivell2, 3:nivell3, 4:nivell4, 5:nivell5, 6:nivell6, 7:nivell7, 8:nivell8, 9:nivell9, 10:nivell10, 11:nivell11, 12:nivell12}
+
     while True:
         if not partida:
-            reinici()
-            mantenint_ocell = False
             if not menú():
                 break
+            reinici()
             partida = True
             n = 0
             nombre_porcs = 0
@@ -2121,12 +2129,8 @@ def GameLoop():
         else:
             perdut = True
             if n==0:
-                if nivell_actual == 1:
-                    sprites.extend(nivell1)
-                    llista_objectes_pantalla.extend(nivell1)
-                if nivell_actual == 2:
-                    sprites.extend(nivell2)
-                    llista_objectes_pantalla.extend(nivell2)
+                sprites.extend(nivells[nivell_actual])
+                llista_objectes_pantalla.extend(nivells[nivell_actual])
                 for i in llista_objectes_pantalla:
                     if i in llista_porcs:
                         nombre_porcs+=1
@@ -2188,6 +2192,7 @@ def GameLoop():
                                 if self.rectangle.colliderect(i.rectangle) and i.caixa:
                                     if self.mask.overlap(i.mask,(i.rectangle.x- self.rectangle.x, i.rectangle.y- self.rectangle.y)):
                                         self.colisió(i)
+                        self.colisionat = True
                 if self in llista_porcs:
                     if self.porc:    
                         for i in llista_objectes_pantalla:
@@ -2204,7 +2209,7 @@ def GameLoop():
                                 if self.rectangle.colliderect(i.rectangle): 
                                     if self.mask.overlap(i.mask,(i.rectangle.x- self.rectangle.x, i.rectangle.y- self.rectangle.y)):    
                                         self.colisió(i)
-                            self.colisionat = True
+                        self.colisionat = True
             for i in  llista_objectes_pantalla:
                 i.dibuixar()
             linea_ocells(nivell[0], nivell[1], nivell[2], nivell[3], nivell[4], nivell[5],)
@@ -2215,10 +2220,17 @@ def GameLoop():
                 if z < 1:
                     z = 1
                 pantalla_final(True,z)
-                partida = False
+                reinici()
+                n = 0
+                nombre_porcs = 0
+                nombre_porcs_orig = 0
+                nivell_actual+=1
             if perdut == True:
+                reinici()
+                n = 0
+                nombre_porcs = 0
+                nombre_porcs_orig = 0
                 pantalla_final(False,0)
-                partida = False
         # Recarregar la pantalla
         pygame.display.flip()
     # Sortir del joc
