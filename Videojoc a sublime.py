@@ -54,6 +54,7 @@ llista_porcs = []
 #Posició inicial ocells
 posició_inicial = [150, pantalla_alçada-150]
 nombre_porcs = 0
+nombre_ocells = 0
 
 #Creació funcions basiques
 def calcular_angle():
@@ -322,21 +323,32 @@ def colisió_cercles(self,x):
                                         xmeitat2+=1
                                     else:
                                         xmeitat1 +=1 
-                        elif 3+xmeitat1 < xmeitat2:
+                        if xmeitat1 > xmeitat2:
                             x.rotar = True
-                            xmeitat2/= 10
-                            xmeitat2 = round(xmeitat2)
-                            xmeitat2*=10
                             if n != 0:    
                                 if abs(xcentre4[2].length() - 0.5*x.amplada) < abs(xcentre4[2].length() - 0.5*x.alçada):
-                                    x.velocitat_angle += abs((x.velocitat[1]) * xmeitat2*0.5)/xtotal
+                                    xvelocitat_angle = -abs((x.velocitat[1]) * xmeitat1*0.5)/xtotal
                                 else:
-                                    x.velocitat_angle += abs((x.velocitat[1]) * xmeitat2*0.5*x.alçada)/(xtotal*x.amplada)
+                                    xvelocitat_angle = -abs((x.velocitat[1]) * xmeitat1*0.5*x.alçada)/(xtotal*x.amplada)
                             else:
                                 if abs(xcolisió_centre[2].length() - 0.5*x.amplada) < abs(xcolisió_centre[2].length() - 0.5*x.alçada):
-                                    x.velocitat_angle += abs((x.velocitat[1]) * xmeitat2*0.5)/xtotal
+                                    xvelocitat_angle = -abs((x.velocitat[1]) * xmeitat1*0.5)/xtotal
                                 else:
-                                    x.velocitat_angle += abs((x.velocitat[1]) * xmeitat2*0.5*x.alçada)/(xtotal*x.amplada) 
+                                    xvelocitat_angle =- abs((x.velocitat[1]) * xmeitat1*0.5*x.alçada)/(xtotal*x.amplada)
+                            x.rotacions.append((xvelocitat_angle, round(posició_xoc[1])))
+                        elif xmeitat1 < xmeitat2:
+                            x.rotar = True
+                            if n != 0:    
+                                if abs(xcentre4[2].length() - 0.5*x.amplada) < abs(xcentre4[2].length() - 0.5*x.alçada):
+                                    xvelocitat_angle = abs((x.velocitat[1]) * xmeitat2*0.5)/xtotal
+                                else:
+                                    xvelocitat_angle = abs((x.velocitat[1]) * xmeitat2*0.5*x.alçada)/(xtotal*x.amplada)
+                            else:
+                                if abs(xcolisió_centre[2].length() - 0.5*x.amplada) < abs(xcolisió_centre[2].length() - 0.5*x.alçada):
+                                    xvelocitat_angle = abs((x.velocitat[1]) * xmeitat2*0.5)/xtotal
+                                else:
+                                    xvelocitat_angle = abs((x.velocitat[1]) * xmeitat2*0.5*x.alçada)/(xtotal*x.amplada) 
+                            x.rotacions.append((xvelocitat_angle, round(posició_xoc[1])))
                     velocitat = self.velocitat.copy()
                     if diferencia_angle_self > 90 and self.velocitat.length() > 0 :    
                         nou_angle_velocitat = 180+2*self.velocitat.angle_to((-1,0)) - 2*self.angle_rampa 
@@ -458,7 +470,9 @@ class ocells():
                 self.cooldown += 1
         else:
             self.cooldown = 0
-        if self.cooldown >= 100:     
+        if self.cooldown >= 100:
+            global nombre_ocells    
+            nombre_ocells-=1 
             llista_objectes_pantalla.remove(self)
         self.colisionat = False
         if self.llançat:    
@@ -466,6 +480,7 @@ class ocells():
             if self.rectangle.center[0]>pantalla_amplada or self.rectangle.center[0]<0 or self.rectangle.center[1]>pantalla_alçada:
                 self.calcul_posició_primer_xoc()
                 if self.rectangle.center[0]>pantalla_amplada+100 or self.rectangle.center[0]<-100 or self.rectangle.center[1]>pantalla_alçada+100:     
+                    nombre_ocells-=1
                     llista_objectes_pantalla.remove(self)
         if self.animació:
             if self.n%5 == 0:    
@@ -921,7 +936,7 @@ class caixa():
                 llista_objectes_pantalla.remove(self)
     def dibuixar(self):
         if self.caixa:    
-            if self.colisionats != [] and self.movible:
+            if self.z == 1 and self.movible:
                 self.posició_real = self.rectangle.center
                 if self.conjut_de_velocitats_1 != []:
                     self.velocitat*=0    
@@ -1155,6 +1170,7 @@ class caixa():
                             self.angle = round(self.angle) - nou_angle
                         else:
                             self.angle = round(self.angle) + nou_angle
+                        self.rotacions.clear()
                 if nx == 2 and x.movible:
                     if ns == 1:
                         ns -=1
@@ -1175,6 +1191,7 @@ class caixa():
                         else:
                             x.angle = round(x.angle) + nou_angle
                         x.centre_no_rotar = xcentre
+                        x.rotacions.clear()
                 posició_xoc_s = posició_xoc
                 posició_xoc_x = posició_xoc
         elif ns == 1:
@@ -1302,7 +1319,7 @@ class caixa():
                                     meitat2+=1
                                 else:
                                     meitat1+=1
-                    if meitat1 > meitat2 + 3:
+                    if meitat1 > meitat2:
                         if abs(centre4[2].length() - 0.5*self.amplada) < abs(centre4[2].length() - 0.5*self.alçada):
                             svelocitat_angle = -abs(self.velocitat[1] * meitat1)/total
                         else:
@@ -1311,7 +1328,7 @@ class caixa():
                             if round(posició_xoc_s[1]) == self.rotacions[0][1]:
                                 self.rotacions.remove(self.rotacions[0])
                         self.rotacions.append((svelocitat_angle, round(posició_xoc_s[1])))
-                    elif meitat1 + 3 < meitat2:
+                    elif meitat1 < meitat2:
                         if abs(centre3[2].length() - 0.5*self.amplada) < abs(centre3[2].length() - 0.5*self.alçada):
                             svelocitat_angle = abs(self.velocitat[1] * meitat2)/total
                         else:
@@ -1609,11 +1626,8 @@ class caixa():
                             elif meitat4>(meitat4+meitat5+meitat6)/2:
                                 meitat1 = meitat4
                                 meitat2 = meitat5
-                    if meitat1 > meitat2+3:
+                    if meitat1 > meitat2:
                         self.rotar = True
-                        meitat1/= 10
-                        meitat1 = round(meitat1)
-                        meitat1*=10
                         if posició_xoc_s in esquines:    
                             if abs(centre4[2].length() - 0.5*self.amplada) < abs(centre4[2].length() - 0.5*self.alçada):
                                 svelocitat_angle = -abs((self.velocitat[1]) * meitat1*0.5)/(total)
@@ -1625,11 +1639,8 @@ class caixa():
                             else:
                                 svelocitat_angle = -abs((self.velocitat[1]) * meitat1*0.5*self.alçada)/((total)*self.amplada)
                         self.rotacions.append((svelocitat_angle, round(posició_xoc_s[1])))
-                    elif meitat1+3 < meitat2:
+                    elif meitat1 < meitat2:
                         self.rotar = True
-                        meitat2/= 10
-                        meitat2 = round(meitat2)
-                        meitat2*=10
                         if posició_xoc_s in esquines:    
                             if abs(centre3[2].length() - 0.5*self.amplada) < abs(centre3[2].length() - 0.5*self.alçada):
                                 svelocitat_angle = abs((self.velocitat[1]) * meitat2*0.5)/(total)
@@ -1827,11 +1838,8 @@ class caixa():
                             elif xmeitat4>(xmeitat4+xmeitat5+xmeitat6)/2:
                                 xmeitat1 = xmeitat4
                                 xmeitat2 = xmeitat5 
-                    if xmeitat1 > xmeitat2+3:
+                    if xmeitat1 > xmeitat2:
                         x.rotar = True
-                        xmeitat1/= 10
-                        xmeitat1 = round(xmeitat1)
-                        xmeitat1*=10
                         if posició_xoc_x in xesquines:    
                             if abs(xcentre4[2].length() - 0.5*x.amplada) < abs(xcentre4[2].length() - 0.5*x.alçada):
                                 xvelocitat_angle = -abs((x.velocitat[1]) * xmeitat1*0.5)/xtotal
@@ -1843,11 +1851,8 @@ class caixa():
                             else:
                                 xvelocitat_angle =- abs((x.velocitat[1]) * xmeitat1*0.5*x.alçada)/(xtotal*x.amplada)
                         x.rotacions.append((xvelocitat_angle, round(posició_xoc_x[1])))
-                    elif 3+xmeitat1 < xmeitat2:
+                    elif xmeitat1 < xmeitat2:
                         x.rotar = True
-                        xmeitat2/= 10
-                        xmeitat2 = round(xmeitat2)
-                        xmeitat2*=10
                         if posició_xoc_x in xesquines:    
                             if abs(xcentre3[2].length() - 0.5*x.amplada) < abs(xcentre3[2].length() - 0.5*x.alçada):
                                 xvelocitat_angle = abs((x.velocitat[1]) * xmeitat2*0.5)/xtotal
@@ -1940,7 +1945,6 @@ class caixa():
                             distancia_explosió = pygame.math.Vector2(self.rectangle.center) - i.rectangle.center
                             potencia = 300 - distancia_explosió.length()
                             if potencia >0:
-                                potencia += 50
                                 if potencia >= 300:
                                     potencia = 300
                                 angle = calcul_angle_cercle(self,i.rectangle.center) + 180
@@ -1949,7 +1953,7 @@ class caixa():
                                 else:
                                     angle = 360-angle + 180
                                 i.velocitat += pygame.math.Vector2.from_polar((potencia*50/i.massa, angle))
-                                i.mig_trencat(potencia/75)
+                                i.mig_trencat(potencia/150)
         else:
             self.color_animació = blanc
         self.caixa = False
@@ -2176,7 +2180,7 @@ nivells_ocells = {1:ocells1, 2:ocells2, 3:ocells3, 4:ocells4, 5:ocells5, 6:ocell
 
 nivell2 = [rectangle_gran, quadrat_petit,quadrat_petit.copy([pantalla_amplada - 105, pantalla_alçada-48]),rectangle_petit,rectangle_petit.copy([pantalla_amplada - 130, pantalla_alçada-175]),rectangle_normal, quadrat_gran,quadrat_petit.copy([pantalla_amplada - 505, pantalla_alçada-48]),quadrat_petit.copy([pantalla_amplada - 355, pantalla_alçada-48]),rectangle_petit.copy([pantalla_amplada - 480, pantalla_alçada-175]),rectangle_petit.copy([pantalla_amplada - 380, pantalla_alçada-175]),rectangle_normal.copy([pantalla_amplada - 430, pantalla_alçada-245]),quadrat_gran.copy([pantalla_amplada - 430, pantalla_alçada-315]),rectangle_gran.copy([pantalla_amplada - 430, pantalla_alçada-105]), porc_estandar, porc_estandar.copy((pantalla_amplada - 430, pantalla_alçada - 160))]
 nivell1 = [porc_estandar.copy([pantalla_amplada- 140, pantalla_alçada-265]), porc_estandar.copy([pantalla_amplada- 540, pantalla_alçada-265]), rectangle_petit.copy([pantalla_amplada- 105,pantalla_alçada-40]), rectangle_petit.copy([pantalla_amplada- 105,pantalla_alçada-115]), rectangle_petit.copy([pantalla_amplada- 105,pantalla_alçada-190]),rectangle_petit.copy([pantalla_amplada- 175,pantalla_alçada-40]), rectangle_petit.copy([pantalla_amplada- 175,pantalla_alçada-115]), rectangle_petit.copy([pantalla_amplada- 175,pantalla_alçada-190]), rectangle_normal.copy([pantalla_amplada- 140, pantalla_alçada-255]), rectangle_petit.copy([pantalla_amplada- 305,pantalla_alçada-115]), rectangle_petit.copy([pantalla_amplada- 305,pantalla_alçada-190]), rectangle_petit.copy([pantalla_amplada- 375,pantalla_alçada-115]), rectangle_petit.copy([pantalla_amplada- 375,pantalla_alçada-190]), rectangle_normal.copy([pantalla_amplada- 340, pantalla_alçada-255]), rectangle_petit.copy([pantalla_amplada- 505,pantalla_alçada-90]), rectangle_petit.copy([pantalla_amplada- 575,pantalla_alçada-90]), rectangle_normal.copy([pantalla_amplada- 540, pantalla_alçada-145]),tnt.copy([pantalla_amplada- 340, pantalla_alçada-300])]
-nivell3 = [porc_estandar.copy((1000,0))]
+nivell3 = [porc_estandar.copy((1000,0)), caixa([pantalla_amplada-250, pantalla_alçada-25],50,50, True, 54,2)]
 nivell4 = [porc_estandar.copy((1000,0))]
 nivell5 = [porc_estandar.copy((1000,0))]
 nivell6 = [porc_estandar.copy((1000,0))]
@@ -2192,6 +2196,7 @@ nivells_caixes_i_porcs = {1:nivell1, 2:nivell2, 3:nivell3, 4:nivell4, 5:nivell5,
 def GameLoop():
     global nivell_actual
     global nombre_porcs
+    global nombre_ocells
     zona_ocell = False
     mantenint_ocell = False
     partida = False
@@ -2204,8 +2209,8 @@ def GameLoop():
             n = 0
             nombre_porcs = 0
             nombre_porcs_orig = 0
+            nombre_ocells = 0
         else:
-            perdut = True
             if n==0:
                 sprites.extend(nivells_caixes_i_porcs[nivell_actual])
                 llista_objectes_pantalla.extend(nivells_caixes_i_porcs[nivell_actual])
@@ -2214,6 +2219,9 @@ def GameLoop():
                         nombre_porcs+=1
                         nombre_porcs_orig += 1
                 ocells_nivell = nivells_ocells[nivell_actual]
+                for i in ocells_nivell:
+                    if i != no_ocell:
+                        nombre_ocells +=1
                 n =1
             ocell_actual = llista_ocells_llançats[següent_ocell(ocells_nivell[0], ocells_nivell[1], ocells_nivell[2], ocells_nivell[3], ocells_nivell[4], ocells_nivell[5])]
             if len(llista_ocells_llançats) > 1:
@@ -2243,8 +2251,6 @@ def GameLoop():
                 ocell_anterior.estela()
             for i in  llista_objectes_pantalla:
                 i.update()
-                if i in llista_ocells and i !=  no_ocell:
-                    perdut = False
             llista_objectes_pantalla.sort(key=lambda i: i.rectangle.center[1])
             for self in llista_objectes_pantalla:
                 if self in llista_ocells:
@@ -2295,7 +2301,7 @@ def GameLoop():
             pygame.draw.line(pantalla, marró, punt_t1, punt_t2, width = 20)
             if nombre_porcs == 0:
                 z = nombre_porcs_orig - (len(llista_ocells_llançats)-3)
-                z+=3
+                z+=2
                 if z < 1:
                     z = 1
                 partida = pantalla_final(True,z)
@@ -2304,13 +2310,15 @@ def GameLoop():
                 nombre_porcs = 0
                 nombre_porcs_orig = 0
                 nivell_actual+=1
+                nombre_ocells = 0
                 if nivell_actual == 13:
                     partida = False
-            if perdut == True:
+            elif nombre_ocells == 0:
                 reinici()
                 n = 0
                 nombre_porcs = 0
                 nombre_porcs_orig = 0
+                nombre_ocells = 0
                 partida = pantalla_final(False,0)
         # Recarregar la pantalla
         pygame.display.flip()
