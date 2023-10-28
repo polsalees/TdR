@@ -63,6 +63,12 @@ def calcular_angle():
 def distancia_ocell_ratoli():
     amplada = math.sqrt(((pygame.mouse.get_pos()[0] - posició_inicial[0]) **2 + (pygame.mouse.get_pos()[1] - posició_inicial[1]) ** 2))
     return amplada
+def calcul_angle_cercle(self, pos):
+    vector_angle = pygame.math.Vector2(pos[0]-self.rectangle.center[0], pos[1]-self.rectangle.center[1])
+    s = vector_angle.angle_to((-1,0)) + 180
+    if s >= 360:
+        s -=360
+    return s
 def colisió_cercles(self,x):
     global nombre_porcs
     if self in llista_ocells:    
@@ -83,7 +89,7 @@ def colisió_cercles(self,x):
                 x.c = 1    
             if x in llista_ocells:     
                 x.calcul_posició_primer_xoc()
-            self.angle_rampa = self.calcul_angle_cercle(x.rectangle.center)
+            self.angle_rampa = calcul_angle_cercle(self,x.rectangle.center)
             x.angle_rampa = self.angle_rampa + 180
             if x.angle_rampa >= 360:
                 x.angle_rampa -= 360
@@ -130,9 +136,8 @@ def colisió_cercles(self,x):
         if self.velocitat.length()*self.massa/x.massa > 4 and x.movible and self in llista_ocells:
             x.destrucció()
             self.velocitat *= 0.4
-        elif self in llista_porcs and self.velocitat.length()*100>self.massa and i.movible:
+        elif self in llista_porcs and self.velocitat.length()*100>self.massa:
             nombre_porcs-=1
-            x.velocitat *=0.4
         else:
             if self.velocitat.length()*self.massa/x.massa > 1.5 and x.movible and self in llista_ocells:
                 x.mig_trencat(self.velocitat.length()*self.massa/x.massa)
@@ -174,11 +179,11 @@ def colisió_cercles(self,x):
                         x.rotar = False
                         x.centre_no_rotar = xcentre 
                 if rampa == self:
-                    self.angle_rampa = self.calcul_angle_cercle(posició_xoc)
+                    self.angle_rampa = calcul_angle_cercle(self,posició_xoc)
                 else:
                     self.angle_rampa = x.calcul_angle_rampa(posició_xoc)
                     if self.angle_rampa == "no":
-                        self.angle_rampa = self.calcul_angle_cercle(posició_xoc)
+                        self.angle_rampa = calcul_angle_cercle(self,posició_xoc)
                 if self.angle_rampa <= 180:    
                     angle_z = 180-self.angle_rampa
                 else:
@@ -397,12 +402,6 @@ class ocells():
             for i in self.llista_copia:
                 i.llista_estela.extend(self.llista_estela)
             self.llista_copia.clear()
-    def calcul_angle_cercle(self, pos):
-        vector_angle = pygame.math.Vector2(pos[0]-self.rectangle.center[0], pos[1]-self.rectangle.center[1])
-        s = vector_angle.angle_to((-1,0)) + 180
-        if s >= 360:
-            s -=360
-        return s
     
     def colisió(self,x):
         colisió_cercles(self,x)
@@ -555,7 +554,7 @@ class ocells():
                                 distancia_explosió = pygame.math.Vector2(self.rectangle.center) - i.rectangle.center
                                 potencia = 200 - distancia_explosió.length() + self.radi
                                 if potencia >0:
-                                    angle = self.calcul_angle_cercle(i.rectangle.center) +180
+                                    angle = calcul_angle_cercle(self,i.rectangle.center) +180
                                     if angle <= 180:    
                                         angle = 180- angle
                                     else:
@@ -573,7 +572,7 @@ class ocells():
                                 distancia_explosió = pygame.math.Vector2(self.rectangle.center) - i.rectangle.center
                                 potencia = 200 - distancia_explosió.length() + self.radi
                                 if potencia >0:
-                                    angle = self.calcul_angle_cercle(i.rectangle.center)
+                                    angle = calcul_angle_cercle(self,i.rectangle.center)
                                     if angle <= 180:    
                                         angle = 180- angle
                                     else:
@@ -591,7 +590,7 @@ class ocells():
                                 distancia_explosió = pygame.math.Vector2(self.rectangle.center) - i.rectangle.center
                                 potencia = 200 - distancia_explosió.length() + self.radi
                                 if potencia >0:
-                                    angle = self.calcul_angle_cercle(i.rectangle.center) + 180
+                                    angle = calcul_angle_cercle(self,i.rectangle.center) + 180
                                     if angle <= 180:    
                                         angle = 180- angle
                                     else:
@@ -599,11 +598,14 @@ class ocells():
                                     if self.color == blanc:
                                         angle +=180
                                         potencia *=2
+                                        i.mig_trencat(potencia/100)
                                     else:
                                         potencia +=50
                                         if potencia > 200:
                                             potencia = 200
+                                            i.mig_trencat(potencia/50)
                                     i.velocitat += pygame.math.Vector2.from_polar((potencia*50/i.massa, angle))
+
             self.activat = True
     def copy(self):
         x = ocells(self.radi, self.color)
@@ -664,10 +666,10 @@ def següent_ocell(ocell1, ocell2, ocell3, ocell4, ocell5, ocell6):
 # Creació linea ocells
 def linea_ocells(ocell1, ocell2, ocell3, ocell4, ocell5, ocell6):
     ordre_ocells = [ocell1, ocell2, ocell3, ocell4, ocell5, ocell6]
-    n = 0
+    n = 1
     for i in ordre_ocells:
         if i not in llista_ocells_llançats:    
-            pygame.draw.circle(pantalla, i.color, (180 - n*50, pantalla_alçada - i.radi), i.radi)
+            pygame.draw.circle(pantalla, i.color, (posició_inicial[0] - n*50, pantalla_alçada - i.radi), i.radi)
             n+=1
 #Tirachines
 rectangle_base = pygame.Rect(posició_inicial[0]-10, posició_inicial[1]+55, 20, pantalla_alçada-posició_inicial[1])
@@ -782,14 +784,6 @@ class porc():
     def colisió(self,x):
         colisió_cercles(self,x)
 
-    def calcul_angle_cercle(self, pos):
-        vector_angle = pygame.math.Vector2(pos[0]-self.rectangle.center[0], pos[1]-self.rectangle.center[1])
-        s = vector_angle.angle_to((-1,0)) + 180
-        if s >= 360:
-            s -=360
-        return s
-
-
     def destrucció(self):
         self.velocitat *= 0
         self.angle_rampa = 90
@@ -805,7 +799,10 @@ class caixa():
     def __init__(self, posició, alçada, amplada, movible, angle, tipo):
         self.alçada = alçada
         self.amplada = amplada
-        self.massa = self.alçada*self.amplada*(tipo**1.5/2**1.5)
+        self.tipo = tipo 
+        if self.tipo == 5:
+            self.tipo = 2
+        self.massa = self.alçada*self.amplada*(self.tipo**1.5/2**1.5)
         self.posició_inicial = posició
         self.velocitat = pygame.math.Vector2(0,0)
         self.movible = movible
@@ -816,21 +813,27 @@ class caixa():
         self.superficie_rectangle.set_colorkey(fons)
         self.angle = angle
         self.angle_inicial = angle
-        if tipo == 1:
+        if self.tipo == 1:
             self.color_borde = blau_fosc
             self.color = cian
-        elif tipo == 2:
+        elif self.tipo == 2:
             self.color_borde = marró_fosc  
             self.color = marró
-        elif tipo == 3:
+        elif self.tipo == 3:
             self.color_borde = gris 
             self.color   = pedra
-        self.tipo = tipo 
         self.superficie_rectangle.fill(self.color)
         if self.amplada < self.alçada:    
             pygame.draw.rect(self.superficie_rectangle, self.color_borde , ((0,0), (self.amplada, self.alçada)), 10 - (100//self.amplada))
         else:
             pygame.draw.rect(self.superficie_rectangle, self.color_borde , ((0,0), (self.amplada, self.alçada)), 10 - (100//self.alçada))
+        self.tipo = tipo 
+        if self.tipo == 5:
+            pygame.draw.rect(self.superficie_rectangle, vermell, ((self.amplada*0.2, self.alçada*0.25), (self.amplada/15, self.alçada/2)))
+            pygame.draw.rect(self.superficie_rectangle, vermell, ((self.amplada*0.08, self.alçada*0.25), (self.amplada/3.5, self.alçada/15)))
+            pygame.draw.polygon(self.superficie_rectangle, vermell, ( (self.amplada*0.4, self.alçada*0.75),(self.amplada*0.4, self.alçada*0.25), (self.amplada*0.48, self.alçada*0.25), (self.amplada*0.56, self.alçada*0.60), (self.amplada*0.56, self.alçada*0.25), (self.amplada*0.62, self.alçada*0.25), (self.amplada*0.62, self.alçada*0.75), (self.amplada*0.54, self.alçada*0.75), (self.amplada*0.46, self.alçada*0.40), (self.amplada*0.46, self.alçada*0.75)))
+            pygame.draw.rect(self.superficie_rectangle, vermell, ((self.amplada*0.77, self.alçada*0.25), (self.amplada/15, self.alçada/2)))
+            pygame.draw.rect(self.superficie_rectangle, vermell, ((self.amplada*0.65, self.alçada*0.25), (self.amplada/3.5, self.alçada/15)))
         self.colisionat = False
         self.rectangle_nou = pygame.transform.rotate(self.superficie_rectangle, self.angle)
         self.rectangle = self.rectangle_nou.get_rect()
@@ -950,7 +953,7 @@ class caixa():
             pantalla.blit(self.rectangle_nou, self.rectangle)
         else:
             for i in self.animació:
-                pygame.draw.circle(pantalla,blanc,i[1],i[0])
+                pygame.draw.circle(pantalla,self.color_animació,i[1],i[0])
     def calcul_angle_rampa(self, pos):
         if self.amplada < self.alçada*2:    
             vector_angle = pygame.math.Vector2(pos[0]-self.rectangle.center[0], pos[1]-self.rectangle.center[1])
@@ -1330,8 +1333,7 @@ class caixa():
                 self.pivot_pantalla = (round(self.pivot_pantalla[0]), round(self.pivot_pantalla[1]))
             nou_angle_velocitat =180 + 2*self.velocitat.angle_to((-1,0)) - 2*self.angle_rampa
             velocitat.rotate_ip(nou_angle_velocitat)
-            velocitat[0] *=0.3 + 0.59*abs(math.sin(math.radians(self.angle_rampa)))
-            velocitat[1] *=0.3 + 0.59*abs(math.cos(math.radians(self.angle_rampa)))
+            velocitat *=0.5
             self.conjut_de_velocitats_1.append(velocitat)
         elif n!= 0:
             for i in x.suma_pes:
@@ -1901,6 +1903,55 @@ class caixa():
         self.conjut_de_velocitats_2.clear()
         self.suma_pes.clear()
         self.rotacions.clear()
+        if self.tipo == 5:    
+            self.color_animació = gris
+            for i in llista_objectes_pantalla:
+                if i != self:
+                    if i in llista_porcs:    
+                        if i.porc:    
+                            distancia_explosió = pygame.math.Vector2(self.rectangle.center) - i.rectangle.center
+                            potencia = 300 - distancia_explosió.length()
+                            if potencia >0:
+                                potencia += 50
+                                if potencia >= 300:
+                                    potencia = 300
+                                angle = calcul_angle_cercle(self,i.rectangle.center) +180
+                                if angle <= 180:    
+                                    angle = 180- angle
+                                else:
+                                    angle = 360-angle + 180
+                                i.velocitat += pygame.math.Vector2.from_polar((potencia*50/i.massa, angle))
+                    elif i in llista_ocells:    
+                        if i.llançat:    
+                            distancia_explosió = pygame.math.Vector2(self.rectangle.center) - i.rectangle.center
+                            potencia = 300 - distancia_explosió.length()
+                            if potencia >0:
+                                potencia += 50
+                                if potencia >= 300:
+                                    potencia = 300
+                                angle = calcul_angle_cercle(self,i.rectangle.center)
+                                if angle <= 180:    
+                                    angle = 180- angle
+                                else:
+                                    angle = 360-angle +180
+                                i.velocitat += pygame.math.Vector2.from_polar((potencia*50/i.massa, angle))
+                    if i in llista_objectes_rectangulars:    
+                        if i.caixa and i.movible:    
+                            distancia_explosió = pygame.math.Vector2(self.rectangle.center) - i.rectangle.center
+                            potencia = 300 - distancia_explosió.length()
+                            if potencia >0:
+                                potencia += 50
+                                if potencia >= 300:
+                                    potencia = 300
+                                angle = calcul_angle_cercle(self,i.rectangle.center) + 180
+                                if angle <= 180:    
+                                    angle = 180- angle
+                                else:
+                                    angle = 360-angle + 180
+                                i.velocitat += pygame.math.Vector2.from_polar((potencia*50/i.massa, angle))
+                                i.mig_trencat(potencia/75)
+        else:
+            self.color_animació = blanc
         self.caixa = False
         radi = self.massa/100
         if radi > self.amplada/2:
@@ -1916,6 +1967,12 @@ class caixa():
                 pygame.draw.rect(self.superficie_rectangle, self.color_borde , ((0,0), (self.amplada, self.alçada)), 10 - (100//self.amplada))
             else:
                 pygame.draw.rect(self.superficie_rectangle, self.color_borde , ((0,0), (self.amplada, self.alçada)), 10 - (100//self.alçada))
+            if self.tipo == 5:
+                pygame.draw.rect(self.superficie_rectangle, vermell, ((self.amplada*0.2, self.alçada*0.25), (self.amplada/15, self.alçada/2)))
+                pygame.draw.rect(self.superficie_rectangle, vermell, ((self.amplada*0.08, self.alçada*0.25), (self.amplada/3.5, self.alçada/15)))
+                pygame.draw.polygon(self.superficie_rectangle, vermell, ( (self.amplada*0.4, self.alçada*0.75),(self.amplada*0.4, self.alçada*0.25), (self.amplada*0.48, self.alçada*0.25), (self.amplada*0.56, self.alçada*0.60), (self.amplada*0.56, self.alçada*0.25), (self.amplada*0.62, self.alçada*0.25), (self.amplada*0.62, self.alçada*0.75), (self.amplada*0.54, self.alçada*0.75), (self.amplada*0.46, self.alçada*0.40), (self.amplada*0.46, self.alçada*0.75)))
+                pygame.draw.rect(self.superficie_rectangle, vermell, ((self.amplada*0.77, self.alçada*0.25), (self.amplada/15, self.alçada/2)))
+                pygame.draw.rect(self.superficie_rectangle, vermell, ((self.amplada*0.65, self.alçada*0.25), (self.amplada/3.5, self.alçada/15)))
     def copy(self, posició):
         x = caixa(posició,self.alçada, self.amplada,self.movible,self.angle_inicial, self.tipo)
         return x
@@ -1925,6 +1982,12 @@ class caixa():
             pygame.draw.rect(self.superficie_rectangle, self.color_borde , ((0,0), (self.amplada, self.alçada)), 10 - (100//self.amplada))
         else:
             pygame.draw.rect(self.superficie_rectangle, self.color_borde , ((0,0), (self.amplada, self.alçada)), 10 - (100//self.alçada))
+        if self.tipo == 5:
+            pygame.draw.rect(self.superficie_rectangle, vermell, ((self.amplada*0.2, self.alçada*0.25), (self.amplada/15, self.alçada/2)))
+            pygame.draw.rect(self.superficie_rectangle, vermell, ((self.amplada*0.08, self.alçada*0.25), (self.amplada/3.5, self.alçada/15)))
+            pygame.draw.polygon(self.superficie_rectangle, vermell, ( (self.amplada*0.4, self.alçada*0.75),(self.amplada*0.4, self.alçada*0.25), (self.amplada*0.48, self.alçada*0.25), (self.amplada*0.56, self.alçada*0.60), (self.amplada*0.56, self.alçada*0.25), (self.amplada*0.62, self.alçada*0.25), (self.amplada*0.62, self.alçada*0.75), (self.amplada*0.54, self.alçada*0.75), (self.amplada*0.46, self.alçada*0.40), (self.amplada*0.46, self.alçada*0.75)))
+            pygame.draw.rect(self.superficie_rectangle, vermell, ((self.amplada*0.77, self.alçada*0.25), (self.amplada/15, self.alçada/2)))
+            pygame.draw.rect(self.superficie_rectangle, vermell, ((self.amplada*0.65, self.alçada*0.25), (self.amplada/3.5, self.alçada/15)))
         self.velocitat *= 0
         self.angle = self.angle_inicial
         self.rectangle_nou = pygame.transform.rotate(self.superficie_rectangle, self.angle)
@@ -1948,6 +2011,7 @@ rectangle_petit = caixa([pantalla_amplada - 230, pantalla_alçada-175], 20, 70, 
 rectangle_normal = caixa([pantalla_amplada - 180, pantalla_alçada-245], 20, 150, True, 0,2)
 quadrat_gran = caixa([pantalla_amplada - 180, pantalla_alçada-315], 60, 60, True, 0,3)
 rectangle_gran = caixa([pantalla_amplada - 180, pantalla_alçada-105], 20, 200, True, 0,2)
+tnt = caixa([pantalla_amplada - 280, pantalla_alçada-405], 50, 50, True, 0,5)
 
 # Selecció de nivell
 def selecció_nivell():
@@ -2096,8 +2160,8 @@ def reinici():
     llista_ocells_llançats = [no_ocell]
 
 #Defimin nivells
-ocells1 = [bombardero.copy(), pequeñin.copy(), estrella.copy(), racista.copy(), vermellet.copy(), racista.copy()]
-ocells2 = [vermellet.copy(), no_ocell, no_ocell, no_ocell, no_ocell, no_ocell]
+ocells2 = [bombardero.copy(), pequeñin.copy(), estrella.copy(), racista.copy(), vermellet.copy(), racista.copy()]
+ocells1 = [vermellet.copy(), vermellet.copy(), vermellet.copy(), no_ocell, no_ocell, no_ocell]
 ocells3 = [vermellet.copy(), no_ocell, no_ocell, no_ocell, no_ocell, no_ocell]
 ocells4 = [vermellet.copy(), no_ocell, no_ocell, no_ocell, no_ocell, no_ocell]
 ocells5 = [vermellet.copy(), no_ocell, no_ocell, no_ocell, no_ocell, no_ocell]
@@ -2110,8 +2174,8 @@ ocells11 = [vermellet.copy(), no_ocell, no_ocell, no_ocell, no_ocell, no_ocell]
 ocells12 = [vermellet.copy(), no_ocell, no_ocell, no_ocell, no_ocell, no_ocell]
 nivells_ocells = {1:ocells1, 2:ocells2, 3:ocells3, 4:ocells4, 5:ocells5, 6:ocells6, 7:ocells7, 8:ocells8, 9:ocells9, 10:ocells10, 11:ocells11, 12:ocells12}
 
-nivell1 = [rectangle_gran, quadrat_petit,quadrat_petit.copy([pantalla_amplada - 105, pantalla_alçada-48]),rectangle_petit,rectangle_petit.copy([pantalla_amplada - 130, pantalla_alçada-175]),rectangle_normal, quadrat_gran,quadrat_petit.copy([pantalla_amplada - 505, pantalla_alçada-48]),quadrat_petit.copy([pantalla_amplada - 355, pantalla_alçada-48]),rectangle_petit.copy([pantalla_amplada - 480, pantalla_alçada-175]),rectangle_petit.copy([pantalla_amplada - 380, pantalla_alçada-175]),rectangle_normal.copy([pantalla_amplada - 430, pantalla_alçada-245]),quadrat_gran.copy([pantalla_amplada - 430, pantalla_alçada-315]),rectangle_gran.copy([pantalla_amplada - 430, pantalla_alçada-105]), porc_estandar, porc_estandar.copy((pantalla_amplada - 430, pantalla_alçada - 160))]
-nivell2 = [porc_estandar.copy((1000,0))]
+nivell2 = [rectangle_gran, quadrat_petit,quadrat_petit.copy([pantalla_amplada - 105, pantalla_alçada-48]),rectangle_petit,rectangle_petit.copy([pantalla_amplada - 130, pantalla_alçada-175]),rectangle_normal, quadrat_gran,quadrat_petit.copy([pantalla_amplada - 505, pantalla_alçada-48]),quadrat_petit.copy([pantalla_amplada - 355, pantalla_alçada-48]),rectangle_petit.copy([pantalla_amplada - 480, pantalla_alçada-175]),rectangle_petit.copy([pantalla_amplada - 380, pantalla_alçada-175]),rectangle_normal.copy([pantalla_amplada - 430, pantalla_alçada-245]),quadrat_gran.copy([pantalla_amplada - 430, pantalla_alçada-315]),rectangle_gran.copy([pantalla_amplada - 430, pantalla_alçada-105]), porc_estandar, porc_estandar.copy((pantalla_amplada - 430, pantalla_alçada - 160))]
+nivell1 = [porc_estandar.copy([pantalla_amplada- 140, pantalla_alçada-265]), porc_estandar.copy([pantalla_amplada- 540, pantalla_alçada-265]), rectangle_petit.copy([pantalla_amplada- 105,pantalla_alçada-40]), rectangle_petit.copy([pantalla_amplada- 105,pantalla_alçada-115]), rectangle_petit.copy([pantalla_amplada- 105,pantalla_alçada-190]),rectangle_petit.copy([pantalla_amplada- 175,pantalla_alçada-40]), rectangle_petit.copy([pantalla_amplada- 175,pantalla_alçada-115]), rectangle_petit.copy([pantalla_amplada- 175,pantalla_alçada-190]), rectangle_normal.copy([pantalla_amplada- 140, pantalla_alçada-255]), rectangle_petit.copy([pantalla_amplada- 305,pantalla_alçada-115]), rectangle_petit.copy([pantalla_amplada- 305,pantalla_alçada-190]), rectangle_petit.copy([pantalla_amplada- 375,pantalla_alçada-115]), rectangle_petit.copy([pantalla_amplada- 375,pantalla_alçada-190]), rectangle_normal.copy([pantalla_amplada- 340, pantalla_alçada-255]), rectangle_petit.copy([pantalla_amplada- 505,pantalla_alçada-90]), rectangle_petit.copy([pantalla_amplada- 575,pantalla_alçada-90]), rectangle_normal.copy([pantalla_amplada- 540, pantalla_alçada-145]),tnt.copy([pantalla_amplada- 340, pantalla_alçada-300])]
 nivell3 = [porc_estandar.copy((1000,0))]
 nivell4 = [porc_estandar.copy((1000,0))]
 nivell5 = [porc_estandar.copy((1000,0))]
