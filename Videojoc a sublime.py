@@ -883,9 +883,9 @@ class caixa():
             self.posició_real += self.velocitat
             self.posició_real[1] += 0.5*gravetat
             self.velocitat[1] += gravetat
-            if abs(self.velocitat[1]) < gravetat*2:
+            if abs(self.velocitat[1]) < gravetat:
                 self.velocitat[1] = 0
-            if abs(self.velocitat[0]) < gravetat*2:
+            if abs(self.velocitat[0]) < gravetat:
                 self.velocitat[0] = 0
             self.angle += self.velocitat_angle
             self.rectangle.center = self.posició_real
