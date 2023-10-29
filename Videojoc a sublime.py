@@ -471,7 +471,7 @@ class ocells():
         else:
             self.cooldown = 0
         if self.cooldown >= 100:
-            global nombre_ocells    
+            global nombre_ocells      
             nombre_ocells-=1 
             llista_objectes_pantalla.remove(self)
         self.colisionat = False
@@ -528,6 +528,7 @@ class ocells():
                 self.activar_animació(blanc,1) 
                 self.velocitat[0] *= 2.5
             elif self.color == cian:
+                global nombre_ocells
                 self.activar_animació(blanc,1) 
                 self.copia1 = self.copy()
                 self.copia2 = self.copy() 
@@ -557,6 +558,7 @@ class ocells():
                 self.copia2.posició_real = self.copia2.rectangle.center
                 self.copia1.llista_copia.append(self)
                 self.copia2.llista_copia.append(self)
+                nombre_ocells+=2
             else:
                 if self.color == negre:    
                     self.activar_animació(taronja2,1.5)
@@ -881,9 +883,9 @@ class caixa():
             self.posició_real += self.velocitat
             self.posició_real[1] += 0.5*gravetat
             self.velocitat[1] += gravetat
-            if abs(self.velocitat[1]) < gravetat:
+            if abs(self.velocitat[1]) < gravetat*2:
                 self.velocitat[1] = 0
-            if abs(self.velocitat[0]) < gravetat:
+            if abs(self.velocitat[0]) < gravetat*2:
                 self.velocitat[0] = 0
             self.angle += self.velocitat_angle
             self.rectangle.center = self.posició_real
