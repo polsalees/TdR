@@ -14,6 +14,7 @@ blanc = (255, 255, 255)
 vermell = (255, 0, 0)
 vermell2 = (200, 0, 0)
 verd = (0, 255, 0)
+verd_fosc = (45,87,44)
 blau = (0, 0, 255)
 blau_fosc = (0, 0, 155)
 cian = (0, 255, 255)
@@ -639,7 +640,6 @@ class ocells():
         self.animació = False
         self.radi = radi
         self.velocitat = pygame.math.Vector2(0,0)
-        self.angle = 0
         self.angle_rampa = 0
         self.aire = False
         self.color = color
@@ -658,11 +658,18 @@ class ocells():
         llista_ocells.append(self) 
         llista_objectes_rodons.append(self) 
         self.colisionat = False
-        self.superficie_ocell = pygame.Surface((2*self.radi, 2*self.radi), pygame.SRCALPHA)
+        self.superficie_ocell = pygame.Surface((2.2*self.radi, 2.2*self.radi), pygame.SRCALPHA)
         self.rectangle = self.superficie_ocell.get_rect()
         self.rectangle.center = (posició_inicial[0], posició_inicial[1])
-        pygame.draw.circle(self.superficie_ocell, self.color, (self.radi, self.radi), self.radi)
+        pygame.draw.circle(self.superficie_ocell, self.color, (self.radi*1.1, self.radi*1.1), self.radi)
         self.mask = pygame.mask.from_surface(self.superficie_ocell)
+        pygame.draw.line(self.superficie_ocell, self.color, (self.radi,self.radi/3), (0, 0), width=round(self.radi/2))
+        pygame.draw.circle(self.superficie_ocell, blanc, (self.radi*1.35, self.radi*0.9), self.radi/3)
+        pygame.draw.circle(self.superficie_ocell, negre, (self.radi*1.35, self.radi*0.9), self.radi/5)
+        if self.color != negre:
+            pygame.draw.line(self.superficie_ocell, negre, (self.radi,self.radi*1.5), (1.8*self.radi, 1.5*self.radi), width=round(self.radi/5))
+        else:
+            pygame.draw.line(self.superficie_ocell, blanc, (self.radi,self.radi*1.5), (1.8*self.radi, 1.5*self.radi), width=round(self.radi/5))
         self.c = 0
         self.posició_real = posició_inicial
         self.massa = self.radi**2 *3.14
@@ -670,9 +677,16 @@ class ocells():
         self.n = 0
         self.llista_estela = []
         self.llista_copia = []
+        self.ocell_nou = self.superficie_ocell.copy()
+        self.rectangle_2 = self.rectangle.copy()
+        self.angle = 0
     
     def calcul_posició_primer_xoc (self):
         if self.tocat_objecte == False:
+            if self.color != negre:
+                pygame.draw.line(self.superficie_ocell, negre, (self.radi*1.4, self.radi*0.55), (self.radi*0.9, self.radi*0.4), width=round(self.radi/5))
+            else:
+                pygame.draw.line(self.superficie_ocell, blanc, (self.radi*1.4, self.radi*0.55), (self.radi*0.9, self.radi*0.4), width=round(self.radi/5))
             self.tocat_objecte = True
             for i in self.llista_copia:
                 i.llista_estela.extend(self.llista_estela)
@@ -685,14 +699,14 @@ class ocells():
         self.linea_direció_radi = 5
         self.linea_direció_posició = [posició_inicial[0], posició_inicial[1]]
         self.potencia = distancia_ocell_ratoli() - self.radi
-        self.angle = math.radians(calcular_angle())
+        angle = math.radians(calcular_angle())
         if self.potencia >= 100:
             self.potencia = 100
-        if self.potencia <= 0 or self.angle > -0.1 or self.angle < -3:
+        if self.potencia <= 0 or angle > -0.1 or angle < -3:
             self.potencia = 0
         if self.potencia !=0:
-            self.linea_direció_velocitat[0] = -math.sin(self.angle) * self.potencia * 0.1
-            self.linea_direció_velocitat[1] = -math.cos(self.angle) * self.potencia * 0.1
+            self.linea_direció_velocitat[0] = -math.sin(angle) * self.potencia * 0.1
+            self.linea_direció_velocitat[1] = -math.cos(angle) * self.potencia * 0.1
             self.linea_direció_velocitat[1]  += gravetat * 0.2 *(self.linea_direció_moviment%30)
             self.linea_direció_posició[0] += self.linea_direció_velocitat[0] * 0.2 *(self.linea_direció_moviment%30)
             self.linea_direció_posició[1] += self.linea_direció_velocitat[1] * 0.2 *(self.linea_direció_moviment%30)
@@ -704,7 +718,7 @@ class ocells():
                 self.linea_direció_posició[1] += self.linea_direció_velocitat[1] * 6
                 for i in llista_objectes_pantalla:
                     if i.rectangle.collidepoint(self.linea_direció_posició):
-                        break 
+                        self.linea_direció_radi = 0
                 pygame.draw.circle(pantalla, blanc, self.linea_direció_posició, self.linea_direció_radi)
             self.linea_direció_moviment +=0.5
     
@@ -713,6 +727,7 @@ class ocells():
             pygame.draw.circle(pantalla, blanc, i[0] ,i[1])
     
     def update(self):
+        global nombre_ocells  
         if self.c == 1:
             self.posició_real = self.rectangle.center
             self.c = 0
@@ -728,23 +743,27 @@ class ocells():
                 self.velocitat[1] = 0
             if abs(self.velocitat[0]) < gravetat:
                 self.velocitat[0] = 0
-        if self.llançat:
-            if self.velocitat.length()<gravetat:    
-                self.cooldown += 1
-        else:
-            self.cooldown = 0
-        if self.cooldown >= 30:
-            global nombre_ocells      
-            nombre_ocells-=1 
-            llista_objectes_pantalla.remove(self)
-        self.colisionat = False
-        if self.llançat:    
             self.rectangle.center = self.posició_real
             if self.rectangle.center[0]>pantalla_amplada or self.rectangle.center[0]<0 or self.rectangle.center[1]>pantalla_alçada:
                 self.calcul_posició_primer_xoc()
                 if self.rectangle.center[0]>pantalla_amplada+100 or self.rectangle.center[0]<-100 or self.rectangle.center[1]>pantalla_alçada+100:     
                     nombre_ocells-=1
                     llista_objectes_pantalla.remove(self)
+            if self.tocat_objecte == False or self.velocitat.length()>2.5:
+                self.angle = self.velocitat.angle_to((-1,0)) +180
+            else:
+                self.angle -= self.velocitat[0]
+            self.ocell_nou = pygame.transform.rotate(self.superficie_ocell, self.angle)
+            self.rectangle_2 = self.ocell_nou.get_rect(center = self.posició_real)
+        if self.llançat:
+            if self.velocitat.length()<gravetat:    
+                self.cooldown += 1
+        else:
+            self.cooldown = 0
+        if self.cooldown >= 30:    
+            nombre_ocells-=1 
+            llista_objectes_pantalla.remove(self)
+        self.colisionat = False
         if self.animació:
             if self.n%5 == 0:    
                 n=pygame.math.Vector2(5,5)
@@ -759,7 +778,7 @@ class ocells():
     def dibuixar(self):
         if self.linea_direció:
             self.calcul_linea_direció()    
-        pantalla.blit(self.superficie_ocell, self.rectangle)
+        pantalla.blit(self.ocell_nou, self.rectangle_2)
         if self.animació:
             for i in self.objecte_animació:
                 pygame.draw.circle(pantalla,self.color_animació,i[1],i[0])
@@ -767,14 +786,14 @@ class ocells():
     def llançament(self):
         self.rectangle.center = posició_inicial
         self.potencia = distancia_ocell_ratoli() - self.radi
-        self.angle = math.radians(calcular_angle())
+        angle = math.radians(calcular_angle())
         if self.potencia >= 100:
             self.potencia = 100
-        if self.potencia <= 0 or self.angle > -0.1 or self.angle < -3:
+        if self.potencia <= 0 or angle > -0.1 or angle < -3:
             self.potencia = 0
         if self.potencia != 0:
-            self.velocitat[0] = -math.sin(self.angle) * self.potencia * 0.1
-            self.velocitat[1] = -math.cos(self.angle) * self.potencia * 0.1
+            self.velocitat[0] = -math.sin(angle) * self.potencia * 0.1
+            self.velocitat[1] = -math.cos(angle) * self.potencia * 0.1
             self.llançat = True
             self.aire = True
     
@@ -783,6 +802,10 @@ class ocells():
         return self.zona
     def habilitat(self):
         if self.activat == False and self.color != vermell:
+            if self.color != negre:
+                pygame.draw.line(self.superficie_ocell, negre, (self.radi*1.4, self.radi*0.55), (self.radi*0.9, self.radi*0.4), width=round(self.radi/5))
+            else:
+                pygame.draw.line(self.superficie_ocell, blanc, (self.radi*1.4, self.radi*0.55), (self.radi*0.9, self.radi*0.4), width=round(self.radi/5))
             self.llista_estela.append((self.rectangle.center, 10))
             self.n = 0    
             if self.color == groc:
@@ -904,6 +927,17 @@ class ocells():
         self.posició_primer_xoc = [0,0] 
         self.animació = False
         self.llista_copia.clear()
+        self.angle = 0
+        pygame.draw.circle(self.superficie_ocell, self.color, (self.radi*1.1, self.radi*1.1), self.radi)
+        pygame.draw.line(self.superficie_ocell, self.color, (self.radi,self.radi/3), (0, 0), width=round(self.radi/2))
+        pygame.draw.circle(self.superficie_ocell, blanc, (self.radi*1.35, self.radi*0.9), self.radi/3)
+        pygame.draw.circle(self.superficie_ocell, negre, (self.radi*1.35, self.radi*0.9), self.radi/5)
+        if self.color != negre:
+            pygame.draw.line(self.superficie_ocell, negre, (self.radi,self.radi*1.5), (1.8*self.radi, 1.5*self.radi), width=round(self.radi/5))
+        else:
+            pygame.draw.line(self.superficie_ocell, blanc, (self.radi,self.radi*1.5), (1.8*self.radi, 1.5*self.radi), width=round(self.radi/5))
+        self.rectangle_2 = self.rectangle.copy()
+        self.ocell_nou = self.superficie_ocell.copy()
     
     def activar_animació(self, color,radi2):
         radi = self.radi /radi2
@@ -947,7 +981,7 @@ def linea_ocells(ocell1, ocell2, ocell3, ocell4, ocell5, ocell6):
     n = 1
     for i in ordre_ocells:
         if i not in llista_ocells_llançats:    
-            pygame.draw.circle(pantalla, i.color, (posició_inicial[0] - n*50, pantalla_alçada - i.radi), i.radi)
+            pantalla.blit(i.ocell_nou,(posició_inicial[0] - n*50-i.radi*1.1, pantalla_alçada - i.radi*2.05))
             n+=1
 #Tirachines
 rectangle_base = pygame.Rect(posició_inicial[0]-10, posició_inicial[1]+55, 20, pantalla_alçada-posició_inicial[1])
@@ -961,10 +995,10 @@ def linea(ocell, x):
     pygame.draw.line(pantalla, marró2, punt_t1, punt_t3, width = 18)
     if x == True:
         pos = pygame.mouse.get_pos()
+        angle = math.atan2(pos[0]-posició_inicial[0], pos[1]-posició_inicial[1])
         if distancia_ocell_ratoli() < (100+ocell.radi):
             pos = list(pos)
         else:
-            angle = math.atan2(pos[0]-posició_inicial[0], pos[1]-posició_inicial[1])
             distancia = distancia_ocell_ratoli() - 100 - ocell.radi
             pos = [pygame.mouse.get_pos()[0]-math.sin(angle)*distancia, pygame.mouse.get_pos()[1]-math.cos(angle)*distancia]
         rectangle = pygame.Rect(pos[0]-ocell.radi, pos[1]-ocell.radi, 2*ocell.radi, 2*ocell.radi)
@@ -982,10 +1016,22 @@ def linea(ocell, x):
         pygame.draw.line(pantalla, (160,160,160), punt_t5, pos, width = 8)
         pygame.draw.line(pantalla, (160,160,160), punt_t4, pos, width = 8)
         pygame.draw.line(pantalla, marró, punt_t1, punt_t2, width = 20)
-        ocell.rectangle.center = pos
+        angle = math.degrees(angle)
+        if angle<= 180:    
+            angle = 180-angle
+        else:
+            angle = 360-angle + 180
+        ocell.angle = -angle -90
+        ocell.ocell_nou = pygame.transform.rotate(ocell.superficie_ocell, ocell.angle)
+        ocell.rectangle_2 = ocell.ocell_nou.get_rect(center = pos)
     else:
         pygame.draw.line(pantalla, (160,160,160),punt_t5, posició_inicial, width = 8)
         pygame.draw.line(pantalla, (160,160,160),punt_t4, posició_inicial, width = 8)
+        if ocell.angle != 0:
+            ocell.angle = 0
+            ocell.ocell_nou = pygame.transform.rotate(ocell.superficie_ocell, ocell.angle)
+            ocell.rectangle_2 = ocell.ocell_nou.get_rect(center = posició_inicial)    
+            ocell.rectangle_2.center = posició_inicial
 # Creació porcs
 class porc():
     def __init__(self, radi, posició,):    
@@ -997,10 +1043,10 @@ class porc():
         llista_porcs.append(self) 
         llista_objectes_rodons.append(self)
         self.colisionat = False
-        self.superficie_porc = pygame.Surface((2*self.radi, 2*self.radi), pygame.SRCALPHA)
+        self.superficie_porc = pygame.Surface((3*self.radi, 3*self.radi), pygame.SRCALPHA)
         self.rectangle = self.superficie_porc.get_rect()
         self.rectangle.center = posició
-        pygame.draw.circle(self.superficie_porc, verd, (self.radi, self.radi), self.radi)
+        pygame.draw.circle(self.superficie_porc, verd, (self.radi*1.5, self.radi*1.5), self.radi)
         self.mask = pygame.mask.from_surface(self.superficie_porc)
         self.c = 0
         self.posició_real = posició
@@ -1009,6 +1055,17 @@ class porc():
         self.rectangle.center = posició
         self.porc = True
         self.n = 0
+        self.angle = 0
+        pygame.draw.circle(self.superficie_porc, verd, (self.radi*1.75, self.radi/3 ), self.radi/4)
+        pygame.draw.circle(self.superficie_porc, verd, (self.radi*2.3, self.radi/1.60), self.radi/4)
+        pygame.draw.circle(self.superficie_porc, verd_fosc, (self.radi*1.5, self.radi*1.65), self.radi/2.5)
+        pygame.draw.circle(self.superficie_porc, blanc, (self.radi*2.1, self.radi*1.3), self.radi/4)
+        pygame.draw.circle(self.superficie_porc, negre, (self.radi*2.1, self.radi*1.3), self.radi/6)
+        pygame.draw.circle(self.superficie_porc, blanc, (self.radi*0.9, self.radi*1.3), self.radi/4)
+        pygame.draw.circle(self.superficie_porc, negre, (self.radi*0.9, self.radi*1.3), self.radi/6)
+        pygame.draw.line(self.superficie_porc, negre, (self.radi*1.3,self.radi*2.2), (1.7*self.radi, 2.2*self.radi), width=round(self.radi/5))
+        self.porc_nou = self.superficie_porc.copy()
+        self.rectangle_2 = self.rectangle.copy()
     
     def update(self):
         if self.porc:
@@ -1028,6 +1085,9 @@ class porc():
                 global nombre_porcs
                 llista_objectes_pantalla.remove(self)
                 nombre_porcs-=1
+            self.angle -= self.velocitat[0]
+            self.porc_nou = pygame.transform.rotate(self.superficie_porc, self.angle)
+            self.rectangle_2 = self.porc_nou.get_rect(center = self.posició_real)
         else:
             if self.n%5 == 0:    
                 n=pygame.math.Vector2(5,5)
@@ -1040,7 +1100,7 @@ class porc():
             self.n+=1
     def dibuixar(self):
         if self.porc:    
-            pantalla.blit(self.superficie_porc, self.rectangle)
+            pantalla.blit(self.porc_nou, self.rectangle_2)
         else:    
             for i in self.animació:
                 pygame.draw.circle(pantalla,verd,i[1],i[0])
@@ -1050,6 +1110,9 @@ class porc():
         self.posició_real = self.posició_inicial
         self.porc = True
         self.n = 0
+        self.angle = 0
+        self.rectangle_2 = self.rectangle.copy()
+        self.ocell_nou = self.superficie_porc.copy()
 
     def colisió(self,x):
         colisió_cercles(self,x)
