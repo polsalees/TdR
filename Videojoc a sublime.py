@@ -1064,6 +1064,8 @@ class porc():
         pygame.draw.circle(self.superficie_porc, blanc, (self.radi*0.9, self.radi*1.3), self.radi/4)
         pygame.draw.circle(self.superficie_porc, negre, (self.radi*0.9, self.radi*1.3), self.radi/6)
         pygame.draw.line(self.superficie_porc, negre, (self.radi*1.3,self.radi*2.2), (1.7*self.radi, 2.2*self.radi), width=round(self.radi/5))
+        pygame.draw.line(self.superficie_porc, negre, (self.radi*1.35,self.radi*1.8), (1.35*self.radi, 1.4*self.radi), width=round(self.radi/6))
+        pygame.draw.line(self.superficie_porc, negre, (self.radi*1.65,self.radi*1.8), (1.65*self.radi, 1.4*self.radi), width=round(self.radi/6))
         self.porc_nou = self.superficie_porc.copy()
         self.rectangle_2 = self.rectangle.copy()
     
