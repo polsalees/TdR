@@ -144,8 +144,12 @@ def colisió_cercles(self,x):
             if x.tipo == 5:
                 self.velocitat*=-1
             x.destrucció()
-        elif self in llista_porcs and self.velocitat.length()*100>self.massa:
+        elif self in llista_porcs and self.velocitat.length()*400>self.massa and x.movible == False:
             nombre_porcs-=1
+            self.destrucció()
+        elif self in llista_porcs and self.velocitat.length()*300>self.massa and x.movible:
+            nombre_porcs-=1
+            self.destrucció()
         else:
             if self.velocitat.length()*self.massa/x.massa > 1.5 and x.movible and self in llista_ocells:
                 x.mig_trencat(self.velocitat.length()*self.massa/x.massa)
@@ -240,6 +244,11 @@ def colisió_cercles(self,x):
                     else:
                         while self.mask.overlap(x.mask,(x.rectangle.x-self.rectangle.x, x.rectangle.y-self.rectangle.y)):
                             self.rectangle.center+=z
+                    if diferencia_angle_x > 90 and x.velocitat.length() > 0 and self in llista_porcs:
+                        if x.velocitat.length()*x.massa/self.massa>3:
+                            self.destrucció()
+                            x.velocitat *= 0.4
+                            nombre_porcs -=1
                     xcentre1 = ((xesquina1[0]-xesquina2[0])/2 + xesquina2[0], (xesquina1[1]-xesquina2[1])/2 + xesquina2[1], pygame.math.Vector2(xesquina1[0]-xesquina2[0],xesquina1[1]-xesquina2[1])*0.5)
                     xcentre2 = ((xesquina1[0]-xesquina3[0])/2 + xesquina3[0], (xesquina1[1]-xesquina3[1])/2 + xesquina3[1], pygame.math.Vector2(xesquina3[0]-xesquina1[0],xesquina3[1]-xesquina1[1])*0.5)
                     xcentre4 = ((xesquina4[0]-xesquina2[0])/2 + xesquina2[0], (xesquina4[1]-xesquina2[1])/2 + xesquina2[1], pygame.math.Vector2(xesquina2[0]-xesquina4[0],xesquina2[1]-xesquina4[1])*0.5)
@@ -729,6 +738,7 @@ class ocell():
     
     def calcul_posició_primer_xoc (self):
         if self.tocat_objecte == False:
+            self.posició_primer_xoc = self.rectangle.center
             self.superficie_ocell = self.superficie_ocell_2
             self.tocat_objecte = True
             for i in self.llista_copia:
@@ -982,8 +992,7 @@ no_ocell = ocell(0, fons)
 llista_ocells_llançats = [no_ocell]
 
 #Creació ordre d'ocells
-def següent_ocell(ocell1, ocell2, ocell3, ocell4, ocell5, ocell6):
-    ordre_ocells = [ocell1, ocell2, ocell3, ocell4, ocell5, ocell6]
+def següent_ocell(ordre_ocells):
     n = 0
     for i in ordre_ocells:
         if n == ordre_ocells.index(i):
@@ -998,13 +1007,12 @@ def següent_ocell(ocell1, ocell2, ocell3, ocell4, ocell5, ocell6):
                     x = llista_ocells_llançats.index(no_ocell)
                 else:
                     n +=1
-                    if n==6:
+                    if n==len(ordre_ocells):
                         x = llista_ocells_llançats.index(no_ocell)  
     return x
 
 # Creació linea ocells
-def linea_ocells(ocell1, ocell2, ocell3, ocell4, ocell5, ocell6, diferencia):
-    ordre_ocells = [ocell1, ocell2, ocell3, ocell4, ocell5, ocell6]
+def linea_ocells(ordre_ocells, diferencia):
     n = 1
     for i in ordre_ocells:
         if i not in llista_ocells_llançats:    
@@ -1112,10 +1120,6 @@ class porc():
             if abs(self.velocitat[0]) < gravetat:
                 self.velocitat[0] = 0
             self.rectangle.center = self.posició_real
-            if self.rectangle.center[0]>pantalla_amplada+ self.radi or self.rectangle.center[0]<-self.radi or self.rectangle.center[1]>pantalla_alçada+self.radi:
-                global nombre_porcs
-                llista_objectes_pantalla.remove(self)
-                nombre_porcs-=1
             self.angle -= self.velocitat[0]
             self.porc_nou = pygame.transform.rotate(self.superficie_porc, self.angle)
             self.rectangle_2 = self.porc_nou.get_rect(center = self.posició_real)
@@ -1307,8 +1311,6 @@ class caixa():
                 self.rectangle.center += error
                 self.mask = pygame.mask.from_surface(self.rectangle_nou)
             self.velocitat_angle_ax = self.velocitat_angle
-            if self.rectangle.center[0]>pantalla_amplada+ self.rectangle.width/2 or self.rectangle.center[0]<-self.rectangle.width/2 or self.rectangle.center[1]>pantalla_alçada+ self.rectangle.height/2:
-                llista_objectes_pantalla.remove(self)
         self.colisionat = False
         if self.caixa == False:
             n=pygame.math.Vector2(1,1)
@@ -1857,7 +1859,8 @@ class caixa():
         self.caixa = True
 
 terra = caixa([pantalla_amplada/2, pantalla_alçada + 45], 100, pantalla_amplada*3, False, 0,2)
-paret_dreta = caixa([pantalla_amplada*2+100, pantalla_alçada/2 -250],200, pantalla_alçada+600, False, 90,2)
+paret_dreta = caixa([pantalla_amplada*2+100, pantalla_alçada/2 -250],300, pantalla_alçada+600, False, 90,2)
+paret_esquerra = caixa([terra.rectangle.left, pantalla_alçada/2 -250],300, pantalla_alçada+600, False, 90,2)
 quadrat_petit = caixa([pantalla_amplada - 255, pantalla_alçada-48], 50, 50, True, 0,1)
 rectangle_petit = caixa([pantalla_amplada - 230, pantalla_alçada-175], 20, 70, True, 90,2)
 rectangle_normal = caixa([pantalla_amplada - 180, pantalla_alçada-245], 20, 150, True, 0,2)
@@ -2011,7 +2014,7 @@ def reinici():
     global llista_ocells_llançats
     for i in sprites:
         i.reinici()
-    llista_objectes_pantalla = [terra, paret_dreta]
+    llista_objectes_pantalla = [terra, paret_dreta, paret_esquerra]
     sprites = [terra]
     llista_ocells_llançats = [no_ocell]
     camara.diferencia *= 0 
@@ -2021,27 +2024,38 @@ def reinici():
 class camera():
     def __init__(self):
         self.rectangle_camara_orig = (pantalla_amplada*0.2, pantalla_alçada*0.2)
-        self.rectangle_camara = pygame.Rect(pantalla_amplada*0.2, pantalla_alçada*0.2, pantalla_amplada*0.6, pantalla_alçada*0.8)
+        self.rectangle_camara = pygame.Rect(pantalla_amplada*0.2, pantalla_alçada*0.2, pantalla_amplada*0.6, pantalla_alçada*0.6)
         self.diferencia = pygame.math.Vector2(0,0)
+        self.diferencia_2 = pygame.math.Vector2(0,0)
         self.tornar_ocell = True
         self.principi_nivell = True
     def cam_1(self,personatge):
-        if personatge.rectangle.top < self.rectangle_camara.top:
-            self.rectangle_camara.top = personatge.rectangle.top 
-        if personatge.rectangle.right > self.rectangle_camara.right:
-            self.rectangle_camara.right = personatge.rectangle.right 
-        if personatge.rectangle.bottom > self.rectangle_camara.bottom:
-            self.rectangle_camara.bottom = personatge.rectangle.bottom
+        if personatge.tocat_objecte==False:    
+            if personatge.rectangle.top < self.rectangle_camara.top:
+                self.rectangle_camara.top = personatge.rectangle.top 
+            if personatge.rectangle.right > self.rectangle_camara.right:
+                self.rectangle_camara.right = personatge.rectangle.right 
+            if personatge.rectangle.bottom > self.rectangle_camara.bottom:
+                self.rectangle_camara.bottom = personatge.rectangle.bottom
+            if self.rectangle_camara.bottom > pantalla_alçada*0.85:
+                self.rectangle_camara.bottom = pantalla_alçada*0.85
+            self.diferencia.x =self.rectangle_camara_orig[0]-self.rectangle_camara.left
+            self.diferencia.y =self.rectangle_camara_orig[1]-self.rectangle_camara.top
+            self.diferencia=round(self.diferencia)
+        else:
+            self.rectangle_camara_orig_2 = self.rectangle_camara.topleft
+            self.camara_punt((personatge.posició_primer_xoc[0], self.rectangle_camara_orig[1]))
+    def camara_punt(self,punt):
+        self.diferencia_2.x =punt[0]-self.rectangle_camara.left
+        self.diferencia_2.y =punt[1]-self.rectangle_camara.top
+        self.diferencia_2*=0.1
+        self.rectangle_camara.left = self.rectangle_camara_orig_2[0] + self.diferencia_2.x
+        self.rectangle_camara.top = self.rectangle_camara_orig_2[1] + self.diferencia_2.y
+        if self.rectangle_camara.bottom > pantalla_alçada*0.85:
+            self.rectangle_camara.bottom = pantalla_alçada*0.85
         self.diferencia.x =self.rectangle_camara_orig[0]-self.rectangle_camara.left
         self.diferencia.y =self.rectangle_camara_orig[1]-self.rectangle_camara.top
         self.diferencia=round(self.diferencia)
-    def camara_punt(self,punt):
-        self.diferencia.x =punt[0]-self.rectangle_camara.left
-        self.diferencia.y =punt[1]-self.rectangle_camara.top
-        self.diferencia*=0.9
-        self.diferencia=round(self.diferencia)
-        self.rectangle_camara.left = self.rectangle_camara_orig[0] - self.diferencia.x
-        self.rectangle_camara.top = self.rectangle_camara_orig[1] - self.diferencia.y
     def camara_ratoli(self, mantenint, posició_mantenint, rectangle_mantenint):
         if mantenint:
             self.tornar_ocell = False
@@ -2050,8 +2064,8 @@ class camera():
             diferencia_ratoli.y =pygame.mouse.get_pos()[1]-posició_mantenint[1]
             self.rectangle_camara.left = rectangle_mantenint.left - diferencia_ratoli.x
             self.rectangle_camara.top = rectangle_mantenint.top - diferencia_ratoli.y
-            if self.rectangle_camara.bottom > pantalla_alçada*1.05:
-                self.rectangle_camara.bottom = pantalla_alçada*1.05
+            if self.rectangle_camara.bottom > pantalla_alçada*0.85:
+                self.rectangle_camara.bottom = pantalla_alçada*0.85
             if self.rectangle_camara.left < -pantalla_amplada*0.05:
                 self.rectangle_camara.left = -pantalla_amplada*0.05
             if self.rectangle_camara.right > pantalla_amplada*1.85:
@@ -2063,17 +2077,19 @@ class camera():
             self.diferencia=round(self.diferencia)
     def update(self, llista_objectes_pantalla, personatge, ocells_nivell,ocell_actual, mantenint_ocell,ocell_anterior, mantenint,posició_mantenint,rectangle_mantenint):
         if self.principi_nivell:
-            self.camara_punt((self.rectangle_camara_orig[0]*0.44 , self.rectangle_camara_orig[1]))
-        elif personatge in llista_objectes_pantalla and personatge.velocitat.length() >= 1:
+            self.rectangle_camara_orig_2 = self.rectangle_camara.topleft
+            self.camara_punt((pantalla_amplada , self.rectangle_camara_orig[1]))
+        elif (personatge in llista_objectes_pantalla and personatge.velocitat.length() >= 2) or ocell_actual.radi == 0:
             self.cam_1(personatge)
             self.tornar_ocell = True
         else:
-            if self.tornar_ocell or mantenint_ocell:    
+            if self.tornar_ocell or mantenint_ocell: 
+                self.rectangle_camara_orig_2 = self.rectangle_camara.topleft   
                 self.camara_punt(self.rectangle_camara_orig)
             self.camara_ratoli(mantenint,posició_mantenint,rectangle_mantenint)
         if ocell_anterior.llançat:    
             ocell_anterior.estela(self.diferencia)  
-        linea_ocells(ocells_nivell[0], ocells_nivell[1], ocells_nivell[2], ocells_nivell[3], ocells_nivell[4], ocells_nivell[5], self.diferencia)
+        linea_ocells(ocells_nivell, self.diferencia)
         linea(ocell_actual,mantenint_ocell, self.diferencia)
         for i in  llista_objectes_pantalla:
             i.dibuixar(self.diferencia)
@@ -2084,31 +2100,31 @@ class camera():
 camara = camera()
 #Defimin nivells
 ocells3 = [bombardero.copy(), pequeñin.copy(), estrella.copy(), racista.copy(), vermellet.copy(), racista.copy()]
-ocells1 = [vermellet.copy(), vermellet.copy(), vermellet.copy(), no_ocell.copy(), no_ocell, no_ocell]
-ocells2 = [vermellet.copy(), no_ocell, no_ocell, no_ocell, no_ocell, no_ocell]
-ocells4 = [vermellet.copy(), no_ocell, no_ocell, no_ocell, no_ocell, no_ocell]
-ocells5 = [vermellet.copy(), no_ocell, no_ocell, no_ocell, no_ocell, no_ocell]
-ocells6 = [vermellet.copy(), no_ocell, no_ocell, no_ocell, no_ocell, no_ocell]
-ocells7 = [vermellet.copy(), no_ocell, no_ocell, no_ocell, no_ocell, no_ocell]
-ocells8 = [vermellet.copy(), no_ocell, no_ocell, no_ocell, no_ocell, no_ocell]
-ocells9 = [vermellet.copy(), no_ocell, no_ocell, no_ocell, no_ocell, no_ocell]
-ocells10 = [vermellet.copy(), no_ocell, no_ocell, no_ocell, no_ocell, no_ocell]
-ocells11 = [vermellet.copy(), no_ocell, no_ocell, no_ocell, no_ocell, no_ocell]
-ocells12 = [vermellet.copy(), no_ocell, no_ocell, no_ocell, no_ocell, no_ocell]
+ocells1 = [vermellet.copy(), vermellet.copy(), vermellet.copy(),vermellet.copy()]
+ocells2 = [vermellet.copy()]
+ocells4 = [vermellet.copy()]
+ocells5 = [vermellet.copy()]
+ocells6 = [vermellet.copy()]
+ocells7 = [vermellet.copy()]
+ocells8 = [vermellet.copy()]
+ocells9 = [vermellet.copy()]
+ocells10 = [vermellet.copy()]
+ocells11 = [vermellet.copy()]
+ocells12 = [vermellet.copy()]
 nivells_ocells = {1:ocells1, 2:ocells2, 3:ocells3, 4:ocells4, 5:ocells5, 6:ocells6, 7:ocells7, 8:ocells8, 9:ocells9, 10:ocells10, 11:ocells11, 12:ocells12}
 
 nivell3 = [rectangle_gran, quadrat_petit,quadrat_petit.copy([pantalla_amplada - 105, pantalla_alçada-48]),rectangle_petit,rectangle_petit.copy([pantalla_amplada - 130, pantalla_alçada-175]),rectangle_normal, quadrat_gran,quadrat_petit.copy([pantalla_amplada - 505, pantalla_alçada-48]),quadrat_petit.copy([pantalla_amplada - 355, pantalla_alçada-48]),rectangle_petit.copy([pantalla_amplada - 480, pantalla_alçada-175]),rectangle_petit.copy([pantalla_amplada - 380, pantalla_alçada-175]),rectangle_normal.copy([pantalla_amplada - 430, pantalla_alçada-245]),quadrat_gran.copy([pantalla_amplada - 430, pantalla_alçada-315]),rectangle_gran.copy([pantalla_amplada - 430, pantalla_alçada-105]), porc_estandar, porc_estandar.copy((pantalla_amplada - 430, pantalla_alçada - 160))]
-nivell1 = [porc_estandar.copy([pantalla_amplada- 140, pantalla_alçada-265]), porc_estandar.copy([pantalla_amplada- 540, pantalla_alçada-265]), rectangle_petit.copy([pantalla_amplada- 105,pantalla_alçada-40]), rectangle_petit.copy([pantalla_amplada- 105,pantalla_alçada-115]), rectangle_petit.copy([pantalla_amplada- 105,pantalla_alçada-190]),rectangle_petit.copy([pantalla_amplada- 175,pantalla_alçada-40]), rectangle_petit.copy([pantalla_amplada- 175,pantalla_alçada-115]), rectangle_petit.copy([pantalla_amplada- 175,pantalla_alçada-190]), rectangle_normal.copy([pantalla_amplada- 140, pantalla_alçada-255]), rectangle_petit.copy([pantalla_amplada- 305,pantalla_alçada-115]), rectangle_petit.copy([pantalla_amplada- 305,pantalla_alçada-190]), rectangle_petit.copy([pantalla_amplada- 375,pantalla_alçada-115]), rectangle_petit.copy([pantalla_amplada- 375,pantalla_alçada-190]), rectangle_normal.copy([pantalla_amplada- 340, pantalla_alçada-255]), rectangle_petit.copy([pantalla_amplada- 505,pantalla_alçada-90]), rectangle_petit.copy([pantalla_amplada- 575,pantalla_alçada-90]), rectangle_normal.copy([pantalla_amplada- 540, pantalla_alçada-145]),tnt.copy([pantalla_amplada- 340, pantalla_alçada-300])]
-nivell2 = [porc_estandar.copy((1000,pantalla_alçada-550)), caixa([pantalla_amplada*0.8, pantalla_alçada-100], 200, pantalla_amplada/2.5, False, 0,2), caixa([pantalla_amplada*0.51, pantalla_alçada*1.082], 200, pantalla_amplada/2.5, False, 45,2)]
-nivell4 = [porc_estandar.copy((1000,0))]
-nivell5 = [porc_estandar.copy((1000,0))]
-nivell6 = [porc_estandar.copy((1000,0))]
-nivell7 = [porc_estandar.copy((1000,0))]
-nivell8 = [porc_estandar.copy((1000,0))]
-nivell9 = [porc_estandar.copy((1000,0))]
-nivell10 = [porc_estandar.copy((1000,0))]
-nivell11 = [porc_estandar.copy((1000,0))]
-nivell12 = [porc_estandar.copy((1000,0))]
+nivell1 = [porc_estandar.copy([pantalla_amplada+260, pantalla_alçada-265]), porc_estandar.copy([pantalla_amplada- 140, pantalla_alçada-265]), rectangle_petit.copy([pantalla_amplada + 295,pantalla_alçada-40]), rectangle_petit.copy([pantalla_amplada +295,pantalla_alçada-115]), rectangle_petit.copy([pantalla_amplada +295,pantalla_alçada-190]),rectangle_petit.copy([pantalla_amplada + 225,pantalla_alçada-40]), rectangle_petit.copy([pantalla_amplada+225,pantalla_alçada-115]), rectangle_petit.copy([pantalla_amplada+225,pantalla_alçada-190]), rectangle_normal.copy([pantalla_amplada + 260, pantalla_alçada-255]), rectangle_petit.copy([pantalla_amplada +25,pantalla_alçada-115]), rectangle_petit.copy([pantalla_amplada+25,pantalla_alçada-190]), rectangle_petit.copy([pantalla_amplada+95,pantalla_alçada-115]), rectangle_petit.copy([pantalla_amplada+95,pantalla_alçada-190]), rectangle_normal.copy([pantalla_amplada+60, pantalla_alçada-255]), rectangle_petit.copy([pantalla_amplada- 105,pantalla_alçada-90]), rectangle_petit.copy([pantalla_amplada- 175,pantalla_alçada-90]), rectangle_normal.copy([pantalla_amplada- 140, pantalla_alçada-145]),tnt.copy([pantalla_amplada+60, pantalla_alçada-300]), porc_estandar.copy([pantalla_amplada+ 540, pantalla_alçada-265]), porc_estandar.copy([pantalla_amplada+ 940, pantalla_alçada-265]), rectangle_petit.copy([pantalla_amplada+ 505,pantalla_alçada-40]), rectangle_petit.copy([pantalla_amplada+ 505,pantalla_alçada-115]), rectangle_petit.copy([pantalla_amplada+ 505,pantalla_alçada-190]),rectangle_petit.copy([pantalla_amplada+ 575,pantalla_alçada-40]), rectangle_petit.copy([pantalla_amplada+ 575,pantalla_alçada-115]), rectangle_petit.copy([pantalla_amplada+ 575,pantalla_alçada-190]), rectangle_normal.copy([pantalla_amplada+ 540, pantalla_alçada-255]), rectangle_petit.copy([pantalla_amplada+ 705,pantalla_alçada-115]), rectangle_petit.copy([pantalla_amplada+ 705,pantalla_alçada-190]), rectangle_petit.copy([pantalla_amplada+ 775,pantalla_alçada-115]), rectangle_petit.copy([pantalla_amplada+ 775,pantalla_alçada-190]), rectangle_normal.copy([pantalla_amplada+ 740, pantalla_alçada-255]), rectangle_petit.copy([pantalla_amplada+ 905,pantalla_alçada-90]), rectangle_petit.copy([pantalla_amplada+ 975,pantalla_alçada-90]), rectangle_normal.copy([pantalla_amplada+ 940, pantalla_alçada-145]),tnt.copy([pantalla_amplada+ 740, pantalla_alçada-300])]
+nivell2 = [porc_estandar.copy((1000,pantalla_alçada-450)), caixa([pantalla_amplada*0.8, pantalla_alçada-100], 200, pantalla_amplada/2.5, False, 0,2), caixa([pantalla_amplada*0.51, pantalla_alçada*1.082], 200, pantalla_amplada/2.5, False, 45,2)]
+nivell4 = [porc_estandar.copy((1000,pantalla_alçada-40))]
+nivell5 = [porc_estandar.copy((1000,pantalla_alçada-40))]
+nivell6 = [porc_estandar.copy((1000,pantalla_alçada-40))]
+nivell7 = [porc_estandar.copy((1000,pantalla_alçada-40))]
+nivell8 = [porc_estandar.copy((1000,pantalla_alçada-40))]
+nivell9 = [porc_estandar.copy((1000,pantalla_alçada-40))]
+nivell10 = [porc_estandar.copy((1000,pantalla_alçada-40))]
+nivell11 = [porc_estandar.copy((1000,pantalla_alçada-40))]
+nivell12 = [porc_estandar.copy((1000,pantalla_alçada-40))]
 nivells_caixes_i_porcs = {1:nivell1, 2:nivell2, 3:nivell3, 4:nivell4, 5:nivell5, 6:nivell6, 7:nivell7, 8:nivell8, 9:nivell9, 10:nivell10, 11:nivell11, 12:nivell12}
 
 # Game GameLoop
@@ -2148,9 +2164,9 @@ def GameLoop():
                     if i.radi != 0:
                         nombre_ocells +=1
                 n =1
-            ocell_actual = llista_ocells_llançats[següent_ocell(ocells_nivell[0], ocells_nivell[1], ocells_nivell[2], ocells_nivell[3], ocells_nivell[4], ocells_nivell[5])]
+            ocell_actual = llista_ocells_llançats[següent_ocell(ocells_nivell)]
             if len(llista_ocells_llançats) > 1:
-                ocell_anterior =  llista_ocells_llançats[següent_ocell(ocells_nivell[0], ocells_nivell[1], ocells_nivell[2], ocells_nivell[3], ocells_nivell[4], ocells_nivell[5])-1]
+                ocell_anterior =  llista_ocells_llançats[següent_ocell(ocells_nivell)-1]
             else:
                 ocell_anterior = ocell_actual
             zona_ocell = ocell_actual.zona_llançament(camara.diferencia)
