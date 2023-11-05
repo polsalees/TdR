@@ -1991,18 +1991,21 @@ def info():
         text11 = font.render("Les caixes són obstacles que estan protegint als porcs. Hi han de diferents tipos,", True, taronja)
         text12 = font.render("les de pedra són les més difícils de trencar, mentre que les de vidre les més fàcils.", True, taronja)
         text13 = font.render(" La TNT explota al xocar-se.", True, taronja)
-        pantalla.blit(text2, (10, text.get_height()*2.6 ))
-        pantalla.blit(text3, (10, text.get_height()*2.6+text2.get_height() ))
-        pantalla.blit(text4, (10, text.get_height()*2.6+text2.get_height()*2 ))
-        pantalla.blit(text5, (text.get_width()*0.2, text.get_height()*2.6+text2.get_height()*3.5))
-        pantalla.blit(text6, (10, text.get_height()*2.6*2.1))
-        pantalla.blit(text7, (10, text.get_height()*2.6*2.1+text2.get_height()))
-        pantalla.blit(text8, (10, text.get_height()*2.6*2.1+text2.get_height()*2 ))
-        pantalla.blit(text9, (text.get_width()*0.2, text.get_height()*2.6*2.1+text2.get_height()*3.5))
-        pantalla.blit(text10, (10, text.get_height()*2.6*3.2))
-        pantalla.blit(text11, (10, text.get_height()*2.6*3.2+text2.get_height()))
-        pantalla.blit(text12, (10, text.get_height()*2.6*3.2+text2.get_height()*2 ))
-        pantalla.blit(text13, (10, text.get_height()*2.6*3.2+text2.get_height()*3 ))
+        textos = [text2,text3,text4,text5,text6,text7,text8,text9,text10,text11,text12,text13]
+        a = 1
+        b = -1
+        for i in textos:
+            if i.get_height() > text2.get_height()+1:
+                amplada = text.get_width()*0.2
+                b += 1.5
+            else:
+                b+=1
+                amplada = 10
+            pantalla.blit(i, (amplada, text.get_height()*2.6*a +text2.get_height()*b))
+            if i.get_height() > text2.get_height()+1:
+                amplada = text.get_width()*0.2
+                a+=1.1
+                b = -1    
         font2 = pygame.font.Font(None, 60)
         text1 = font2.render("ESC per a sortir", True, groc)
         pantalla.blit(text1, (text1.get_width()*0.2, text1.get_height()*1.5))
@@ -2092,9 +2095,9 @@ class camera():
             self.diferencia.y =self.rectangle_camara_orig[1]-self.rectangle_camara.top
             self.diferencia=round(self.diferencia)
         else:
-            self.rectangle_camara_orig_2 = self.rectangle_camara.topleft
             self.camara_punt((personatge.posició_primer_xoc[0], self.rectangle_camara_orig[1]))
     def camara_punt(self,punt):
+        self.rectangle_camara_orig_2 = self.rectangle_camara.topleft 
         self.diferencia_2.x =punt[0]-self.rectangle_camara.left
         self.diferencia_2.y =punt[1]-self.rectangle_camara.top
         self.diferencia_2*=0.1
@@ -2111,8 +2114,8 @@ class camera():
             diferencia_ratoli = pygame.math.Vector2()    
             diferencia_ratoli.x =pygame.mouse.get_pos()[0]-posició_mantenint[0]
             diferencia_ratoli.y =pygame.mouse.get_pos()[1]-posició_mantenint[1]
-            self.rectangle_camara.left = rectangle_mantenint.left - diferencia_ratoli.x
-            self.rectangle_camara.top = rectangle_mantenint.top - diferencia_ratoli.y
+            self.rectangle_camara.left = rectangle_mantenint.left - diferencia_ratoli.x*2
+            self.rectangle_camara.top = rectangle_mantenint.top - diferencia_ratoli.y*2
             if self.rectangle_camara.bottom > pantalla_alçada*0.85:
                 self.rectangle_camara.bottom = pantalla_alçada*0.85
             if self.rectangle_camara.left < -pantalla_amplada*0.05:
@@ -2126,14 +2129,12 @@ class camera():
             self.diferencia=round(self.diferencia)
     def update(self, llista_objectes_pantalla, personatge, ocells_nivell,ocell_actual, mantenint_ocell,ocell_anterior, mantenint,posició_mantenint,rectangle_mantenint):
         if self.principi_nivell:
-            self.rectangle_camara_orig_2 = self.rectangle_camara.topleft
             self.camara_punt((pantalla_amplada , self.rectangle_camara_orig[1]))
         elif (personatge in llista_objectes_pantalla and personatge.velocitat.length() >= 2) or ocell_actual.radi == 0:
             self.cam_1(personatge)
             self.tornar_ocell = True
         else:
-            if self.tornar_ocell or mantenint_ocell: 
-                self.rectangle_camara_orig_2 = self.rectangle_camara.topleft   
+            if self.tornar_ocell or mantenint_ocell:   
                 self.camara_punt(self.rectangle_camara_orig)
             self.camara_ratoli(mantenint,posició_mantenint,rectangle_mantenint)
         if ocell_anterior.llançat:    
