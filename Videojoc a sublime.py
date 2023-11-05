@@ -1950,13 +1950,62 @@ def menú():
                         print("Dificultat seleccionada:", dificultat)
                         nivell_actual = dificultat
                         return True
-
+                elif event.key == pygame.K_i:
+                    info()
         pantalla.fill(fons)
 
         font = pygame.font.Font(None, 300)
         text = font.render("Angry Birds", True, taronja)
-        pantalla.blit(text, (pantalla_amplada // 2 - text.get_width() // 2, pantalla_alçada // 2 - text.get_height() // 2))
+        pantalla.blit(text, (pantalla_amplada // 2 - text.get_width() // 2, pantalla_alçada*2 // 5 - text.get_height() // 2))
+        font = pygame.font.Font(None, 75)
+        text2 = font.render("ESPAI PER CONTINUAR", True, taronja)
+        pantalla.blit(text2, (pantalla_amplada *0.3 - text2.get_width() // 2, pantalla_alçada*4 // 5 - text2.get_height() // 2))
+        text3 = font.render("'i' PER INFO", True, taronja)
+        pantalla.blit(text3, (pantalla_amplada*0.75 - text3.get_width() // 2, pantalla_alçada*4 // 5 - text3.get_height() // 2))
+        font2 = pygame.font.Font(None, 60)
+        text1 = font2.render("ESC per a sortir", True, groc)
+        pantalla.blit(text1, (text1.get_width()*0.2, text1.get_height()*1.5))
+        pygame.display.flip()
+def info():
+    global nivell_actual
+    while True:
+        for event in pygame.event.get():
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    return False
+        pantalla.fill(fons)
 
+        font = pygame.font.Font(None, 100)
+        text = font.render("Camara", True, taronja)
+        text5 = font.render("Ocells", True, taronja)
+        text9 = font.render("Altres objectes", True, taronja)
+        pantalla.blit(text, (text.get_width()*0.2 , text.get_height()*1.6))
+        font = pygame.font.Font(None, 50)
+        text2 = font.render("Al començar un nivell, la camara anirà a la part que no és veu. Per ha anar al", True, taronja)
+        text3 = font.render("tiratxines pren espai. La camara al llançar un ocell el seguira. Per poder veure el", True, taronja)
+        text4 = font.render("mapa amb llibertat utilitza el ratoli, per tornar al tiratxines pren espai un altre cop.", True, taronja)
+        text6 = font.render("Per llançar un ocell arrastra'l amb el ratoli i deixa'l anar. Alguns ocells tenen una", True, taronja)
+        text7 = font.render("habilitat especial que s'activa al fer click quan estan en el aire. Els ocells poden ", True, taronja)
+        text8 = font.render("destruir caixes i fer despaeixer els porcs.", True, taronja)
+        text10 = font.render("Els porcs són l'objectiu d'aquest joc, guanyes el nivell quan has eliminat a tots.", True, taronja)
+        text11 = font.render("Les caixes són obstacles que estan protegint als porcs. Hi han de diferents tipos,", True, taronja)
+        text12 = font.render("les de pedra són les més difícils de trencar, mentre que les de vidre les més fàcils.", True, taronja)
+        text13 = font.render(" La TNT explota al xocar-se.", True, taronja)
+        pantalla.blit(text2, (10, text.get_height()*2.6 ))
+        pantalla.blit(text3, (10, text.get_height()*2.6+text2.get_height() ))
+        pantalla.blit(text4, (10, text.get_height()*2.6+text2.get_height()*2 ))
+        pantalla.blit(text5, (text.get_width()*0.2, text.get_height()*2.6+text2.get_height()*3.5))
+        pantalla.blit(text6, (10, text.get_height()*2.6*2.1))
+        pantalla.blit(text7, (10, text.get_height()*2.6*2.1+text2.get_height()))
+        pantalla.blit(text8, (10, text.get_height()*2.6*2.1+text2.get_height()*2 ))
+        pantalla.blit(text9, (text.get_width()*0.2, text.get_height()*2.6*2.1+text2.get_height()*3.5))
+        pantalla.blit(text10, (10, text.get_height()*2.6*3.2))
+        pantalla.blit(text11, (10, text.get_height()*2.6*3.2+text2.get_height()))
+        pantalla.blit(text12, (10, text.get_height()*2.6*3.2+text2.get_height()*2 ))
+        pantalla.blit(text13, (10, text.get_height()*2.6*3.2+text2.get_height()*3 ))
+        font2 = pygame.font.Font(None, 60)
+        text1 = font2.render("ESC per a sortir", True, groc)
+        pantalla.blit(text1, (text1.get_width()*0.2, text1.get_height()*1.5))
         pygame.display.flip()
 def pantalla_final(tipo, estrelles):
     global partida
