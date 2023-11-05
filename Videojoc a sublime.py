@@ -646,6 +646,7 @@ def rotacions(self,x, posició_xoc_s, ns, nx, rectangle_xoc, centre1,centre2,cen
 class ocell():
     def __init__(self, radi, color):
         global gravetat
+        self.temps_desde_tocar_objectes = 0
         self.animació = False
         self.radi = radi
         self.velocitat = pygame.math.Vector2(0,0)
@@ -684,47 +685,57 @@ class ocell():
             self.color2 = gris
         pygame.draw.circle(self.superficie_ocell, self.color2, (self.radi*1.1, self.radi*1.1), self.radi)
         self.mask = pygame.mask.from_surface(self.superficie_ocell)
-        pygame.draw.circle(self.superficie_ocell, self.color, (self.radi*1.1, self.radi*0.75), self.radi*0.7)
-        pygame.draw.circle(self.superficie_ocell, self.color, (self.radi*1.4, self.radi*0.95), self.radi*0.7)
-        pygame.draw.circle(self.superficie_ocell, self.color, (self.radi*0.7, self.radi*0.95), self.radi*0.7)
-        pygame.draw.circle(self.superficie_ocell, self.color, (self.radi*1.1, self.radi*1), self.radi*0.8)
-        pygame.draw.circle(self.superficie_ocell, self.color, (self.radi*1.3, self.radi*0.8), self.radi*0.7)
-        pygame.draw.circle(self.superficie_ocell, self.color2, (self.radi*1.85, self.radi*0.9), self.radi/3)
-        pygame.draw.circle(self.superficie_ocell, self.color2, (self.radi*1.15, self.radi*0.9), self.radi/3)
-        pygame.draw.line(self.superficie_ocell, self.color, (self.radi,self.radi/3), (0, 0), width=round(self.radi/2))
-        pygame.draw.circle(self.superficie_ocell, blanc, (self.radi*1.85, self.radi*0.9), self.radi/4)
-        pygame.draw.circle(self.superficie_ocell, negre, (self.radi*1.85, self.radi*0.9), self.radi/6)
-        pygame.draw.circle(self.superficie_ocell, blanc, (self.radi*1.15, self.radi*0.9), self.radi/4)
-        pygame.draw.circle(self.superficie_ocell, negre, (self.radi*1.15, self.radi*0.9), self.radi/6)
-        pygame.draw.polygon(self.superficie_ocell, taronja, ((self.radi*1.5,self.radi*1.2), (self.radi*1.5,self.radi*1.7), (self.radi*2.2,self.radi*1.45)))
-        pygame.draw.line(self.superficie_ocell, negre, (self.radi*1.5,self.radi*1.45), (self.radi*2.2,self.radi*1.45), width=round(self.radi/20))
-        if self.color != negre:
-            pygame.draw.line(self.superficie_ocell, negre, (self.radi*0.8,self.radi*0.4), (1.8*self.radi, 0.4*self.radi), width=round(self.radi/5))
-        else:
-            pygame.draw.line(self.superficie_ocell, blanc, (self.radi*0.8,self.radi*0.4), (1.8*self.radi, 0.4*self.radi), width=round(self.radi/5))
-        self.superficie_ocell_orig = self.superficie_ocell.copy()
-        self.superficie_ocell_2 = pygame.Surface((2.2*self.radi, 2.2*self.radi), pygame.SRCALPHA)
-        pygame.draw.circle(self.superficie_ocell_2, self.color2, (self.radi*1.1, self.radi*1.1), self.radi)
-        pygame.draw.circle(self.superficie_ocell_2, self.color, (self.radi*1.1, self.radi*0.75), self.radi*0.7)
-        pygame.draw.circle(self.superficie_ocell_2, self.color, (self.radi*1.4, self.radi*0.95), self.radi*0.7)
-        pygame.draw.circle(self.superficie_ocell_2, self.color, (self.radi*0.7, self.radi*0.95), self.radi*0.7)
-        pygame.draw.circle(self.superficie_ocell_2, self.color, (self.radi*1.1, self.radi*1), self.radi*0.8)
-        pygame.draw.circle(self.superficie_ocell_2, self.color, (self.radi*1.3, self.radi*0.8), self.radi*0.7)
-        pygame.draw.circle(self.superficie_ocell_2, self.color2, (self.radi*1.85, self.radi*0.9), self.radi/3)
-        pygame.draw.circle(self.superficie_ocell_2, self.color2, (self.radi*1.15, self.radi*0.9), self.radi/3)
-        pygame.draw.line(self.superficie_ocell_2, self.color, (self.radi,self.radi/3), (0, 0), width=round(self.radi/2))
-        pygame.draw.circle(self.superficie_ocell_2, blanc, (self.radi*1.85, self.radi*0.9), self.radi/4)
-        pygame.draw.circle(self.superficie_ocell_2, negre, (self.radi*1.85, self.radi*0.9), self.radi/6)
-        pygame.draw.circle(self.superficie_ocell_2, blanc, (self.radi*1.15, self.radi*0.9), self.radi/4)
-        pygame.draw.circle(self.superficie_ocell_2, negre, (self.radi*1.15, self.radi*0.9), self.radi/6)
-        pygame.draw.polygon(self.superficie_ocell_2, taronja, ((self.radi*1.5,self.radi*1.2), (self.radi*1.5,self.radi*1.45), (self.radi*2.2,self.radi*1.2)))
-        pygame.draw.polygon(self.superficie_ocell_2, taronja, ((self.radi*1.5,self.radi*1.45), (self.radi*1.5,self.radi*1.7), (self.radi*2.2,self.radi*1.8)))
-        if self.color != negre:
-            pygame.draw.line(self.superficie_ocell_2, negre, (self.radi*0.8,self.radi*0.1), (1.5*self.radi, 0.4*self.radi), width=round(self.radi/5))
-            pygame.draw.line(self.superficie_ocell_2, negre, (self.radi*1.5,self.radi*0.4), (1.8*self.radi, 0.1*self.radi), width=round(self.radi/5))
-        else:
-            pygame.draw.line(self.superficie_ocell_2, blanc, (self.radi*0.8,self.radi*0.1), (1.5*self.radi, 0.4*self.radi), width=round(self.radi/5))
-            pygame.draw.line(self.superficie_ocell_2, blanc, (self.radi*1.5,self.radi*0.4), (1.8*self.radi, 0.1*self.radi), width=round(self.radi/5))
+        if self.color!=vermell:    
+            pygame.draw.circle(self.superficie_ocell, self.color, (self.radi*1.1, self.radi*0.75), self.radi*0.7)
+            pygame.draw.circle(self.superficie_ocell, self.color, (self.radi*1.4, self.radi*0.95), self.radi*0.7)
+            pygame.draw.circle(self.superficie_ocell, self.color, (self.radi*0.7, self.radi*0.95), self.radi*0.7)
+            pygame.draw.circle(self.superficie_ocell, self.color, (self.radi*1.1, self.radi*1), self.radi*0.8)
+            pygame.draw.circle(self.superficie_ocell, self.color, (self.radi*1.3, self.radi*0.8), self.radi*0.7)
+            pygame.draw.circle(self.superficie_ocell, self.color2, (self.radi*1.85, self.radi*0.9), self.radi/3)
+            pygame.draw.circle(self.superficie_ocell, self.color2, (self.radi*1.15, self.radi*0.9), self.radi/3)
+            pygame.draw.line(self.superficie_ocell, self.color, (self.radi,self.radi/3), (0, 0), width=round(self.radi/2))
+            pygame.draw.circle(self.superficie_ocell, blanc, (self.radi*1.85, self.radi*0.9), self.radi/4)
+            pygame.draw.circle(self.superficie_ocell, negre, (self.radi*1.85, self.radi*0.9), self.radi/6)
+            pygame.draw.circle(self.superficie_ocell, blanc, (self.radi*1.15, self.radi*0.9), self.radi/4)
+            pygame.draw.circle(self.superficie_ocell, negre, (self.radi*1.15, self.radi*0.9), self.radi/6)
+            pygame.draw.polygon(self.superficie_ocell, taronja, ((self.radi*1.5,self.radi*1.2), (self.radi*1.5,self.radi*1.7), (self.radi*2.2,self.radi*1.45)))
+            pygame.draw.line(self.superficie_ocell, negre, (self.radi*1.5,self.radi*1.45), (self.radi*2.2,self.radi*1.45), width=round(self.radi/20))
+            if self.color != negre:
+                pygame.draw.line(self.superficie_ocell, negre, (self.radi*0.8,self.radi*0.4), (1.8*self.radi, 0.4*self.radi), width=round(self.radi/5))
+            else:
+                pygame.draw.line(self.superficie_ocell, blanc, (self.radi*0.8,self.radi*0.4), (1.8*self.radi, 0.4*self.radi), width=round(self.radi/5))
+            self.superficie_ocell_orig = self.superficie_ocell.copy()
+            self.superficie_ocell_2 = pygame.Surface((2.2*self.radi, 2.2*self.radi), pygame.SRCALPHA)
+            pygame.draw.circle(self.superficie_ocell_2, self.color2, (self.radi*1.1, self.radi*1.1), self.radi)
+            pygame.draw.circle(self.superficie_ocell_2, self.color, (self.radi*1.1, self.radi*0.75), self.radi*0.7)
+            pygame.draw.circle(self.superficie_ocell_2, self.color, (self.radi*1.4, self.radi*0.95), self.radi*0.7)
+            pygame.draw.circle(self.superficie_ocell_2, self.color, (self.radi*0.7, self.radi*0.95), self.radi*0.7)
+            pygame.draw.circle(self.superficie_ocell_2, self.color, (self.radi*1.1, self.radi*1), self.radi*0.8)
+            pygame.draw.circle(self.superficie_ocell_2, self.color, (self.radi*1.3, self.radi*0.8), self.radi*0.7)
+            pygame.draw.circle(self.superficie_ocell_2, self.color2, (self.radi*1.85, self.radi*0.9), self.radi/3)
+            pygame.draw.circle(self.superficie_ocell_2, self.color2, (self.radi*1.15, self.radi*0.9), self.radi/3)
+            pygame.draw.line(self.superficie_ocell_2, self.color, (self.radi,self.radi/3), (0, 0), width=round(self.radi/2))
+            pygame.draw.circle(self.superficie_ocell_2, blanc, (self.radi*1.85, self.radi*0.9), self.radi/4)
+            pygame.draw.circle(self.superficie_ocell_2, negre, (self.radi*1.85, self.radi*0.9), self.radi/6)
+            pygame.draw.circle(self.superficie_ocell_2, blanc, (self.radi*1.15, self.radi*0.9), self.radi/4)
+            pygame.draw.circle(self.superficie_ocell_2, negre, (self.radi*1.15, self.radi*0.9), self.radi/6)
+            pygame.draw.polygon(self.superficie_ocell_2, taronja, ((self.radi*1.5,self.radi*1.2), (self.radi*1.5,self.radi*1.45), (self.radi*2.2,self.radi*1.2)))
+            pygame.draw.polygon(self.superficie_ocell_2, taronja, ((self.radi*1.5,self.radi*1.45), (self.radi*1.5,self.radi*1.7), (self.radi*2.2,self.radi*1.8)))
+            if self.color != negre:
+                pygame.draw.line(self.superficie_ocell_2, negre, (self.radi*0.8,self.radi*0.1), (1.5*self.radi, 0.4*self.radi), width=round(self.radi/5))
+                pygame.draw.line(self.superficie_ocell_2, negre, (self.radi*1.5,self.radi*0.4), (1.8*self.radi, 0.1*self.radi), width=round(self.radi/5))
+            else:
+                pygame.draw.line(self.superficie_ocell_2, blanc, (self.radi*0.8,self.radi*0.1), (1.5*self.radi, 0.4*self.radi), width=round(self.radi/5))
+                pygame.draw.line(self.superficie_ocell_2, blanc, (self.radi*1.5,self.radi*0.4), (1.8*self.radi, 0.1*self.radi), width=round(self.radi/5))
+            self.superficie_ocell_3 = self.superficie_ocell_2.copy()
+        else:    
+            self.superficie_ocell = pygame.image.load("Grafics/art.png").convert_alpha()
+            self.superficie_ocell = pygame.transform.scale(self.superficie_ocell,(self.radi*2,self.radi*2))
+            self.superficie_ocell_2 = pygame.image.load("Grafics/art2.png").convert_alpha()
+            self.superficie_ocell_2 = pygame.transform.scale(self.superficie_ocell_2,(self.radi*8/3,self.radi*2))
+            self.superficie_ocell_3 = pygame.image.load("Grafics/art3.png").convert_alpha()
+            self.superficie_ocell_3 = pygame.transform.scale(self.superficie_ocell_3,(self.radi*2,self.radi*2))
+            self.superficie_ocell_orig = self.superficie_ocell.copy()
         self.c = 0
         self.posició_real = posició_inicial
         self.massa = self.radi**2 *3.14
@@ -734,12 +745,13 @@ class ocell():
         self.llista_copia = []
         self.ocell_nou = self.superficie_ocell.copy()
         self.rectangle_2 = self.rectangle.copy()
+        self.rectangle_2.center = posició_inicial
         self.angle = 0
     
     def calcul_posició_primer_xoc (self):
         if self.tocat_objecte == False:
-            self.posició_primer_xoc = self.rectangle.center
-            self.superficie_ocell = self.superficie_ocell_2
+            self.posició_primer_xoc = self.rectangle.center 
+            self.superficie_ocell = self.superficie_ocell_3
             self.tocat_objecte = True
             for i in self.llista_copia:
                 i.llista_estela.extend(self.llista_estela)
@@ -800,6 +812,8 @@ class ocell():
                 self.angle -= self.velocitat[0]
             self.ocell_nou = pygame.transform.rotate(self.superficie_ocell, self.angle)
             self.rectangle_2 = self.ocell_nou.get_rect(center = self.posició_real)
+            if self.tocat_objecte:
+                self.temps_desde_tocar_objectes += 1
         if self.llançat:
             if self.velocitat.length()<gravetat:    
                 self.cooldown += 1
@@ -838,6 +852,7 @@ class ocell():
         if self.potencia <= 0 or angle > -0.1 or angle < -3:
             self.potencia = 0
         if self.potencia != 0:
+            self.superficie_ocell = self.superficie_ocell_2
             self.velocitat[0] = -math.sin(angle) * self.potencia * 0.1
             self.velocitat[1] = -math.cos(angle) * self.potencia * 0.1
             self.llançat = True
@@ -850,7 +865,6 @@ class ocell():
         return self.zona
     def habilitat(self):
         if self.activat == False and self.color != vermell:
-            self.superficie_ocell = self.superficie_ocell_2
             self.llista_estela.append((self.rectangle.center, 10))
             self.n = 0    
             if self.color == groc:
@@ -957,6 +971,7 @@ class ocell():
         x = ocell(self.radi, self.color)
         return x
     def reinici(self):
+        self.temps_desde_tocar_objectes = 0
         self.activat = False
         self.aire = False
         self.velocitat *= 0
@@ -2095,7 +2110,7 @@ class camera():
             self.diferencia.y =self.rectangle_camara_orig[1]-self.rectangle_camara.top
             self.diferencia=round(self.diferencia)
         else:
-            self.camara_punt((personatge.posició_primer_xoc[0], self.rectangle_camara_orig[1]))
+            self.camara_punt((personatge.posició_primer_xoc[0]-pantalla_amplada*0.3, self.rectangle_camara_orig[1]))
     def camara_punt(self,punt):
         self.rectangle_camara_orig_2 = self.rectangle_camara.topleft 
         self.diferencia_2.x =punt[0]-self.rectangle_camara.left
@@ -2105,6 +2120,12 @@ class camera():
         self.rectangle_camara.top = self.rectangle_camara_orig_2[1] + self.diferencia_2.y
         if self.rectangle_camara.bottom > pantalla_alçada*0.85:
             self.rectangle_camara.bottom = pantalla_alçada*0.85
+        if self.rectangle_camara.left < -pantalla_amplada*0.05:
+            self.rectangle_camara.left = -pantalla_amplada*0.05
+        if self.rectangle_camara.right > pantalla_amplada*1.85:
+            self.rectangle_camara.right = pantalla_amplada*1.85
+        if self.rectangle_camara.top < -pantalla_alçada*0.05:
+            self.rectangle_camara.top = -pantalla_alçada*0.05
         self.diferencia.x =self.rectangle_camara_orig[0]-self.rectangle_camara.left
         self.diferencia.y =self.rectangle_camara_orig[1]-self.rectangle_camara.top
         self.diferencia=round(self.diferencia)
@@ -2130,7 +2151,7 @@ class camera():
     def update(self, llista_objectes_pantalla, personatge, ocells_nivell,ocell_actual, mantenint_ocell,ocell_anterior, mantenint,posició_mantenint,rectangle_mantenint):
         if self.principi_nivell:
             self.camara_punt((pantalla_amplada , self.rectangle_camara_orig[1]))
-        elif (personatge in llista_objectes_pantalla and personatge.velocitat.length() >= 2) or ocell_actual.radi == 0:
+        elif (personatge in llista_objectes_pantalla and personatge.temps_desde_tocar_objectes <= 200) or ocell_actual.radi == 0:
             self.cam_1(personatge)
             self.tornar_ocell = True
         else:
