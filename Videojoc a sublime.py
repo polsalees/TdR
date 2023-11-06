@@ -49,6 +49,8 @@ llista_ocells_llançats = []
 sprites = []
 llista_ocells = []
 llista_porcs = []
+#carregem skins
+skin = pygame.image.load("Grafics/art4.png").convert_alpha()
 
 #Posició inicial ocells
 posició_inicial = [150, pantalla_alçada-150]
@@ -386,6 +388,9 @@ def GameLoop():
                     if event.key == pygame.K_SPACE:
                         camara.principi_nivell = False
                         camara.tornar_ocell = True
+                    if event.key == pygame.K_t:
+                        for i in llista_ocells:
+                            i.posar_skin(skin)
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     if zona_ocell:    
                         mantenint_ocell = True

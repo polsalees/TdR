@@ -34,6 +34,7 @@ def distancia_ocell_ratoli(diferencia,self):
 class ocell():
     def __init__(self, radi, color, llista_ocells, llista_objectes_rodons, posició_inicial, pantalla):
         global gravetat
+        self.skin = False
         self.pantalla = pantalla
         self.temps_desde_tocar_objectes = 0
         self.animació = False
@@ -173,7 +174,15 @@ class ocell():
                 self.linea_direció_posició[1] += self.linea_direció_velocitat[1] * 6
                 pygame.draw.circle(self.pantalla, blanc, self.linea_direció_posició, self.linea_direció_radi)
             self.linea_direció_moviment +=0.5
-    
+    def posar_skin(self, imatge):
+        if self.skin == False:
+            self.imatge_skin = pygame.transform.scale(imatge,(self.radi*2, self.radi*2+(9/5)*self.radi))
+            self.skin_offset = pygame.math.Vector2(0,-0.45*self.radi)
+            self.diferencia_skin = pygame.math.Vector2(0,-1.25*self.radi)
+            self.skin = True
+            self.rectangle_skin = self.imatge_skin.get_rect()
+        else:
+            self.skin = False
     def estela(self,diferencia): 
         for i in self.llista_estela:
             pygame.draw.circle(self.pantalla, blanc, i[0]+diferencia ,i[1])
@@ -229,6 +238,13 @@ class ocell():
             self.calcul_linea_direció(diferencia)
         rectangle = self.rectangle_2.topleft + diferencia     
         self.pantalla.blit(self.ocell_nou, rectangle)
+        if self.skin:
+            imatge_skin_rotada = pygame.transform.rotate(self.imatge_skin, self.angle)
+            if self.llançat and self.tocat_objecte == False:
+                self.rectangle_skin = imatge_skin_rotada.get_rect(center =self.rectangle_2.center + diferencia + self.skin_offset.rotate(-self.angle)+pygame.math.Vector2((8/3-2)*self.radi,0).rotate(-self.angle))
+            else:
+                self.rectangle_skin = imatge_skin_rotada.get_rect(center =self.rectangle_2.center + diferencia + self.skin_offset.rotate(-self.angle))
+            self.pantalla.blit(imatge_skin_rotada, self.rectangle_skin)
         if self.animació:
             for i in self.objecte_animació:
                 pygame.draw.circle(self.pantalla,self.color_animació,i[1]+diferencia,i[0])
@@ -361,6 +377,7 @@ class ocell():
         x = ocell(self.radi, self.color, llista_ocells, llista_objectes_rodons, self.posició_inicial, self.pantalla)
         return x
     def reinici(self):
+        self.skin = False
         self.temps_desde_tocar_objectes = 0
         self.activat = False
         self.aire = False

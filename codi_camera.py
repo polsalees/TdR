@@ -10,6 +10,8 @@ def linea_ocells(ordre_ocells, diferencia, llista_ocells_llançats,pantalla, pos
     for i in ordre_ocells:
         if i not in llista_ocells_llançats:    
             pantalla.blit(i.ocell_nou,(posició_inicial[0] - n*50-i.radi*1.1 + diferencia.x, pantalla_alçada - i.radi*2-5+diferencia.y))
+            if i.skin:
+                i.pantalla.blit(i.imatge_skin, (posició_inicial[0] - n*50-i.radi*1.1 + diferencia.x, pantalla_alçada - i.radi*2-5+diferencia.y+i.diferencia_skin.y))
             n+=1
 #Tirachines
 def linea(ocell, x, diferencia, pantalla, posició_inicial, rectangle_base, punt_t1, punt_t2, punt_t3, punt_t4, punt_t5):
