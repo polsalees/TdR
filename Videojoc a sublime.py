@@ -1473,7 +1473,7 @@ class caixa():
                 posició_xoc_x = esquines_xoc[1]
             rampa_x = x
             rampa_s = x
-        if nx ==2 and round(self.angle)%90 != round(x.angle)%90 and x.velocitat.length()>1:    
+        if nx ==2 and round(self.angle)%90 != round(x.angle)%90 and x.velocitat.length()>1 and x.movible:    
             nx -=1
             n -=1
             if (xesquines_xoc[0]-self.rectangle.center).length() < (xesquines_xoc[1]-self.rectangle.center).length():
@@ -1874,7 +1874,7 @@ class caixa():
         self.caixa = True
 
 terra = caixa([pantalla_amplada/2, pantalla_alçada + 45], 100, pantalla_amplada*3, False, 0,2)
-paret_dreta = caixa([pantalla_amplada*2+100, pantalla_alçada/2 -250],300, pantalla_alçada+600, False, 90,2)
+paret_dreta = caixa([pantalla_amplada*2+100, pantalla_alçada/2 -1950],300, pantalla_alçada*4+600, False, 90,2)
 paret_esquerra = caixa([terra.rectangle.left, pantalla_alçada/2 -250],300, pantalla_alçada+600, False, 90,2)
 quadrat_petit = caixa([pantalla_amplada - 255, pantalla_alçada-48], 50, 50, True, 0,1)
 rectangle_petit = caixa([pantalla_amplada - 230, pantalla_alçada-175], 20, 70, True, 90,2)
@@ -2167,7 +2167,20 @@ class camera():
         pygame.draw.line(pantalla, marró, punt_t1+self.diferencia, punt_t2+self.diferencia, width = 20)
         rectangle_base_2 = rectangle_base.copy() 
         rectangle_base_2.topleft += self.diferencia
-        pygame.draw.rect(pantalla, marró, rectangle_base_2)  
+        pygame.draw.rect(pantalla, marró, rectangle_base_2)
+        if mantenint_ocell:
+            pantalla2 = pantalla.copy()
+            pantalla2 = pygame.transform.scale(pantalla2, (pantalla_amplada*0.5,pantalla_alçada*0.5)) 
+            pantalla.fill(fons)
+            if ocell_anterior.llançat:    
+                ocell_anterior.estela(self.diferencia+pygame.math.Vector2(-pantalla_amplada,0))  
+            for i in  llista_objectes_pantalla:
+                i.dibuixar(self.diferencia +pygame.math.Vector2(-pantalla_amplada,0))
+            pantalla3 = pantalla.copy()
+            pantalla3 = pygame.transform.scale(pantalla3, (pantalla_amplada*0.5,pantalla_alçada*0.5))
+            pantalla.fill(fons)
+            pantalla.blit(pantalla2,(0,0.5*pantalla_alçada))
+            pantalla.blit(pantalla3,(pantalla_amplada*0.5,0.5*pantalla_alçada))    
 camara = camera()
 #Defimin nivells
 ocells3 = [bombardero.copy(), pequeñin.copy(), estrella.copy(), racista.copy(), vermellet.copy(), racista.copy()]
