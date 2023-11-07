@@ -1,6 +1,7 @@
 import pygame
 import math
 from colisió_ocells import colisió_cercles
+from colisió_ocells import calcul_angle_cercle
 negre = (0, 0, 0)
 blanc = (255, 255, 255)
 vermell = (255, 0, 0)
@@ -161,14 +162,14 @@ class ocell():
         if self.potencia <= 0 or angle > -0.1 or angle < -3:
             self.potencia = 0
         if self.potencia !=0:
-            self.linea_direció_velocitat[0] = -math.sin(angle) * self.potencia * 0.1
+            self.linea_direció_velocitat[0] = -math.sin(angle) * self.potencia * 0.12
             self.linea_direció_velocitat[1] = -math.cos(angle) * self.potencia * 0.1
             self.linea_direció_velocitat[1]  += gravetat * 0.2 *(self.linea_direció_moviment%30)
             self.linea_direció_posició[0] += self.linea_direció_velocitat[0] * 0.2 *(self.linea_direció_moviment%30)
             self.linea_direció_posició[1] += self.linea_direció_velocitat[1] * 0.2 *(self.linea_direció_moviment%30)
             pygame.draw.circle(self.pantalla, blanc, self.linea_direció_posició, self.linea_direció_radi)    
             while self.linea_direció_radi >1:   
-                self.linea_direció_radi -= 0.20
+                self.linea_direció_radi -= 0.2
                 self.linea_direció_velocitat[1]  += gravetat * 6
                 self.linea_direció_posició[0] += self.linea_direció_velocitat[0] * 6
                 self.linea_direció_posició[1] += self.linea_direció_velocitat[1] * 6
@@ -259,7 +260,7 @@ class ocell():
             self.potencia = 0
         if self.potencia != 0:
             self.superficie_ocell = self.superficie_ocell_2
-            self.velocitat[0] = -math.sin(angle) * self.potencia * 0.1
+            self.velocitat[0] = -math.sin(angle) * self.potencia * 0.12
             self.velocitat[1] = -math.cos(angle) * self.potencia * 0.1
             self.llançat = True
             self.aire = True
@@ -269,7 +270,7 @@ class ocell():
         rectangle.topleft+=diferencia
         self.zona = rectangle.collidepoint(pygame.mouse.get_pos())
         return self.zona
-    def habilitat(self):
+    def habilitat(self, llista_ocells, llista_objectes_rodons, llista_objectes_pantalla, llista_porcs, llista_objectes_rectangulars, sprites, nombre_ocells):
         if self.activat == False and self.color != vermell:
             self.llista_estela.append((self.rectangle.center, 10))
             self.n = 0    
@@ -277,10 +278,9 @@ class ocell():
                 self.activar_animació(blanc,1) 
                 self.velocitat[0] *= 2.5
             elif self.color == cian:
-                global nombre_ocells
                 self.activar_animació(blanc,1) 
-                self.copia1 = self.copy()
-                self.copia2 = self.copy() 
+                self.copia1 = self.copy(llista_ocells, llista_objectes_rodons)
+                self.copia2 = self.copy(llista_ocells, llista_objectes_rodons) 
                 self.copia1.llançat = True
                 self.copia2.llançat = True
                 self.copia1.aire = True
@@ -289,6 +289,9 @@ class ocell():
                 self.copia2.tocat_objecte = False
                 self.copia1.posició_real = self.rectangle.center
                 self.copia2.posició_real = self.rectangle.center
+                if self.skin:
+                    self.copia1.posar_skin(self.imatge_skin)
+                    self.copia2.posar_skin(self.imatge_skin)
                 llista_objectes_pantalla.append(self.copia1) 
                 llista_objectes_pantalla.append(self.copia2)
                 sprites.append(self.copia1)
@@ -364,15 +367,16 @@ class ocell():
                                     if self.color == blanc:
                                         angle +=180
                                         potencia *=2
-                                        i.mig_trencat(potencia/100)
+                                        i.mig_trencat(potencia/100, llista_objectes_pantalla, llista_porcs, llista_ocells)
                                     else:
                                         potencia +=50
                                         if potencia > 200:
                                             potencia = 200
-                                            i.mig_trencat(potencia/50)
+                                            i.mig_trencat(potencia/50, llista_objectes_pantalla, llista_porcs, llista_ocells)
                                     i.velocitat += pygame.math.Vector2.from_polar((potencia*50/i.massa, angle))
 
             self.activat = True
+            return nombre_ocells
     def copy(self, llista_ocells, llista_objectes_rodons):
         x = ocell(self.radi, self.color, llista_ocells, llista_objectes_rodons, self.posició_inicial, self.pantalla)
         return x

@@ -26,7 +26,8 @@ taronja3 = (165, 75, 0)
 marró = (128, 64, 0)
 marró2 = (118, 54, 0)
 marró_fosc = (84, 56, 34)
-fons = (80, 80, 255)
+fons = (30,33,61)
+fons2 = (80, 80, 255)
 gris=(50,50,50)
 pedra = (139,140,122)
 
@@ -91,7 +92,7 @@ porc_estandar = porc(20, (pantalla_amplada - 180, pantalla_alçada - 160), llist
 
 #Caixes 
 terra = caixa([pantalla_amplada/2, pantalla_alçada + 45], 100, pantalla_amplada*3, False, 0,2, llista_objectes_rectangulars,pantalla)
-paret_dreta = caixa([pantalla_amplada*2+100, pantalla_alçada/2 -250],300, pantalla_alçada+600, False, 90,2, llista_objectes_rectangulars,pantalla)
+paret_dreta = caixa([pantalla_amplada*2+100, 0],300, pantalla_alçada*2, False, 90,2, llista_objectes_rectangulars,pantalla)
 paret_esquerra = caixa([terra.rectangle.left, pantalla_alçada/2 -250],300, pantalla_alçada+600, False, 90,2, llista_objectes_rectangulars,pantalla)
 quadrat_petit = caixa([pantalla_amplada - 255, pantalla_alçada-48], 50, 50, True, 0,1, llista_objectes_rectangulars,pantalla)
 rectangle_petit = caixa([pantalla_amplada - 230, pantalla_alçada-175], 20, 70, True, 90,2, llista_objectes_rectangulars,pantalla)
@@ -184,7 +185,7 @@ def menú():
                         return True
                 elif event.key == pygame.K_i:
                     info()
-        pantalla.fill(fons)
+        pantalla.fill(fons2)
 
         font = pygame.font.Font(None, 300)
         text = font.render("Angry Birds", True, taronja)
@@ -205,7 +206,7 @@ def info():
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
                     return False
-        pantalla.fill(fons)
+        pantalla.fill(fons2)
 
         font = pygame.font.Font(None, 100)
         text = font.render("Camara", True, taronja)
@@ -262,7 +263,7 @@ def pantalla_final(tipo, estrelles):
                 if event.key == pygame.K_SPACE:
                     y = True
                     final = False
-        pantalla.fill(fons)
+        pantalla.fill(fons2)
         texto1 = "ESC per a menú principal" 
         font = pygame.font.Font(None, 300)
         font2 = pygame.font.Font(None, 60)
@@ -310,7 +311,7 @@ camara = camera(pantalla_amplada, pantalla_alçada, pantalla)
 #Defimin nivells
 ocells3 = [bombardero.copy(llista_ocells, llista_objectes_rodons), pequeñin.copy(llista_ocells, llista_objectes_rodons), estrella.copy(llista_ocells, llista_objectes_rodons), racista.copy(llista_ocells, llista_objectes_rodons), vermellet.copy(llista_ocells, llista_objectes_rodons), racista.copy(llista_ocells, llista_objectes_rodons)]
 ocells1 = [vermellet.copy(llista_ocells, llista_objectes_rodons), vermellet.copy(llista_ocells, llista_objectes_rodons), vermellet.copy(llista_ocells, llista_objectes_rodons),vermellet.copy(llista_ocells, llista_objectes_rodons)]
-ocells2 = [vermellet.copy(llista_ocells, llista_objectes_rodons)]
+ocells2 = [racista.copy(llista_ocells, llista_objectes_rodons),racista.copy(llista_ocells, llista_objectes_rodons),racista.copy(llista_ocells, llista_objectes_rodons),vermellet.copy(llista_ocells, llista_objectes_rodons), vermellet.copy(llista_ocells, llista_objectes_rodons)]
 ocells4 = [vermellet.copy(llista_ocells, llista_objectes_rodons)]
 ocells5 = [vermellet.copy(llista_ocells, llista_objectes_rodons)]
 ocells6 = [vermellet.copy(llista_ocells, llista_objectes_rodons)]
@@ -324,7 +325,7 @@ nivells_ocells = {1:ocells1, 2:ocells2, 3:ocells3, 4:ocells4, 5:ocells5, 6:ocell
 
 nivell3 = [rectangle_gran, quadrat_petit,quadrat_petit.copy([pantalla_amplada - 105, pantalla_alçada-48], llista_objectes_rectangulars),rectangle_petit,rectangle_petit.copy([pantalla_amplada - 130, pantalla_alçada-175], llista_objectes_rectangulars),rectangle_normal, quadrat_gran,quadrat_petit.copy([pantalla_amplada - 505, pantalla_alçada-48], llista_objectes_rectangulars),quadrat_petit.copy([pantalla_amplada - 355, pantalla_alçada-48], llista_objectes_rectangulars),rectangle_petit.copy([pantalla_amplada - 480, pantalla_alçada-175], llista_objectes_rectangulars),rectangle_petit.copy([pantalla_amplada - 380, pantalla_alçada-175], llista_objectes_rectangulars),rectangle_normal.copy([pantalla_amplada - 430, pantalla_alçada-245], llista_objectes_rectangulars),quadrat_gran.copy([pantalla_amplada - 430, pantalla_alçada-315], llista_objectes_rectangulars),rectangle_gran.copy([pantalla_amplada - 430, pantalla_alçada-105], llista_objectes_rectangulars), porc_estandar, porc_estandar.copy((pantalla_amplada - 430, pantalla_alçada - 160), llista_porcs, llista_objectes_rodons)]
 nivell1 = [porc_estandar.copy([pantalla_amplada+260, pantalla_alçada-265], llista_porcs, llista_objectes_rodons), porc_estandar.copy([pantalla_amplada- 140, pantalla_alçada-265], llista_porcs, llista_objectes_rodons), rectangle_petit.copy([pantalla_amplada + 295,pantalla_alçada-40], llista_objectes_rectangulars), rectangle_petit.copy([pantalla_amplada +295,pantalla_alçada-115], llista_objectes_rectangulars), rectangle_petit.copy([pantalla_amplada +295,pantalla_alçada-190], llista_objectes_rectangulars),rectangle_petit.copy([pantalla_amplada + 225,pantalla_alçada-40], llista_objectes_rectangulars), rectangle_petit.copy([pantalla_amplada+225,pantalla_alçada-115], llista_objectes_rectangulars), rectangle_petit.copy([pantalla_amplada+225,pantalla_alçada-190], llista_objectes_rectangulars), rectangle_normal.copy([pantalla_amplada + 260, pantalla_alçada-255], llista_objectes_rectangulars), rectangle_petit.copy([pantalla_amplada +25,pantalla_alçada-115], llista_objectes_rectangulars), rectangle_petit.copy([pantalla_amplada+25,pantalla_alçada-190], llista_objectes_rectangulars), rectangle_petit.copy([pantalla_amplada+95,pantalla_alçada-115], llista_objectes_rectangulars), rectangle_petit.copy([pantalla_amplada+95,pantalla_alçada-190], llista_objectes_rectangulars), rectangle_normal.copy([pantalla_amplada+60, pantalla_alçada-255], llista_objectes_rectangulars), rectangle_petit.copy([pantalla_amplada- 105,pantalla_alçada-90], llista_objectes_rectangulars), rectangle_petit.copy([pantalla_amplada- 175,pantalla_alçada-90], llista_objectes_rectangulars), rectangle_normal.copy([pantalla_amplada- 140, pantalla_alçada-145], llista_objectes_rectangulars),tnt.copy([pantalla_amplada+60, pantalla_alçada-300], llista_objectes_rectangulars), porc_estandar.copy([pantalla_amplada+ 540, pantalla_alçada-265], llista_porcs, llista_objectes_rodons), porc_estandar.copy([pantalla_amplada+ 940, pantalla_alçada-265], llista_porcs, llista_objectes_rodons), rectangle_petit.copy([pantalla_amplada+ 505,pantalla_alçada-40], llista_objectes_rectangulars), rectangle_petit.copy([pantalla_amplada+ 505,pantalla_alçada-115], llista_objectes_rectangulars), rectangle_petit.copy([pantalla_amplada+ 505,pantalla_alçada-190], llista_objectes_rectangulars),rectangle_petit.copy([pantalla_amplada+ 575,pantalla_alçada-40], llista_objectes_rectangulars), rectangle_petit.copy([pantalla_amplada+ 575,pantalla_alçada-115], llista_objectes_rectangulars), rectangle_petit.copy([pantalla_amplada+ 575,pantalla_alçada-190], llista_objectes_rectangulars), rectangle_normal.copy([pantalla_amplada+ 540, pantalla_alçada-255], llista_objectes_rectangulars), rectangle_petit.copy([pantalla_amplada+ 705,pantalla_alçada-115], llista_objectes_rectangulars), rectangle_petit.copy([pantalla_amplada+ 705,pantalla_alçada-190], llista_objectes_rectangulars), rectangle_petit.copy([pantalla_amplada+ 775,pantalla_alçada-115], llista_objectes_rectangulars), rectangle_petit.copy([pantalla_amplada+ 775,pantalla_alçada-190], llista_objectes_rectangulars), rectangle_normal.copy([pantalla_amplada+ 740, pantalla_alçada-255], llista_objectes_rectangulars), rectangle_petit.copy([pantalla_amplada+ 905,pantalla_alçada-90], llista_objectes_rectangulars), rectangle_petit.copy([pantalla_amplada+ 975,pantalla_alçada-90], llista_objectes_rectangulars), rectangle_normal.copy([pantalla_amplada+ 940, pantalla_alçada-145], llista_objectes_rectangulars),tnt.copy([pantalla_amplada+ 740, pantalla_alçada-300], llista_objectes_rectangulars)]
-nivell2 = [porc_estandar.copy((1000,pantalla_alçada-450), llista_porcs, llista_objectes_rodons), caixa([pantalla_amplada*0.8, pantalla_alçada-100], 200, pantalla_amplada/2.5, False, 0,2, llista_objectes_rectangulars,pantalla), caixa([pantalla_amplada*0.51, pantalla_alçada*1.082], 200, pantalla_amplada/2.5, False, 45,2, llista_objectes_rectangulars,pantalla)]
+nivell2 = [porc_estandar.copy((pantalla_amplada*0.75,pantalla_alçada-320), llista_porcs, llista_objectes_rodons), porc_estandar.copy((pantalla_amplada*1.05,pantalla_alçada-320), llista_porcs, llista_objectes_rodons), porc_estandar.copy((pantalla_amplada*1.5,pantalla_alçada-420), llista_porcs, llista_objectes_rodons), porc_estandar.copy((pantalla_amplada*1.75,pantalla_alçada-420), llista_porcs, llista_objectes_rodons),caixa([pantalla_amplada*1.6, pantalla_alçada-50], 100, pantalla_amplada*2, False, 0,2, llista_objectes_rectangulars,pantalla), caixa([pantalla_amplada*0.51, pantalla_alçada*1.082+100], 200, pantalla_amplada/2.5, False, 45,2, llista_objectes_rectangulars,pantalla), caixa([pantalla_amplada*2.4, pantalla_alçada-150], 200, pantalla_amplada*2, False, 0,2, llista_objectes_rectangulars,pantalla), caixa([pantalla_amplada*1.31, pantalla_alçada*1.082-50], 200, pantalla_amplada/2.5, False, 45,2, llista_objectes_rectangulars,pantalla), caixa([pantalla_amplada*0.75,pantalla_alçada-225], 20, 150, True, 90, 3, llista_objectes_rectangulars,pantalla), caixa([pantalla_amplada*0.75,pantalla_alçada-310], 20, 100, True, 0, 3, llista_objectes_rectangulars,pantalla), caixa([pantalla_amplada*1.05,pantalla_alçada-225], 20, 150, True, 90, 3, llista_objectes_rectangulars,pantalla), caixa([pantalla_amplada*1.05,pantalla_alçada-310], 20, 100, True, 0, 3, llista_objectes_rectangulars,pantalla), caixa([pantalla_amplada*1.5,pantalla_alçada-325], 20, 150, True, 90, 3, llista_objectes_rectangulars,pantalla), caixa([pantalla_amplada*1.5,pantalla_alçada-410], 20, 100, True, 0, 3, llista_objectes_rectangulars,pantalla), caixa([pantalla_amplada*1.75,pantalla_alçada-325], 20, 150, True, 90, 3, llista_objectes_rectangulars,pantalla), caixa([pantalla_amplada*1.75,pantalla_alçada-410], 20, 100, True, 0, 3, llista_objectes_rectangulars,pantalla)]
 nivell4 = [porc_estandar.copy((1000,pantalla_alçada-40), llista_porcs, llista_objectes_rodons)]
 nivell5 = [porc_estandar.copy((1000,pantalla_alçada-40), llista_porcs, llista_objectes_rodons)]
 nivell6 = [porc_estandar.copy((1000,pantalla_alçada-40), llista_porcs, llista_objectes_rodons)]
@@ -362,6 +363,7 @@ def GameLoop():
         else:
             n2 += 1
             if n==0:
+                nivell_actual = 2
                 sprites.extend(nivells_caixes_i_porcs[nivell_actual])
                 llista_objectes_pantalla.extend(nivells_caixes_i_porcs[nivell_actual])
                 for i in llista_objectes_pantalla:
@@ -407,7 +409,7 @@ def GameLoop():
                     elif mantenint:
                         mantenint = False
                     elif ocell_anterior.tocat_objecte == False:
-                        ocell_anterior.habilitat()
+                        nombre_ocells = ocell_anterior.habilitat(llista_ocells, llista_objectes_rodons, llista_objectes_pantalla, llista_porcs, llista_objectes_rectangulars, sprites, nombre_ocells)
             # Aparèixer porcs, ocells i linea
             for i in  llista_objectes_pantalla:
                 if i in llista_ocells:    

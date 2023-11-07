@@ -175,8 +175,8 @@ def colisió_cercles(self,x, llista_ocells, llista_objectes_rectangulars, llista
                     else:
                         while self.mask.overlap(x.mask,(x.rectangle.x-self.rectangle.x, x.rectangle.y-self.rectangle.y)):
                             self.rectangle.center+=z
-                    if diferencia_angle_x > 90 and x.velocitat.length() > 0 and self in llista_porcs:
-                        if x.velocitat.length()*x.massa/self.massa>3:
+                    if diferencia_angle_x > 90 and x.velocitat.length() > 0.1 and self in llista_porcs:
+                        if x.velocitat.length()*x.massa/self.massa>4:
                             self.destrucció()
                             x.velocitat *= 0.4
                             nombre_porcs -=1

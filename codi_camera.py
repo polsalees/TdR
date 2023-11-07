@@ -3,7 +3,7 @@ import math
 from codi_ocells import distancia_ocell_ratoli
 marró = (128, 64, 0)
 marró2 = (118, 54, 0)
-fons = (80, 80, 255)
+fons = (30,33,61)
 
 def linea_ocells(ordre_ocells, diferencia, llista_ocells_llançats,pantalla, posició_inicial,pantalla_alçada):
     n = 1
@@ -159,5 +159,17 @@ class camera():
             pantalla3 = self.pantalla.copy()
             pantalla3 = pygame.transform.scale(pantalla3, (self.pantalla_amplada*0.5,self.pantalla_alçada*0.5))
             self.pantalla.fill(fons)
+            if ocell_anterior.llançat:    
+                ocell_anterior.estela(self.diferencia+pygame.math.Vector2(0, self.pantalla_alçada))  
+            pantalla4 = self.pantalla.copy()
+            pantalla4 = pygame.transform.scale(pantalla4, (self.pantalla_amplada*0.5,self.pantalla_alçada*0.5))
+            self.pantalla.fill(fons)  
+            for i in  llista_objectes_pantalla:
+                i.dibuixar(self.diferencia +pygame.math.Vector2(-self.pantalla_amplada, self.pantalla_alçada))
+            pantalla5 = self.pantalla.copy()
+            pantalla5 = pygame.transform.scale(pantalla5, (self.pantalla_amplada*0.5,self.pantalla_alçada*0.5))
+            self.pantalla.fill(fons)
             self.pantalla.blit(pantalla2,(0,0.5*self.pantalla_alçada))
-            self.pantalla.blit(pantalla3,(self.pantalla_amplada*0.5,0.5*self.pantalla_alçada))    
+            self.pantalla.blit(pantalla4,(0,0))
+            self.pantalla.blit(pantalla3,(self.pantalla_amplada*0.5,0.5*self.pantalla_alçada))  
+            self.pantalla.blit(pantalla5,(self.pantalla_amplada*0.5,0))  
