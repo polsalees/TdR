@@ -260,7 +260,7 @@ class ocell():
             self.potencia = 0
         if self.potencia != 0:
             self.superficie_ocell = self.superficie_ocell_2
-            self.velocitat[0] = -math.sin(angle) * self.potencia * 0.12
+            self.velocitat[0] = -math.sin(angle) * self.potencia * 0.1
             self.velocitat[1] = -math.cos(angle) * self.potencia * 0.1
             self.llançat = True
             self.aire = True
@@ -376,7 +376,7 @@ class ocell():
                                     i.velocitat += pygame.math.Vector2.from_polar((potencia*50/i.massa, angle))
 
             self.activat = True
-            return nombre_ocells
+        return nombre_ocells
     def copy(self, llista_ocells, llista_objectes_rodons):
         x = ocell(self.radi, self.color, llista_ocells, llista_objectes_rodons, self.posició_inicial, self.pantalla)
         return x

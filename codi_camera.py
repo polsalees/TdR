@@ -160,7 +160,9 @@ class camera():
             pantalla3 = pygame.transform.scale(pantalla3, (self.pantalla_amplada*0.5,self.pantalla_alçada*0.5))
             self.pantalla.fill(fons)
             if ocell_anterior.llançat:    
-                ocell_anterior.estela(self.diferencia+pygame.math.Vector2(0, self.pantalla_alçada))  
+                ocell_anterior.estela(self.diferencia+pygame.math.Vector2(0, self.pantalla_alçada))
+            for i in  llista_objectes_pantalla:
+                i.dibuixar(self.diferencia +pygame.math.Vector2(0, self.pantalla_alçada))  
             pantalla4 = self.pantalla.copy()
             pantalla4 = pygame.transform.scale(pantalla4, (self.pantalla_amplada*0.5,self.pantalla_alçada*0.5))
             self.pantalla.fill(fons)  

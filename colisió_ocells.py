@@ -13,11 +13,11 @@ def colisió_cercles(self,x, llista_ocells, llista_objectes_rectangulars, llista
     if self.c == 0:
         self.c =1
     if x in llista_objectes_rodons:
-        if self.velocitat.length()*self.massa/x.massa > 3 and x in llista_porcs and self in llista_ocells:
+        if self.velocitat.length()*self.massa/x.massa > 1 and x in llista_porcs and self in llista_ocells:
             x.destrucció()
             self.velocitat *= 0.4
             nombre_porcs -=1
-        elif x.velocitat.length()*x.massa/self.massa > 3 and self in llista_porcs and x in llista_ocells:
+        elif x.velocitat.length()*x.massa/self.massa > 1 and self in llista_porcs and x in llista_ocells:
             self.destrucció()
             x.velocitat *= 0.4 
             nombre_porcs -=1       
