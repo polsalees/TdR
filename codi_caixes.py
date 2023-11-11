@@ -87,7 +87,8 @@ class caixa():
         self.rotacions = []
         self.caixa = True
         self.vida = 4
-        self.z = 0 
+        self.z = 0
+        self.pantalla_rect = pantalla.get_rect() 
     
     def update(self, llista_objectes_pantalla):
         if self.movible == True and self.caixa:
@@ -183,12 +184,14 @@ class caixa():
             if self.animació[0][0] <=1:
                 llista_objectes_pantalla.remove(self)
     def dibuixar(self, diferencia):
-        if self.caixa:
-            rectangle = self.rectangle.topleft + diferencia    
-            self.pantalla.blit(self.rectangle_nou, rectangle)
-        else:
-            for i in self.animació:
-                pygame.draw.circle(self.pantalla,self.color_animació,i[1]+diferencia,i[0])
+        rectangle = self.rectangle.copy()
+        rectangle.topleft+=diferencia  
+        if rectangle.colliderect(self.pantalla_rect):    
+            if self.caixa: 
+                self.pantalla.blit(self.rectangle_nou, rectangle)
+            else:
+                for i in self.animació:
+                    pygame.draw.circle(self.pantalla,self.color_animació,i[1]+diferencia,i[0])
     def calcul_angle_rampa(self, pos):
         pos_centre1 = self.vector_centre1.rotate(-self.angle)+ self.rectangle.center
         pos_centre2 = self.vector_centre2.rotate(-self.angle)+ self.rectangle.center

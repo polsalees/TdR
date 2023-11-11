@@ -139,14 +139,13 @@ class ocell():
         self.rectangle_2.center = posició_inicial
         self.angle = 0
         self.posició_inicial = posició_inicial
+        self.pantalla_rect = pantalla.get_rect()
     
     def calcul_posició_primer_xoc (self):
         if self.tocat_objecte == False:
             self.posició_primer_xoc = self.rectangle.center 
             self.superficie_ocell = self.superficie_ocell_3
             self.tocat_objecte = True
-            for i in self.llista_copia:
-                i.llista_estela.extend(self.llista_estela)
             self.llista_copia.clear()
     
     def colisió(self,x, llista_ocells, llista_objectes_rectangulars, llista_objectes_rodons, llista_porcs,nombre_porcs,llista_objectes_pantalla):
@@ -162,7 +161,7 @@ class ocell():
         if self.potencia <= 0 or angle > -0.1 or angle < -3:
             self.potencia = 0
         if self.potencia !=0:
-            self.linea_direció_velocitat[0] = -math.sin(angle) * self.potencia * 0.12
+            self.linea_direció_velocitat[0] = -math.sin(angle) * self.potencia * 0.1
             self.linea_direció_velocitat[1] = -math.cos(angle) * self.potencia * 0.1
             self.linea_direció_velocitat[1]  += gravetat * 0.2 *(self.linea_direció_moviment%30)
             self.linea_direció_posició[0] += self.linea_direció_velocitat[0] * 0.2 *(self.linea_direció_moviment%30)
@@ -195,7 +194,11 @@ class ocell():
         if self.llançat and self.tocat_objecte == False:
             self.n+=1
             if self.n%5 == 0:
-                self.llista_estela.append((self.rectangle.center,2))
+                if self.llista_copia == []:    
+                    self.llista_estela.append((self.rectangle.center,2))
+                else:
+                    for i in self.llista_copia:
+                        i.llista_estela.append((self.rectangle.center,2))
         if self.aire:  
             self.posició_real += self.velocitat
             self.posició_real[1] += 0.5*gravetat
@@ -237,18 +240,20 @@ class ocell():
     def dibuixar(self, diferencia):
         if self.linea_direció:
             self.calcul_linea_direció(diferencia)
-        rectangle = self.rectangle_2.topleft + diferencia     
-        self.pantalla.blit(self.ocell_nou, rectangle)
-        if self.skin:
-            imatge_skin_rotada = pygame.transform.rotate(self.imatge_skin, self.angle)
-            if self.llançat and self.tocat_objecte == False:
-                self.rectangle_skin = imatge_skin_rotada.get_rect(center =self.rectangle_2.center + diferencia + self.skin_offset.rotate(-self.angle)+pygame.math.Vector2((8/3-2)*self.radi,0).rotate(-self.angle))
-            else:
-                self.rectangle_skin = imatge_skin_rotada.get_rect(center =self.rectangle_2.center + diferencia + self.skin_offset.rotate(-self.angle))
-            self.pantalla.blit(imatge_skin_rotada, self.rectangle_skin)
-        if self.animació:
-            for i in self.objecte_animació:
-                pygame.draw.circle(self.pantalla,self.color_animació,i[1]+diferencia,i[0])
+        rectangle = self.rectangle_2.copy()   
+        rectangle.topleft += diferencia  
+        if rectangle.colliderect(self.pantalla_rect):  
+            self.pantalla.blit(self.ocell_nou, rectangle)
+            if self.skin:
+                imatge_skin_rotada = pygame.transform.rotate(self.imatge_skin, self.angle)
+                if self.llançat and self.tocat_objecte == False:
+                    self.rectangle_skin = imatge_skin_rotada.get_rect(center =self.rectangle_2.center + diferencia + self.skin_offset.rotate(-self.angle)+pygame.math.Vector2((8/3-2)*self.radi,0).rotate(-self.angle))
+                else:
+                    self.rectangle_skin = imatge_skin_rotada.get_rect(center =self.rectangle_2.center + diferencia + self.skin_offset.rotate(-self.angle))
+                self.pantalla.blit(imatge_skin_rotada, self.rectangle_skin)
+            if self.animació:
+                for i in self.objecte_animació:
+                    pygame.draw.circle(self.pantalla,self.color_animació,i[1]+diferencia,i[0])
 
     def llançament(self,diferencia):
         self.rectangle.center = self.posició_inicial
@@ -321,7 +326,7 @@ class ocell():
                         if i in llista_porcs:    
                             if i.porc:    
                                 distancia_explosió = pygame.math.Vector2(self.rectangle.center) - i.rectangle.center
-                                potencia = 200 - distancia_explosió.length() + self.radi
+                                potencia = 400 - distancia_explosió.length() + self.radi
                                 if potencia >0:
                                     angle = calcul_angle_cercle(self,i.rectangle.center) +180
                                     if angle <= 180:    
@@ -332,14 +337,13 @@ class ocell():
                                         angle +=180
                                         potencia *=2
                                     else:
-                                        potencia +=50
-                                        if potencia > 200:
-                                            potencia = 200
+                                        potencia +=30
+                                    potencia /= 2.5
                                     i.velocitat += pygame.math.Vector2.from_polar((potencia*50/i.massa, angle))
                         elif i in llista_ocells:    
                             if i.llançat:    
                                 distancia_explosió = pygame.math.Vector2(self.rectangle.center) - i.rectangle.center
-                                potencia = 200 - distancia_explosió.length() + self.radi
+                                potencia = 400 - distancia_explosió.length() + self.radi
                                 if potencia >0:
                                     angle = calcul_angle_cercle(self,i.rectangle.center)
                                     if angle <= 180:    
@@ -349,15 +353,14 @@ class ocell():
                                     if self.color == blanc:
                                         angle +=180
                                         potencia *=2
-                                    else:
-                                        potencia +=50
-                                        if potencia > 200:
-                                            potencia = 200
+                                    else:    
+                                        potencia +=30
+                                    potencia /= 2.5
                                     i.velocitat += pygame.math.Vector2.from_polar((potencia*50/i.massa, angle))
                         if i in llista_objectes_rectangulars:    
                             if i.caixa and i.movible:    
                                 distancia_explosió = pygame.math.Vector2(self.rectangle.center) - i.rectangle.center
-                                potencia = 200 - distancia_explosió.length() + self.radi
+                                potencia = 400 - distancia_explosió.length() + self.radi
                                 if potencia >0:
                                     angle = calcul_angle_cercle(self,i.rectangle.center) + 180
                                     if angle <= 180:    
@@ -367,12 +370,10 @@ class ocell():
                                     if self.color == blanc:
                                         angle +=180
                                         potencia *=2
-                                        i.mig_trencat(potencia/100, llista_objectes_pantalla, llista_porcs, llista_ocells)
-                                    else:
-                                        potencia +=50
-                                        if potencia > 200:
-                                            potencia = 200
-                                            i.mig_trencat(potencia/50, llista_objectes_pantalla, llista_porcs, llista_ocells)
+                                    else:    
+                                        potencia +=30
+                                    potencia /= 2.5
+                                    i.mig_trencat(potencia/100, llista_objectes_pantalla, llista_porcs, llista_ocells)
                                     i.velocitat += pygame.math.Vector2.from_polar((potencia*50/i.massa, angle))
 
             self.activat = True

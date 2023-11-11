@@ -59,6 +59,7 @@ class porc():
         self.porc_nou = self.superficie_porc.copy()
         self.rectangle_2 = self.rectangle.copy()
         self.pantalla = pantalla
+        self.pantalla_rect = pantalla.get_rect()
     
     def update(self, llista_objectes_pantalla):
         if self.porc:
@@ -88,12 +89,14 @@ class porc():
                     llista_objectes_pantalla.remove(self)
             self.n+=1
     def dibuixar(self,diferencia):
-        if self.porc:
-            rectangle = self.rectangle_2.topleft + diferencia     
-            self.pantalla.blit(self.porc_nou, rectangle)
-        else:    
-            for i in self.animació:
-                pygame.draw.circle(self.pantalla,verd,i[1]+diferencia,i[0])
+        rectangle = self.rectangle_2.copy()
+        rectangle.topleft += diferencia   
+        if rectangle.colliderect(self.pantalla_rect):    
+            if self.porc:    
+                self.pantalla.blit(self.porc_nou, rectangle)
+            else:    
+                for i in self.animació:
+                    pygame.draw.circle(self.pantalla,verd,i[1]+diferencia,i[0])
     def reinici(self):
         self.velocitat *= 0
         self.rectangle.center = self.posició_inicial
