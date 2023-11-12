@@ -25,12 +25,12 @@ gravetat = 0.05
 art = pygame.image.load("Grafics/art.png").convert_alpha()
 art2 = pygame.image.load("Grafics/art2.png").convert_alpha()
 art3 = pygame.image.load("Grafics/art3.png").convert_alpha()
-def calcular_angle(diferencia,self):
-    angle = math.degrees(math.atan2(pygame.mouse.get_pos()[0] - (self.posició_inicial[0]+diferencia.x), pygame.mouse.get_pos()[1] - (self.posició_inicial[1]+diferencia.y)))
+def calcular_angle(self):
+    angle = math.degrees(math.atan2(pygame.mouse.get_pos()[0] - (self.posició_inicial[0]), pygame.mouse.get_pos()[1] - (self.posició_inicial[1])))
     return angle
 
-def distancia_ocell_ratoli(diferencia,self):
-    amplada = math.sqrt(((pygame.mouse.get_pos()[0] - (self.posició_inicial[0]+diferencia.x)) **2 + (pygame.mouse.get_pos()[1] - (self.posició_inicial[1]+diferencia.y)) ** 2))
+def distancia_ocell_ratoli(self):
+    amplada = math.sqrt(((pygame.mouse.get_pos()[0] - (self.posició_inicial[0])) **2 + (pygame.mouse.get_pos()[1] - (self.posició_inicial[1])) ** 2))
     return amplada
 class ocell():
     def __init__(self, radi, color, llista_ocells, llista_objectes_rodons, posició_inicial, pantalla):
@@ -151,18 +151,18 @@ class ocell():
     def colisió(self,x, llista_ocells, llista_objectes_rectangulars, llista_objectes_rodons, llista_porcs,nombre_porcs,llista_objectes_pantalla):
         nombre_porcs = colisió_cercles(self,x, llista_ocells, llista_objectes_rectangulars, llista_objectes_rodons, llista_porcs, nombre_porcs,llista_objectes_pantalla)
         return nombre_porcs
-    def calcul_linea_direció(self, diferencia):
+    def calcul_linea_direció(self, diferencia, factor_de_potencia):
         self.linea_direció_radi = 5
         self.linea_direció_posició = [self.posició_inicial[0], self.posició_inicial[1]] + diferencia
-        self.potencia = distancia_ocell_ratoli(diferencia,self) - self.radi
-        angle = math.radians(calcular_angle(diferencia,self))
+        self.potencia = distancia_ocell_ratoli(self) - self.radi
+        angle = math.radians(calcular_angle(self))
         if self.potencia >= 100:
             self.potencia = 100
         if self.potencia <= 0 or angle > -0.1 or angle < -3:
             self.potencia = 0
         if self.potencia !=0:
-            self.linea_direció_velocitat[0] = -math.sin(angle) * self.potencia * 0.1
-            self.linea_direció_velocitat[1] = -math.cos(angle) * self.potencia * 0.1
+            self.linea_direció_velocitat[0] = -math.sin(angle) * self.potencia * factor_de_potencia
+            self.linea_direció_velocitat[1] = -math.cos(angle) * self.potencia * factor_de_potencia
             self.linea_direció_velocitat[1]  += gravetat * 0.2 *(self.linea_direció_moviment%30)
             self.linea_direció_posició[0] += self.linea_direció_velocitat[0] * 0.2 *(self.linea_direció_moviment%30)
             self.linea_direció_posició[1] += self.linea_direció_velocitat[1] * 0.2 *(self.linea_direció_moviment%30)
@@ -237,9 +237,9 @@ class ocell():
             self.n+=1
         return nombre_ocells
 
-    def dibuixar(self, diferencia):
+    def dibuixar(self, diferencia, factor_de_potencia):
         if self.linea_direció:
-            self.calcul_linea_direció(diferencia)
+            self.calcul_linea_direció(diferencia, factor_de_potencia)
         rectangle = self.rectangle_2.copy()   
         rectangle.topleft += diferencia  
         if rectangle.colliderect(self.pantalla_rect):  
@@ -255,18 +255,18 @@ class ocell():
                 for i in self.objecte_animació:
                     pygame.draw.circle(self.pantalla,self.color_animació,i[1]+diferencia,i[0])
 
-    def llançament(self,diferencia):
+    def llançament(self, factor_de_potencia):
         self.rectangle.center = self.posició_inicial
-        self.potencia = distancia_ocell_ratoli(diferencia,self) - self.radi
-        angle = math.radians(calcular_angle(diferencia,self))
+        self.potencia = distancia_ocell_ratoli(self) - self.radi
+        angle = math.radians(calcular_angle(self))
         if self.potencia >= 100:
             self.potencia = 100
         if self.potencia <= 0 or angle > -0.1 or angle < -3:
             self.potencia = 0
         if self.potencia != 0:
             self.superficie_ocell = self.superficie_ocell_2
-            self.velocitat[0] = -math.sin(angle) * self.potencia * 0.1
-            self.velocitat[1] = -math.cos(angle) * self.potencia * 0.1
+            self.velocitat[0] = -math.sin(angle) * self.potencia * factor_de_potencia
+            self.velocitat[1] = -math.cos(angle) * self.potencia * factor_de_potencia
             self.llançat = True
             self.aire = True
     

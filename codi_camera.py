@@ -19,10 +19,10 @@ def linea(ocell, x, diferencia, pantalla, posició_inicial, rectangle_base, punt
     if x == True:
         pos = pygame.mouse.get_pos()
         angle = math.atan2(pos[0]-(posició_inicial[0]+diferencia.x), pos[1]-(posició_inicial[1]+diferencia.y))
-        if distancia_ocell_ratoli(diferencia,ocell) < (100+ocell.radi):
+        if distancia_ocell_ratoli(ocell) < (100+ocell.radi):
             pos = list(pos)
         else:
-            distancia = distancia_ocell_ratoli(diferencia,ocell) - 100 - ocell.radi
+            distancia = distancia_ocell_ratoli(ocell) - 100 - ocell.radi
             pos = [pygame.mouse.get_pos()[0]-math.sin(angle)*distancia, pygame.mouse.get_pos()[1]-math.cos(angle)*distancia]
         rectangle = pygame.Rect(pos[0]-ocell.radi, pos[1]-ocell.radi, 2*ocell.radi, 2*ocell.radi)
         rectangle_base_2 = rectangle_base.copy() 
@@ -90,7 +90,7 @@ class camera():
             self.diferencia.y =self.rectangle_camara_orig[1]-self.rectangle_camara.top
             self.diferencia=round(self.diferencia)
         else:
-            self.camara_punt((personatge.posició_primer_xoc[0]-self.pantalla_amplada*0.3, self.rectangle_camara_orig[1]))
+            self.camara_punt((personatge.posició_primer_xoc[0]-self.pantalla_amplada*0.3, personatge.posició_primer_xoc[1]-self.pantalla_alçada*0.3))
     def camara_punt(self,punt):
         self.rectangle_camara_orig_2 = self.rectangle_camara.topleft 
         self.diferencia_2.x =punt[0]-self.rectangle_camara.left
@@ -104,8 +104,8 @@ class camera():
             self.rectangle_camara.left = -self.pantalla_amplada*0.05
         if self.rectangle_camara.right > self.pantalla_amplada*1.85:
             self.rectangle_camara.right = self.pantalla_amplada*1.85
-        if self.rectangle_camara.top < -self.pantalla_alçada*0.05:
-            self.rectangle_camara.top = -self.pantalla_alçada*0.05
+        if self.rectangle_camara.top < -self.pantalla_alçada*1.05:
+            self.rectangle_camara.top = -self.pantalla_alçada*1.05
         self.diferencia.x =self.rectangle_camara_orig[0]-self.rectangle_camara.left
         self.diferencia.y =self.rectangle_camara_orig[1]-self.rectangle_camara.top
         self.diferencia=round(self.diferencia)
@@ -123,12 +123,12 @@ class camera():
                 self.rectangle_camara.left = -self.pantalla_amplada*0.05
             if self.rectangle_camara.right > self.pantalla_amplada*1.85:
                 self.rectangle_camara.right = self.pantalla_amplada*1.85
-            if self.rectangle_camara.top < -self.pantalla_alçada*0.05:
-                self.rectangle_camara.top = -self.pantalla_alçada*0.05
+            if self.rectangle_camara.top < -self.pantalla_alçada*1.05:
+                self.rectangle_camara.top = -self.pantalla_alçada*1.05
             self.diferencia.x =self.rectangle_camara_orig[0]-self.rectangle_camara.left
             self.diferencia.y =self.rectangle_camara_orig[1]-self.rectangle_camara.top
             self.diferencia=round(self.diferencia)
-    def update(self, llista_objectes_pantalla, personatge, ocells_nivell,ocell_actual, mantenint_ocell,ocell_anterior, mantenint,posició_mantenint,rectangle_mantenint, llista_ocells_llançats):
+    def update(self, llista_objectes_pantalla, personatge, ocells_nivell,ocell_actual, mantenint_ocell,ocell_anterior, mantenint,posició_mantenint,rectangle_mantenint, llista_ocells_llançats, factor_de_potencia,llista_ocells):
         if mantenint_ocell == False:    
             if self.principi_nivell:
                 self.camara_punt((self.pantalla_amplada , self.rectangle_camara_orig[1]))
@@ -146,7 +146,10 @@ class camera():
         linea_ocells(ocells_nivell, self.diferencia, llista_ocells_llançats, self.pantalla,self.posició_inicial, self.pantalla_alçada)
         linea(ocell_actual,mantenint_ocell, self.diferencia, self.pantalla,self.posició_inicial, self.rectangle_base, self.punt_t1, self.punt_t2, self.punt_t3, self.punt_t4, self.punt_t5)
         for i in  llista_objectes_pantalla:
-            i.dibuixar(self.diferencia)
+            if i in llista_ocells:    
+                i.dibuixar(self.diferencia, factor_de_potencia)
+            else:
+                i.dibuixar(self.diferencia)
         pygame.draw.line(self.pantalla, marró, self.punt_t1+self.diferencia, self.punt_t2+self.diferencia, width = 20)
         rectangle_base_2 = self.rectangle_base.copy() 
         rectangle_base_2.topleft += self.diferencia
@@ -158,19 +161,30 @@ class camera():
             if ocell_anterior.llançat:    
                 ocell_anterior.estela(pygame.math.Vector2(-self.pantalla_amplada,0))  
             for i in  llista_objectes_pantalla:
-                i.dibuixar(pygame.math.Vector2(-self.pantalla_amplada,0))
+                if i in llista_ocells:  
+                    i.dibuixar(pygame.math.Vector2(-self.pantalla_amplada,0), factor_de_potencia)
+                else:    
+                    i.dibuixar(pygame.math.Vector2(-self.pantalla_amplada,0))
             pantalla3 = self.pantalla.copy()
             pantalla3 = pygame.transform.scale(pantalla3, (self.pantalla_amplada*0.5,self.pantalla_alçada*0.5))
             self.pantalla.fill(fons)
             if ocell_anterior.llançat:    
                 ocell_anterior.estela(pygame.math.Vector2(0, self.pantalla_alçada))
             for i in  llista_objectes_pantalla:
-                i.dibuixar(pygame.math.Vector2(0, self.pantalla_alçada))  
+                if i in llista_ocells:
+                    i.dibuixar(pygame.math.Vector2(0, self.pantalla_alçada), factor_de_potencia)  
+                else:    
+                    i.dibuixar(pygame.math.Vector2(0, self.pantalla_alçada))  
             pantalla4 = self.pantalla.copy()
             pantalla4 = pygame.transform.scale(pantalla4, (self.pantalla_amplada*0.5,self.pantalla_alçada*0.5))
-            self.pantalla.fill(fons)  
+            self.pantalla.fill(fons)
+            if ocell_anterior.llançat:    
+                ocell_anterior.estela(pygame.math.Vector2(-self.pantalla_amplada, self.pantalla_alçada))  
             for i in  llista_objectes_pantalla:
-                i.dibuixar(pygame.math.Vector2(-self.pantalla_amplada, self.pantalla_alçada))
+                if i in llista_ocells:      
+                    i.dibuixar(pygame.math.Vector2(-self.pantalla_amplada, self.pantalla_alçada), factor_de_potencia)
+                else:
+                    i.dibuixar(pygame.math.Vector2(-self.pantalla_amplada, self.pantalla_alçada))
             pantalla5 = self.pantalla.copy()
             pantalla5 = pygame.transform.scale(pantalla5, (self.pantalla_amplada*0.5,self.pantalla_alçada*0.5))
             self.pantalla.fill(fons)

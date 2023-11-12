@@ -88,8 +88,13 @@ class caixa():
         self.caixa = True
         self.vida = 4
         self.z = 0
-        self.pantalla_rect = pantalla.get_rect() 
-    
+        self.pantalla_rect = pantalla.get_rect()
+        if self.movible == False:
+            if self.tipo == 1:
+                self.velocitat_angle = 1
+            elif self.tipo == 3:
+                self.velocitat_angle = -1
+
     def update(self, llista_objectes_pantalla):
         if self.movible == True and self.caixa:
             if self.z == 1:
@@ -139,7 +144,7 @@ class caixa():
                     self.centre_no_rotar_orig = [self.centre_no_rotar[0], self.centre_no_rotar[1],self.centre_no_rotar[2],self.centre_no_rotar[3]]
             if self.angle >= 360:
                 self.angle -= 360
-            if self.angle < 0:
+            elif self.angle < 0:
                 self.angle += 360
             self.posició_real += self.velocitat
             self.posició_real[1] += 0.5*gravetat
@@ -183,6 +188,17 @@ class caixa():
                 n.rotate_ip(90)
             if self.animació[0][0] <=1:
                 llista_objectes_pantalla.remove(self)
+        if self.movible == False:
+            if self.tipo == 3 or self.tipo == 1:    
+                self.angle+=self.velocitat_angle
+                if self.angle >= 360:
+                    self.angle -= 360
+                elif self.angle < 0:
+                    self.angle += 360
+                self.rectangle_nou = pygame.transform.rotate(self.superficie_rectangle, self.angle)
+                self.rectangle = self.rectangle_nou.get_rect(center = self.posició_real)
+                self.mask = pygame.mask.from_surface(self.rectangle_nou)
+
     def dibuixar(self, diferencia):
         rectangle = self.rectangle.copy()
         rectangle.topleft+=diferencia  
@@ -722,3 +738,8 @@ class caixa():
         self.suma_pes.clear()
         self.rotacions.clear()
         self.caixa = True
+        if self.movible == False:
+            if self.tipo == 1:
+                self.velocitat_angle = 1
+            elif self.tipo == 3:
+                self.velocitat_angle = -1
