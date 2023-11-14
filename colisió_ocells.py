@@ -167,11 +167,6 @@ def colisió_cercles(self,x, llista_ocells, llista_objectes_rectangulars, llista
                         z_x = pygame.math.Vector2.from_polar((1, angle_zx))
                         while self.mask.overlap(x.mask,(x.rectangle.x-self.rectangle.x, x.rectangle.y-self.rectangle.y)):
                             x.rectangle.center+=z_x
-                        if x.rotar == False:
-                            x.centre_no_rotar[0] += x.rectangle.center[0] - antic_centre_x[0] 
-                            x.centre_no_rotar[1] += x.rectangle.center[1] - antic_centre_x[1]
-                            x.centre_no_rotar[2] += x.rectangle.center[0] - antic_centre_x[0]
-                            x.centre_no_rotar[3] += x.rectangle.center[1] - antic_centre_x[1]
                     else:
                         while self.mask.overlap(x.mask,(x.rectangle.x-self.rectangle.x, x.rectangle.y-self.rectangle.y)):
                             self.rectangle.center+=z
@@ -296,6 +291,12 @@ def colisió_cercles(self,x, llista_ocells, llista_objectes_rectangulars, llista
                                 else:
                                     xvelocitat_angle = abs((x.velocitat[1]) * xmeitat2*0.5*x.alçada)/(xtotal*x.amplada) 
                             x.rotacions.append((xvelocitat_angle, round(posició_xoc[1])))
+                    if diferencia_angle_x > 90 and x.velocitat.length() > 0:
+                        if x.rotar == False:
+                            x.centre_no_rotar[0] += x.rectangle.center[0] - antic_centre_x[0] 
+                            x.centre_no_rotar[1] += x.rectangle.center[1] - antic_centre_x[1]
+                            x.centre_no_rotar[2] += x.rectangle.center[0] - antic_centre_x[0]
+                            x.centre_no_rotar[3] += x.rectangle.center[1] - antic_centre_x[1]
                     velocitat = self.velocitat.copy()
                     if diferencia_angle_self > 90 and self.velocitat.length() > 0 :    
                         nou_angle_velocitat = 180+2*self.velocitat.angle_to((-1,0)) - 2*self.angle_rampa 
