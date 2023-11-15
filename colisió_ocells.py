@@ -124,7 +124,7 @@ def colisió_cercles(self,x, llista_ocells, llista_objectes_rectangulars, llista
                 if rampa == self:
                     self.angle_rampa = calcul_angle_cercle(self,posició_xoc)
                 else:
-                    self.angle_rampa = x.calcul_angle_rampa(self.posició_xoc)
+                    self.angle_rampa = x.calcul_angle_rampa(posició_xoc)
                     if self.angle_rampa == "no":
                         self.angle_rampa = calcul_angle_cercle(self,posició_xoc)
                 if self.angle_rampa <= 180:

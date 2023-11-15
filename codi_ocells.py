@@ -22,9 +22,13 @@ marró_fosc = (84, 56, 34)
 gris=(50,50,50)
 gravetat = 0.05
 #Cargem les imatges
-art = pygame.image.load("Grafics/art.png").convert_alpha()
-art2 = pygame.image.load("Grafics/art2.png").convert_alpha()
-art3 = pygame.image.load("Grafics/art3.png").convert_alpha()
+art = pygame.image.load("Grafics/Meteorito_sin_fuego.png").convert_alpha()
+art2 = pygame.image.load("Grafics/Meteorito.png").convert_alpha()
+art3 = pygame.image.load("Grafics/SOL.png").convert_alpha()
+art4 = pygame.image.load("Grafics/Agujero_negro.png").convert_alpha()
+pequeñin_skin1 = pygame.image.load("Grafics/Hielo.png").convert_alpha()
+pequeñin_skin2 = pygame.image.load("Grafics/Hielo2.png").convert_alpha()
+pequeñin_skin3 = pygame.image.load("Grafics/Hielo3.png").convert_alpha()
 def calcular_angle(self):
     angle = math.degrees(math.atan2(pygame.mouse.get_pos()[0] - (self.posició_inicial[0]), pygame.mouse.get_pos()[1] - (self.posició_inicial[1])))
     return angle
@@ -76,7 +80,7 @@ class ocell():
             self.color2 = gris
         pygame.draw.circle(self.superficie_ocell, self.color2, (self.radi*1.1, self.radi*1.1), self.radi)
         self.mask = pygame.mask.from_surface(self.superficie_ocell)
-        if self.color!=vermell:    
+        if self.color==groc:    
             pygame.draw.circle(self.superficie_ocell, self.color, (self.radi*1.1, self.radi*0.75), self.radi*0.7)
             pygame.draw.circle(self.superficie_ocell, self.color, (self.radi*1.4, self.radi*0.95), self.radi*0.7)
             pygame.draw.circle(self.superficie_ocell, self.color, (self.radi*0.7, self.radi*0.95), self.radi*0.7)
@@ -91,11 +95,6 @@ class ocell():
             pygame.draw.circle(self.superficie_ocell, negre, (self.radi*1.15, self.radi*0.9), self.radi/6)
             pygame.draw.polygon(self.superficie_ocell, taronja, ((self.radi*1.5,self.radi*1.2), (self.radi*1.5,self.radi*1.7), (self.radi*2.2,self.radi*1.45)))
             pygame.draw.line(self.superficie_ocell, negre, (self.radi*1.5,self.radi*1.45), (self.radi*2.2,self.radi*1.45), width=round(self.radi/20))
-            if self.color != negre:
-                pygame.draw.line(self.superficie_ocell, negre, (self.radi*0.8,self.radi*0.4), (1.8*self.radi, 0.4*self.radi), width=round(self.radi/5))
-            else:
-                pygame.draw.line(self.superficie_ocell, blanc, (self.radi*0.8,self.radi*0.4), (1.8*self.radi, 0.4*self.radi), width=round(self.radi/5))
-            self.superficie_ocell_orig = self.superficie_ocell.copy()
             self.superficie_ocell_2 = pygame.Surface((2.2*self.radi, 2.2*self.radi), pygame.SRCALPHA)
             pygame.draw.circle(self.superficie_ocell_2, self.color2, (self.radi*1.1, self.radi*1.1), self.radi)
             pygame.draw.circle(self.superficie_ocell_2, self.color, (self.radi*1.1, self.radi*0.75), self.radi*0.7)
@@ -119,14 +118,30 @@ class ocell():
                 pygame.draw.line(self.superficie_ocell_2, blanc, (self.radi*0.8,self.radi*0.1), (1.5*self.radi, 0.4*self.radi), width=round(self.radi/5))
                 pygame.draw.line(self.superficie_ocell_2, blanc, (self.radi*1.5,self.radi*0.4), (1.8*self.radi, 0.1*self.radi), width=round(self.radi/5))
             self.superficie_ocell_3 = self.superficie_ocell_2.copy()
-        else:    
+        elif self.color == vermell:    
             self.superficie_ocell = art
-            self.superficie_ocell = pygame.transform.scale(self.superficie_ocell,(self.radi*2,self.radi*2))
+            self.superficie_ocell = pygame.transform.scale(self.superficie_ocell,(self.radi*2.2,self.radi*2))
             self.superficie_ocell_2 = art2
-            self.superficie_ocell_2 = pygame.transform.scale(self.superficie_ocell_2,(self.radi*8/3,self.radi*2))
-            self.superficie_ocell_3 = art3
-            self.superficie_ocell_3 = pygame.transform.scale(self.superficie_ocell_3,(self.radi*2,self.radi*2))
-            self.superficie_ocell_orig = self.superficie_ocell.copy()
+            self.superficie_ocell_2 = pygame.transform.scale(self.superficie_ocell_2,(self.radi*(2.2*art2.get_width()/art.get_width()),self.radi*(2*art2.get_height()/art.get_height())))
+            self.superficie_ocell_3 = self.superficie_ocell_2.copy()
+        elif self.color == negre:
+            self.superficie_ocell = art3
+            self.superficie_ocell = pygame.transform.scale(self.superficie_ocell,(self.radi*2.2*1.2,self.radi*2*1.2))
+            self.superficie_ocell_2 = self.superficie_ocell.copy()
+            self.superficie_ocell_3 = self.superficie_ocell_2.copy()
+        elif self.color == blanc:
+            self.superficie_ocell = art4
+            self.superficie_ocell = pygame.transform.scale(self.superficie_ocell,(self.radi*2.2*1.2,self.radi*2*1.2))
+            self.superficie_ocell_2 = self.superficie_ocell.copy()
+            self.superficie_ocell_3 = self.superficie_ocell_2.copy()
+        elif self.color == cian:
+            self.superficie_ocell = pequeñin_skin1
+            self.superficie_ocell = pygame.transform.scale(self.superficie_ocell,(self.radi*2.2,self.radi*2))
+            self.superficie_ocell_2 = pequeñin_skin2
+            self.superficie_ocell_2 = pygame.transform.scale(self.superficie_ocell_2,(self.radi*(2.2*pequeñin_skin2.get_width()/pequeñin_skin1.get_width()),self.radi*(2.2*pequeñin_skin2.get_height()/pequeñin_skin1.get_height())))
+            self.superficie_ocell_3 = pequeñin_skin3
+            self.superficie_ocell_3 = pygame.transform.scale(self.superficie_ocell_3,(self.radi*(2.2*pequeñin_skin3.get_width()/pequeñin_skin1.get_width()),self.radi*(2.2*pequeñin_skin3.get_height()/pequeñin_skin1.get_height())))
+        self.superficie_ocell_orig = self.superficie_ocell.copy()
         self.c = 0
         self.posició_real = posició_inicial
         self.massa = self.radi**2 *3.14
@@ -318,9 +333,9 @@ class ocell():
                 nombre_ocells+=2
             else:
                 if self.color == negre:    
-                    self.activar_animació(taronja2,1.5)
+                    self.activar_animació(taronja2,0.7)
                 else:
-                    self.activar_animació(negre,1.5)
+                    self.activar_animació(negre,0.7)
                 for i in llista_objectes_pantalla:
                     if i != self:
                         if i in llista_porcs:    
