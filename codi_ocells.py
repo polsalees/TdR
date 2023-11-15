@@ -338,7 +338,7 @@ class ocell():
                                         potencia *=2
                                     else:
                                         potencia +=30
-                                    potencia /= 2.5
+                                    potencia /= 5
                                     i.velocitat += pygame.math.Vector2.from_polar((potencia*50/i.massa, angle))
                         elif i in llista_ocells:    
                             if i.llançat:    
@@ -373,8 +373,8 @@ class ocell():
                                     else:    
                                         potencia +=30
                                     potencia /= 2.5
-                                    i.mig_trencat(potencia/100, llista_objectes_pantalla, llista_porcs, llista_ocells)
-                                    i.velocitat += pygame.math.Vector2.from_polar((potencia*50/i.massa, angle))
+                                    i.mig_trencat(potencia*50/i.massa/100, llista_objectes_pantalla, llista_porcs, llista_ocells)
+                                    i.velocitat += pygame.math.Vector2.from_polar((potencia*100/(i.massa*0.7), angle))
 
             self.activat = True
         return nombre_ocells
