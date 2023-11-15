@@ -112,11 +112,11 @@ def colisió_cercles(self,x, llista_ocells, llista_objectes_rectangulars, llista
                                 xcentre  = (pygame.math.Vector2(i)-posició_xoc)*0.5 + posició_xoc
                                 xcentre2 = (xcentre - x.rectangle.center).rotate(180)
                                 xcentre = [xcentre[0], xcentre[1], xcentre2[0], xcentre2[1]]
-                            posició_xoc = i                      
+                            posició_xoc = i
                 if n == 0 or n == 2:
                     mask_xoc = self.mask.overlap_mask(x.mask,(x.rectangle.x- self.rectangle.x, x.rectangle.y- self.rectangle.y))        
                     rectangle_xoc = mask_xoc.get_bounding_rects()
-                    posició_xoc = rectangle_xoc[0].center + pygame.math.Vector2(self.rectangle.topleft)
+                    posició_xoc = mask_xoc.centroid() + pygame.math.Vector2(self.rectangle.topleft)
                     rampa = x
                     if n == 2:
                         x.rotar = False
@@ -124,10 +124,10 @@ def colisió_cercles(self,x, llista_ocells, llista_objectes_rectangulars, llista
                 if rampa == self:
                     self.angle_rampa = calcul_angle_cercle(self,posició_xoc)
                 else:
-                    self.angle_rampa = x.calcul_angle_rampa(posició_xoc)
+                    self.angle_rampa = x.calcul_angle_rampa(self.posició_xoc)
                     if self.angle_rampa == "no":
                         self.angle_rampa = calcul_angle_cercle(self,posició_xoc)
-                if self.angle_rampa <= 180:    
+                if self.angle_rampa <= 180:
                     angle_z = 180-self.angle_rampa
                 else:
                     angle_z = 360-self.angle_rampa + 180
@@ -137,8 +137,7 @@ def colisió_cercles(self,x, llista_ocells, llista_objectes_rectangulars, llista
                         self.rectangle.center+=z
                     nou_angle_velocitat =180 + 2*self.velocitat.angle_to((-1,0)) - 2*self.angle_rampa
                     self.velocitat.rotate_ip(nou_angle_velocitat)
-                    self.velocitat[0] *=0.3 + 0.59*math.sqrt(math.sin(math.radians(self.angle_rampa))**2)
-                    self.velocitat[1] *=0.3 + 0.59*math.sqrt(math.cos(math.radians(self.angle_rampa))**2)
+                    self.velocitat *=0.5
                 else:
                     if x.z == 0:
                         x.z =1
