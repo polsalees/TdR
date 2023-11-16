@@ -69,19 +69,7 @@ class ocell():
         self.superficie_ocell = pygame.Surface((2.2*self.radi, 2.2*self.radi), pygame.SRCALPHA)
         self.rectangle = self.superficie_ocell.get_rect()
         self.rectangle.center = (posició_inicial[0], posició_inicial[1])
-        if self.color != negre:    
-            self.color2 = self.color - pygame.math.Vector3(100,100,100)
-            color2 = []
-            for i in self.color2:
-                if i > 255:
-                    i = 255
-                if i < 0:
-                    i = 0
-                color2.append(i)
-            self.color2 = color2
-        else:
-            self.color2 = gris
-        pygame.draw.circle(self.superficie_ocell, self.color2, (self.radi*1.1, self.radi*1.1), self.radi)
+        pygame.draw.circle(self.superficie_ocell, self.color, (self.radi*1.1, self.radi*1.1), self.radi)
         self.mask = pygame.mask.from_surface(self.superficie_ocell)
         if self.color==groc:    
             self.superficie_ocell = estrella

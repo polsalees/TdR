@@ -92,7 +92,7 @@ porc_estandar = porc(20, (pantalla_amplada - 180, pantalla_alçada - 160), llist
 
 #Caixes 
 terra = caixa([pantalla_amplada/2, pantalla_alçada + 45], 100, pantalla_amplada*3, False, 0,2, llista_objectes_rectangulars,pantalla)
-paret_dreta = caixa([pantalla_amplada*2+100, 0],300, pantalla_alçada*2, False, 90,2, llista_objectes_rectangulars,pantalla)
+paret_dreta = caixa([pantalla_amplada*2+100, 50],300, pantalla_alçada*2, False, 90,2, llista_objectes_rectangulars,pantalla)
 paret_esquerra = caixa([terra.rectangle.left, pantalla_alçada/2 -250],300, pantalla_alçada+600, False, 90,2, llista_objectes_rectangulars,pantalla)
 quadrat_petit = caixa([pantalla_amplada - 255, pantalla_alçada-48], 50, 50, True, 0,3, llista_objectes_rectangulars,pantalla)
 rectangle_petit = caixa([pantalla_amplada - 230, pantalla_alçada-175], 20, 70, True, 90,2, llista_objectes_rectangulars,pantalla)
@@ -491,7 +491,6 @@ def GameLoop():
             else:
                 velocitat = 1
             if n2%velocitat == 0:
-                pantalla.fill(fons)
                 camara.update(llista_objectes_pantalla,ocell_anterior, ocells_nivell, ocell_actual, mantenint_ocell, ocell_anterior, mantenint,posició_mantenint,rectangle_mantenint, llista_ocells_llançats, factor_de_potencia, llista_ocells)
             if nombre_porcs == 0:
                 estrelles = nombre_porcs_orig - (len(llista_ocells_llançats)-3)
