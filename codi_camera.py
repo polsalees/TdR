@@ -77,7 +77,16 @@ class camera():
         self.punt_t4 = (self.posició_inicial[0]+50,self.posició_inicial[1]-45)
         self.punt_t5 = (self.posició_inicial[0]-60,self.posició_inicial[1]-45)
         relació = fons.get_width()/fons.get_height()
-        self.fons  = pygame.transform.scale(fons,(pantalla_alçada*2.2*relació, pantalla_alçada*2.2))
+        fons1 = pygame.transform.scale(fons,(fons.get_width()*3, fons.get_height()*3))
+        self.fons  = pygame.Surface((2.2*pantalla_amplada, 2.2*pantalla_amplada))
+        x = 0
+        y = 0
+        for i in range(8):
+            self.fons.blit(fons1,(x,y))
+            x+=fons.get_width()*3
+            if x>pantalla_amplada*2.2+fons.get_width():
+                x = 0
+                y += fons.get_height()*3
     def cam_1(self,personatge):
         if personatge.tocat_objecte==False:    
             if personatge.rectangle.top < self.rectangle_camara.top:

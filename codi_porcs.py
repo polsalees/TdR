@@ -90,7 +90,7 @@ class porc():
                 self.pantalla.blit(self.porc_nou, rectangle)
             else:    
                 for i in self.animació:
-                    pygame.draw.circle(self.pantalla,verd,i[1]+diferencia,i[0])
+                    pygame.draw.circle(self.pantalla,cian,i[1]+diferencia,i[0])
     def reinici(self):
         self.velocitat *= 0
         self.rectangle.center = self.posició_inicial
