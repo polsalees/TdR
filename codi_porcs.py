@@ -22,6 +22,8 @@ fons = (80, 80, 255)
 gris=(50,50,50)
 pedra = (139,140,122)
 gravetat = 0.05
+#Cargem les imatges
+art = pygame.image.load("Grafics/Terra.png").convert_alpha()
 
 class porc():
     def __init__(self, radi, posició, llista_porcs, llista_objectes_rodons, pantalla):    
@@ -46,16 +48,8 @@ class porc():
         self.porc = True
         self.n = 0
         self.angle = 0
-        pygame.draw.circle(self.superficie_porc, verd, (self.radi*1.75, self.radi/3 ), self.radi/4)
-        pygame.draw.circle(self.superficie_porc, verd, (self.radi*2.3, self.radi/1.60), self.radi/4)
-        pygame.draw.circle(self.superficie_porc, verd_fosc, (self.radi*1.5, self.radi*1.65), self.radi/2.5)
-        pygame.draw.circle(self.superficie_porc, blanc, (self.radi*2.1, self.radi*1.3), self.radi/4)
-        pygame.draw.circle(self.superficie_porc, negre, (self.radi*2.1, self.radi*1.3), self.radi/6)
-        pygame.draw.circle(self.superficie_porc, blanc, (self.radi*0.9, self.radi*1.3), self.radi/4)
-        pygame.draw.circle(self.superficie_porc, negre, (self.radi*0.9, self.radi*1.3), self.radi/6)
-        pygame.draw.line(self.superficie_porc, negre, (self.radi*1.3,self.radi*2.2), (1.7*self.radi, 2.2*self.radi), width=round(self.radi/5))
-        pygame.draw.line(self.superficie_porc, negre, (self.radi*1.35,self.radi*1.8), (1.35*self.radi, 1.4*self.radi), width=round(self.radi/6))
-        pygame.draw.line(self.superficie_porc, negre, (self.radi*1.65,self.radi*1.8), (1.65*self.radi, 1.4*self.radi), width=round(self.radi/6))
+        self.superficie_porc = art
+        self.superficie_porc = pygame.transform.scale(self.superficie_porc,(self.radi*2.2,self.radi*2.2))
         self.porc_nou = self.superficie_porc.copy()
         self.rectangle_2 = self.rectangle.copy()
         self.pantalla = pantalla

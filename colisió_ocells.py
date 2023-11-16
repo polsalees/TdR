@@ -138,6 +138,8 @@ def colisió_cercles(self,x, llista_ocells, llista_objectes_rectangulars, llista
                     nou_angle_velocitat =180 + 2*self.velocitat.angle_to((-1,0)) - 2*self.angle_rampa
                     self.velocitat.rotate_ip(nou_angle_velocitat)
                     self.velocitat *=0.5
+                    if x.tipo == 1 or x.tipo == 3:
+                        self.velocitat +=z*5
                 else:
                     if x.z == 0:
                         x.z =1
