@@ -49,7 +49,7 @@ llista_objectes_pantalla = []
 llista_ocells_llançats = []
 sprites = []
 llista_ocells = []
-llista_porcs = []
+llista_porcs = [] 
 #carregem skins
 skin = pygame.image.load("Grafics/art4.png").convert_alpha()
 

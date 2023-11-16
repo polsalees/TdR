@@ -1,5 +1,6 @@
 import pygame
 import math
+import random
 from colisió_ocells import calcul_angle_cercle 
 from rotació import rotacions
 
@@ -70,6 +71,11 @@ class caixa():
             self.color = verd_fosc
             self.color_borde = verd_fosc
             self.superficie_rectangle.fill(verd_fosc)
+            for i in range(int(amplada/30)):
+                random_x = random.randint(-20, int(amplada)+20)
+                random_y = random.randint(-20, int(alçada)+20)
+                random_amplada = random.randint(5, 50)/2
+                pygame.draw.circle(self.superficie_rectangle, gris,(random_x,random_y,), random_amplada)
         self.rectangle_nou = pygame.transform.rotate(self.superficie_rectangle, self.angle)
         self.rectangle = self.rectangle_nou.get_rect()
         self.rectangle.center = posició
