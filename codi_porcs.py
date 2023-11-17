@@ -1,6 +1,7 @@
 import pygame
 import math
 from colisió_ocells import colisió_cercles
+from random import randint
 negre = (0, 0, 0)
 blanc = (255, 255, 255)
 vermell = (255, 0, 0)
@@ -26,7 +27,7 @@ gravetat = 0.05
 art = pygame.image.load("Grafics/Terra.png").convert_alpha()
 
 class porc():
-    def __init__(self, radi, posició, llista_porcs, llista_objectes_rodons, pantalla):    
+    def __init__(self, radi, posició, llista_porcs, llista_objectes_rodons, pantalla, movible):    
         global gravetat
         self.radi = radi
         self.velocitat = pygame.math.Vector2(0,0)
@@ -54,6 +55,13 @@ class porc():
         self.rectangle_2 = self.rectangle.copy()
         self.pantalla = pantalla
         self.pantalla_rect = pantalla.get_rect()
+        self.movible = movible
+        if movible:
+            velocitat = randint(1,2)
+            if velocitat == 1:    
+                self.velocitat.x = 1
+            else:
+                self.velocitat.x = -1
     
     def update(self, llista_objectes_pantalla):
         if self.porc:
@@ -72,6 +80,11 @@ class porc():
             self.angle -= self.velocitat[0]
             self.porc_nou = pygame.transform.rotate(self.superficie_porc, self.angle)
             self.rectangle_2 = self.porc_nou.get_rect(center = self.posició_real)
+            if self.movible:
+                if self.velocitat.x != 1 and self.velocitat.x>=0:
+                    self.velocitat.x = 1
+                elif self.velocitat.x != -1 and self.velocitat.x<0:
+                    self.velocitat.x =-1
         else:
             if self.n%5 == 0:    
                 n=pygame.math.Vector2(5,5)
@@ -93,6 +106,12 @@ class porc():
                     pygame.draw.circle(self.pantalla,cian,i[1]+diferencia,i[0])
     def reinici(self):
         self.velocitat *= 0
+        if self.movible:
+            velocitat = randint(1,2)
+            if velocitat == 1:    
+                self.velocitat.x = 1
+            else:
+                self.velocitat.x = -1
         self.rectangle.center = self.posició_inicial
         self.posició_real = self.posició_inicial
         self.porc = True
@@ -111,5 +130,5 @@ class porc():
         self.porc  = False
         self.animació = [[radi,self.rectangle.center],[radi,self.rectangle.center],[radi,self.rectangle.center],[radi,self.rectangle.center]]
     def copy(self, posició, llista_porcs, llista_objectes_rodons):
-        x = porc(self.radi, posició, llista_porcs, llista_objectes_rodons, self.pantalla)
+        x = porc(self.radi, posició, llista_porcs, llista_objectes_rodons, self.pantalla, self.movible)
         return x

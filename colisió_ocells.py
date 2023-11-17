@@ -13,11 +13,11 @@ def colisió_cercles(self,x, llista_ocells, llista_objectes_rectangulars, llista
     if x in llista_objectes_rodons:
         if self in llista_ocells:    
             self.calcul_posició_primer_xoc()
-        if self.velocitat.length()*self.massa/x.massa > 1 and x in llista_porcs and self in llista_ocells:
+        if self.velocitat.length()*self.massa/x.massa > 1 and x in llista_porcs and self in llista_ocells and x.movible == False:
             x.destrucció()
             self.velocitat *= 0.4
             nombre_porcs -=1
-        elif x.velocitat.length()*x.massa/self.massa > 1 and self in llista_porcs and x in llista_ocells:
+        elif x.velocitat.length()*x.massa/self.massa > 1 and self in llista_porcs and x in llista_ocells and self.movible== False:
             self.destrucció()
             x.velocitat *= 0.4 
             nombre_porcs -=1       
@@ -140,6 +140,9 @@ def colisió_cercles(self,x, llista_ocells, llista_objectes_rectangulars, llista
                     nou_angle_velocitat =180 + 2*self.velocitat.angle_to((-1,0)) - 2*self.angle_rampa
                     self.velocitat.rotate_ip(nou_angle_velocitat)
                     self.velocitat *=0.5
+                    if self in llista_porcs:
+                        if self.movible:
+                            self.velocitat.x *=2
                     if x.tipo == 1 or x.tipo == 3 or x.tipo == 5:
                         if n== 0:
                             xcentre1 = ((xesquina1[0]-xesquina2[0])/2 + xesquina2[0], (xesquina1[1]-xesquina2[1])/2 + xesquina2[1], pygame.math.Vector2(xesquina1[0]-xesquina2[0],xesquina1[1]-xesquina2[1])*0.5)

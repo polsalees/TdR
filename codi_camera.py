@@ -87,7 +87,7 @@ class camera():
             if x>pantalla_amplada*2.2+fons.get_width():
                 x = 0
                 y += fons.get_height()*3
-    def cam_1(self,personatge):
+    def cam_1(self,personatge,factor_de_potencia):
         if personatge.tocat_objecte==False:    
             if personatge.rectangle.top < self.rectangle_camara.top:
                 self.rectangle_camara.top = personatge.rectangle.top 
@@ -101,7 +101,10 @@ class camera():
             self.diferencia.y =self.rectangle_camara_orig[1]-self.rectangle_camara.top
             self.diferencia=round(self.diferencia)
         else:
-            self.camara_punt((personatge.posició_primer_xoc[0]-self.pantalla_amplada*0.3, personatge.posició_primer_xoc[1]-self.pantalla_alçada*0.3))
+            if factor_de_potencia!= 0.125:    
+                self.camara_punt((personatge.posició_primer_xoc[0]-self.pantalla_amplada*0.3, personatge.posició_primer_xoc[1]-self.pantalla_alçada*0.3))
+            else:
+                self.camara_punt((personatge.posició_primer_xoc[0]-self.pantalla_amplada*0.3, self.rectangle_camara_orig[1]))
     def camara_punt(self,punt):
         self.rectangle_camara_orig_2 = self.rectangle_camara.topleft 
         self.diferencia_2.x =punt[0]-self.rectangle_camara.left
@@ -144,7 +147,7 @@ class camera():
             if self.principi_nivell:
                 self.camara_punt((self.pantalla_amplada , self.rectangle_camara_orig[1]))
             elif (personatge in llista_objectes_pantalla and personatge.temps_desde_tocar_objectes <= 200):
-                self.cam_1(personatge)
+                self.cam_1(personatge, factor_de_potencia)
                 self.tornar_ocell = True
             else:
                 if self.tornar_ocell or mantenint_ocell:   

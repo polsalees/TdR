@@ -108,7 +108,7 @@ class caixa():
             elif self.tipo == 3:
                 self.velocitat_angle = -1
             elif self.tipo == 5:
-                self.velocitat_angle = -10
+                self.velocitat_angle = -3
         self.n2 = 0
 
     def update(self, llista_objectes_pantalla):
