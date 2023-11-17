@@ -140,10 +140,10 @@ class camera():
             self.diferencia.y =self.rectangle_camara_orig[1]-self.rectangle_camara.top
             self.diferencia=round(self.diferencia)
     def update(self, llista_objectes_pantalla, personatge, ocells_nivell,ocell_actual, mantenint_ocell,ocell_anterior, mantenint,posició_mantenint,rectangle_mantenint, llista_ocells_llançats, factor_de_potencia,llista_ocells):
-        if mantenint_ocell == False:    
+        if mantenint_ocell == False and (ocell_actual.radi != 0 or ocell_anterior.tocat_objecte== False):    
             if self.principi_nivell:
                 self.camara_punt((self.pantalla_amplada , self.rectangle_camara_orig[1]))
-            elif (personatge in llista_objectes_pantalla and personatge.temps_desde_tocar_objectes <= 200) or ocell_actual.radi == 0:
+            elif (personatge in llista_objectes_pantalla and personatge.temps_desde_tocar_objectes <= 200):
                 self.cam_1(personatge)
                 self.tornar_ocell = True
             else:
@@ -167,7 +167,7 @@ class camera():
         rectangle_base_2 = self.rectangle_base.copy() 
         rectangle_base_2.topleft += self.diferencia
         pygame.draw.rect(self.pantalla, marró, rectangle_base_2)
-        if mantenint_ocell:
+        if mantenint_ocell or (ocell_actual.radi == 0 and ocell_anterior.tocat_objecte):
             pantalla2 = self.pantalla.copy()
             pantalla2 = pygame.transform.scale(pantalla2, (self.pantalla_amplada*0.5,self.pantalla_alçada*0.5)) 
             self.pantalla.blit(self.fons, (-0.2*self.pantalla_amplada,-self.pantalla_alçada*1.2)+pygame.math.Vector2(-self.pantalla_amplada,0))

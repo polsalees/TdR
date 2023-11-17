@@ -35,6 +35,8 @@ class caixa():
         if self.tipo == 5:
             self.tipo = 2
         self.massa = self.alçada*self.amplada*(self.tipo**1.5/2**1.5)
+        if movible == False:
+            self.massa = self.alçada*self.amplada
         self.posició_inicial = posició
         self.velocitat = pygame.math.Vector2(0,0)
         self.movible = movible
@@ -53,7 +55,7 @@ class caixa():
             self.color = marró
         elif self.tipo == 3:
             self.color_borde = gris 
-            self.color   = pedra
+            self.color = pedra
         self.superficie_rectangle.fill(self.color)
         if self.amplada < self.alçada:    
             pygame.draw.rect(self.superficie_rectangle, self.color_borde , ((0,0), (self.amplada, self.alçada)), 10 - (100//self.amplada))
@@ -71,11 +73,16 @@ class caixa():
             self.color = verd_fosc
             self.color_borde = verd_fosc
             self.superficie_rectangle.fill(verd_fosc)
-            for i in range(int(amplada/30)):
-                random_x = random.randint(-20, int(amplada)+20)
-                random_y = random.randint(-20, int(alçada)+20)
-                random_amplada = random.randint(10, 50)/2
-                pygame.draw.circle(self.superficie_rectangle, gris,(random_x,random_y,), random_amplada)
+            llista_craters = []
+            for i in range(int(self.massa/5000)+1):
+                random_amplada = random.randint(20, 60)
+                random_alçada = random.randint(random_amplada-10, random_amplada+10)
+                random_x = random.randint(-random_amplada, int(amplada))
+                random_y = random.randint(-random_alçada, int(alçada))
+                pygame.draw.ellipse(self.superficie_rectangle, gris,(random_x,random_y, random_amplada, random_alçada))
+                llista_craters.append((random_x, random_y, random_amplada, random_alçada))
+            for i in llista_craters:
+                pygame.draw.ellipse(self.superficie_rectangle, pedra,(i[0]+5,i[1]+5, i[2]-10,i[3]-10))
         self.rectangle_nou = pygame.transform.rotate(self.superficie_rectangle, self.angle)
         self.rectangle = self.rectangle_nou.get_rect()
         self.rectangle.center = posició
@@ -100,6 +107,8 @@ class caixa():
                 self.velocitat_angle = 1
             elif self.tipo == 3:
                 self.velocitat_angle = -1
+            elif self.tipo == 5:
+                self.velocitat_angle = -10
         self.n2 = 0
 
     def update(self, llista_objectes_pantalla):
@@ -197,7 +206,7 @@ class caixa():
                 llista_objectes_pantalla.remove(self)
         if self.movible == False:
             self.z = 0
-            if self.tipo == 3 or self.tipo == 1:    
+            if self.tipo == 3 or self.tipo == 1 or self.tipo ==5:    
                 self.angle+=self.velocitat_angle
                 if self.angle >= 360:
                     self.angle -= 360
@@ -746,17 +755,18 @@ class caixa():
         return x
     def reinici(self):
         self.vida = 4
-        self.superficie_rectangle.fill(self.color)
-        if self.amplada < self.alçada:    
-            pygame.draw.rect(self.superficie_rectangle, self.color_borde , ((0,0), (self.amplada, self.alçada)), 10 - (100//self.amplada))
-        else:
-            pygame.draw.rect(self.superficie_rectangle, self.color_borde , ((0,0), (self.amplada, self.alçada)), 10 - (100//self.alçada))
-        if self.tipo == 5:
-            pygame.draw.rect(self.superficie_rectangle, vermell, ((self.amplada*0.2, self.alçada*0.25), (self.amplada/15, self.alçada/2)))
-            pygame.draw.rect(self.superficie_rectangle, vermell, ((self.amplada*0.08, self.alçada*0.25), (self.amplada/3.5, self.alçada/15)))
-            pygame.draw.polygon(self.superficie_rectangle, vermell, ( (self.amplada*0.4, self.alçada*0.75),(self.amplada*0.4, self.alçada*0.25), (self.amplada*0.48, self.alçada*0.25), (self.amplada*0.56, self.alçada*0.60), (self.amplada*0.56, self.alçada*0.25), (self.amplada*0.62, self.alçada*0.25), (self.amplada*0.62, self.alçada*0.75), (self.amplada*0.54, self.alçada*0.75), (self.amplada*0.46, self.alçada*0.40), (self.amplada*0.46, self.alçada*0.75)))
-            pygame.draw.rect(self.superficie_rectangle, vermell, ((self.amplada*0.77, self.alçada*0.25), (self.amplada/15, self.alçada/2)))
-            pygame.draw.rect(self.superficie_rectangle, vermell, ((self.amplada*0.65, self.alçada*0.25), (self.amplada/3.5, self.alçada/15)))
+        if self.movible:
+            self.superficie_rectangle.fill(self.color)
+            if self.amplada < self.alçada:    
+                pygame.draw.rect(self.superficie_rectangle, self.color_borde , ((0,0), (self.amplada, self.alçada)), 10 - (100//self.amplada))
+            else:
+                pygame.draw.rect(self.superficie_rectangle, self.color_borde , ((0,0), (self.amplada, self.alçada)), 10 - (100//self.alçada))
+            if self.tipo == 5:
+                pygame.draw.rect(self.superficie_rectangle, vermell, ((self.amplada*0.2, self.alçada*0.25), (self.amplada/15, self.alçada/2)))
+                pygame.draw.rect(self.superficie_rectangle, vermell, ((self.amplada*0.08, self.alçada*0.25), (self.amplada/3.5, self.alçada/15)))
+                pygame.draw.polygon(self.superficie_rectangle, vermell, ( (self.amplada*0.4, self.alçada*0.75),(self.amplada*0.4, self.alçada*0.25), (self.amplada*0.48, self.alçada*0.25), (self.amplada*0.56, self.alçada*0.60), (self.amplada*0.56, self.alçada*0.25), (self.amplada*0.62, self.alçada*0.25), (self.amplada*0.62, self.alçada*0.75), (self.amplada*0.54, self.alçada*0.75), (self.amplada*0.46, self.alçada*0.40), (self.amplada*0.46, self.alçada*0.75)))
+                pygame.draw.rect(self.superficie_rectangle, vermell, ((self.amplada*0.77, self.alçada*0.25), (self.amplada/15, self.alçada/2)))
+                pygame.draw.rect(self.superficie_rectangle, vermell, ((self.amplada*0.65, self.alçada*0.25), (self.amplada/3.5, self.alçada/15)))
         self.velocitat *= 0
         self.angle = self.angle_inicial
         self.rectangle_nou = pygame.transform.rotate(self.superficie_rectangle, self.angle)
@@ -779,3 +789,5 @@ class caixa():
                 self.velocitat_angle = 1
             elif self.tipo == 3:
                 self.velocitat_angle = -1
+            elif self.tipo == 5:
+                self.velocitat_angle = -3

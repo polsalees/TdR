@@ -8,11 +8,11 @@ def calcul_angle_cercle(self, pos):
     return s
 
 def colisió_cercles(self,x, llista_ocells, llista_objectes_rectangulars, llista_objectes_rodons, llista_porcs, nombre_porcs, llista_objectes_pantalla):
-    if self in llista_ocells:    
-        self.calcul_posició_primer_xoc()
     if self.c == 0:
         self.c =1
     if x in llista_objectes_rodons:
+        if self in llista_ocells:    
+            self.calcul_posició_primer_xoc()
         if self.velocitat.length()*self.massa/x.massa > 1 and x in llista_porcs and self in llista_ocells:
             x.destrucció()
             self.velocitat *= 0.4
@@ -69,6 +69,8 @@ def colisió_cercles(self,x, llista_ocells, llista_objectes_rectangulars, llista
             elif diferencia_angle_self > 90 and velocitat_inicial.length() >= 2:
                 x.velocitat += velocitat_inicial*0.4
     if x in llista_objectes_rectangulars:
+        if self in llista_ocells and (x.movible or x.tipo !=5):    
+            self.calcul_posició_primer_xoc()
         x.colisionats.append(self)
         if self.velocitat.length()*self.massa/x.massa > 4 and x.movible and self in llista_ocells:
             self.velocitat *= 0.4
@@ -138,8 +140,29 @@ def colisió_cercles(self,x, llista_ocells, llista_objectes_rectangulars, llista
                     nou_angle_velocitat =180 + 2*self.velocitat.angle_to((-1,0)) - 2*self.angle_rampa
                     self.velocitat.rotate_ip(nou_angle_velocitat)
                     self.velocitat *=0.5
-                    if x.tipo == 1 or x.tipo == 3:
-                        self.velocitat +=z*5
+                    if x.tipo == 1 or x.tipo == 3 or x.tipo == 5:
+                        if n== 0:
+                            xcentre1 = ((xesquina1[0]-xesquina2[0])/2 + xesquina2[0], (xesquina1[1]-xesquina2[1])/2 + xesquina2[1], pygame.math.Vector2(xesquina1[0]-xesquina2[0],xesquina1[1]-xesquina2[1])*0.5)
+                            xcentre2 = ((xesquina1[0]-xesquina3[0])/2 + xesquina3[0], (xesquina1[1]-xesquina3[1])/2 + xesquina3[1], pygame.math.Vector2(xesquina3[0]-xesquina1[0],xesquina3[1]-xesquina1[1])*0.5)
+                            xcentre4 = ((xesquina4[0]-xesquina2[0])/2 + xesquina2[0], (xesquina4[1]-xesquina2[1])/2 + xesquina2[1], pygame.math.Vector2(xesquina2[0]-xesquina4[0],xesquina2[1]-xesquina4[1])*0.5)
+                            xcentre3 = ((xesquina4[0]-xesquina3[0])/2 + xesquina3[0], (xesquina4[1]-xesquina3[1])/2 + xesquina3[1], pygame.math.Vector2(xesquina4[0]-xesquina3[0],xesquina4[1]-xesquina3[1])*0.5)
+                            xcentres = [xcentre1, xcentre2, xcentre3, xcentre4]
+                            xvector_colisió = pygame.math.Vector2(100000,100000)
+                            for i in xcentres:
+                                vector = pygame.math.Vector2(posició_xoc[0]-i[0],posició_xoc[1]-i[1])
+                                i2_negatiu = i[2].rotate(180)
+                                if vector.length() < i[2].length() and vector.length() < xvector_colisió.length():
+                                    xcolisió_centre = i
+                                    xvector_colisió = vector
+                                    if vector.length()<=self.radi:
+                                        xvector_colisió = pygame.math.Vector2(100000,100000)    
+                                    xvector_negatiu = i2_negatiu
+                            if x.tipo == 3 or x.tipo == 5:
+                                if abs(xcolisió_centre[2].angle_to((-1,0)) - xvector_colisió.angle_to((-1,0))) <  abs(xvector_negatiu.angle_to((-1,0)) - xvector_colisió.angle_to((-1,0))):
+                                    self.velocitat +=(z*15)*xvector_colisió.length()/xcolisió_centre[2].length()
+                            if x.tipo == 1:
+                                if abs(xcolisió_centre[2].angle_to((-1,0)) - xvector_colisió.angle_to((-1,0))) >  abs(xvector_negatiu.angle_to((-1,0)) - xvector_colisió.angle_to((-1,0))):
+                                    self.velocitat +=(z*15)*xvector_colisió.length()/xcolisió_centre[2].length()
                 else:
                     if x.z == 0:
                         x.z =1
@@ -279,6 +302,20 @@ def colisió_cercles(self,x, llista_ocells, llista_objectes_rectangulars, llista
                                 else:
                                     xvelocitat_angle =- abs((x.velocitat[1]) * xmeitat1*0.5*x.alçada)/(xtotal*x.amplada)
                             x.rotacions.append((xvelocitat_angle, round(posició_xoc[1])))
+                            if min(x.rotacions, key = lambda i: i[0])[0] * max(x.rotacions, key = lambda i: i[0])[0] <0:
+                                    x.velocitat_angle = 0
+                                    x.rotar = False
+                                    if x.angle%90 == 0: 
+                                        x.centre_no_rotar = [xcentre3[0], xcentre3[1], xcentre1[0], xcentre1[1]]
+                                    elif posició_xoc in xesquines:
+                                        if x.angle%90 <= 45:
+                                            x.centre_no_rotar = [xcentre4[0], xcentre4[1], xcentre2[0], xcentre2[1]]
+                                        else:
+                                            x.centre_no_rotar = [xcentre3[0], xcentre3[1], xcentre1[0], xcentre1[1]]
+                                    else:
+                                        xcolisió_centre_2 = (pygame.math.Vector2(xcolisió_centre[0],xcolisió_centre[1]) - antic_centre_x).rotate(180) + antic_centre_x
+                                        x.centre_no_rotar = [xcolisió_centre[0], xcolisió_centre[1], xcolisió_centre_2[0], xcolisió_centre_2[1]]
+                                    x.suma_pes.clear()    
                         elif xmeitat1 < xmeitat2:
                             x.rotar = True
                             if n != 0:    
@@ -292,6 +329,21 @@ def colisió_cercles(self,x, llista_ocells, llista_objectes_rectangulars, llista
                                 else:
                                     xvelocitat_angle = abs((x.velocitat[1]) * xmeitat2*0.5*x.alçada)/(xtotal*x.amplada) 
                             x.rotacions.append((xvelocitat_angle, round(posició_xoc[1])))
+                            if len(x.rotacions)>1:
+                                if min(x.rotacions, key = lambda i: i[0])[0] * max(x.rotacions, key = lambda i: i[0])[0] <0:
+                                    x.velocitat_angle = 0
+                                    x.rotar = False
+                                    if x.angle%90 == 0: 
+                                        x.centre_no_rotar = [xcentre3[0], xcentre3[1], xcentre1[0], xcentre1[1]]
+                                    elif posició_xoc in xesquines:
+                                        if x.angle%90 <= 45:
+                                            x.centre_no_rotar = [xcentre4[0], xcentre4[1], xcentre2[0], xcentre2[1]]
+                                        else:
+                                            x.centre_no_rotar = [xcentre3[0], xcentre3[1], xcentre1[0], xcentre1[1]]
+                                    else:
+                                        xcolisió_centre_2 = (pygame.math.Vector2(xcolisió_centre[0],xcolisió_centre[1]) - antic_centre_x).rotate(180) + antic_centre_x
+                                        x.centre_no_rotar = [xcolisió_centre[0], xcolisió_centre[1], xcolisió_centre_2[0], xcolisió_centre_2[1]]
+                                    x.suma_pes.clear()    
                     if diferencia_angle_x > 90 and x.velocitat.length() > 0:
                         if x.rotar == False:
                             x.centre_no_rotar[0] += x.rectangle.center[0] - antic_centre_x[0] 

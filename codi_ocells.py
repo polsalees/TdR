@@ -119,7 +119,7 @@ class ocell():
     def calcul_posició_primer_xoc (self):
         if self.tocat_objecte == False:
             self.posició_primer_xoc = self.rectangle.center 
-            self.superficie_ocell = self.superficie_ocell_3
+            self.superficie_ocell = self.superficie_ocell_3    
             self.tocat_objecte = True
             self.llista_copia.clear()
     
@@ -196,7 +196,8 @@ class ocell():
                 self.cooldown += 1
         else:
             self.cooldown = 0
-        if self.cooldown >= 30:    
+        if self.cooldown >= 30 or self.posició_real[1] > self.pantalla.get_height()+self.radi:    
+            self.calcul_posició_primer_xoc()
             nombre_ocells-=1 
             llista_objectes_pantalla.remove(self)
         self.colisionat = False

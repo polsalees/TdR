@@ -235,7 +235,7 @@ def rotacions(self,x, posició_xoc_s, ns, nx, rectangle_xoc, centre1,centre2,cen
                             else:
                                 self.centre_no_rotar = [centre3[0], centre3[1], centre1[0], centre1[1]]
                         else:
-                            colisió_centre_2 = (pygame.math.Vector2(colisió_centre[0],colisió_centre[1]) - self.rectangle.center).rotate(180) + self.rectangle.center
+                            colisió_centre_2 = (pygame.math.Vector2(colisió_centre[0],colisió_centre[1]) - antic_centre).rotate(180) + antic_centre
                             self.centre_no_rotar = [colisió_centre[0], colisió_centre[1], colisió_centre_2[0], colisió_centre_2[1]]
                         self.suma_pes.clear()    
             elif meitat1 < meitat2:
@@ -264,7 +264,7 @@ def rotacions(self,x, posició_xoc_s, ns, nx, rectangle_xoc, centre1,centre2,cen
                             else:
                                 self.centre_no_rotar = [centre3[0], centre3[1], centre1[0], centre1[1]]
                         else:
-                            colisió_centre_2 = (pygame.math.Vector2(colisió_centre[0],colisió_centre[1]) - self.rectangle.center).rotate(180) + self.rectangle.center
+                            colisió_centre_2 = (pygame.math.Vector2(colisió_centre[0],colisió_centre[1]) - antic_centre).rotate(180) + antic_centre
                             self.centre_no_rotar = [colisió_centre[0], colisió_centre[1], colisió_centre_2[0], colisió_centre_2[1]]
                         self.suma_pes.clear()    
     elif self.rotar:
@@ -279,7 +279,7 @@ def rotacions(self,x, posició_xoc_s, ns, nx, rectangle_xoc, centre1,centre2,cen
             else:
                 self.centre_no_rotar = [centre3[0], centre3[1], centre1[0], centre1[1]]
         else:
-            colisió_centre_2 = (pygame.math.Vector2(colisió_centre[0],colisió_centre[1]) - self.rectangle.center).rotate(180) + self.rectangle.center
+            colisió_centre_2 = (pygame.math.Vector2(colisió_centre[0],colisió_centre[1]) - antic_centre).rotate(180) + antic_centre
             self.centre_no_rotar = [colisió_centre[0], colisió_centre[1], colisió_centre_2.x, colisió_centre_2.y] 
         self.rotacions.append((-1,0))
         self.rotacions.append((1,0))
