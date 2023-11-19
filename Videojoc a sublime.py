@@ -381,7 +381,6 @@ def GameLoop():
         else:
             n2 += 1
             if n==0:
-                nivell_actual = 9
                 sprites.extend(nivells_caixes_i_porcs[nivell_actual])
                 llista_objectes_pantalla.extend(nivells_caixes_i_porcs[nivell_actual])
                 for i in llista_objectes_pantalla:
