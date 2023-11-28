@@ -57,10 +57,7 @@ class caixa():
             self.color_borde = gris 
             self.color = pedra
         self.superficie_rectangle.fill(self.color)
-        if self.amplada < self.alçada:    
-            pygame.draw.rect(self.superficie_rectangle, self.color_borde , ((0,0), (self.amplada, self.alçada)), 10 - (100//self.amplada))
-        else:
-            pygame.draw.rect(self.superficie_rectangle, self.color_borde , ((0,0), (self.amplada, self.alçada)), 10 - (100//self.alçada))
+        pygame.draw.rect(self.superficie_rectangle, self.color_borde , ((0,0), (self.amplada, self.alçada)), 10 - (100//self.alçada))
         self.tipo = tipo 
         if self.tipo == 5:
             pygame.draw.rect(self.superficie_rectangle, vermell, ((self.amplada*0.2, self.alçada*0.25), (self.amplada/15, self.alçada/2)))

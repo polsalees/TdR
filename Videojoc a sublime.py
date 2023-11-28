@@ -12,7 +12,7 @@ FPS = 140
 negre = (0, 0, 0)
 blanc = (255, 255, 255)
 vermell = (255, 0, 0)
-vermell2 = (200, 0, 0)
+vermell2 = (150, 0, 0)
 verd = (0, 255, 0)
 verd_fosc = (45,87,44)
 blau = (0, 0, 255)
@@ -30,6 +30,7 @@ fons = (30,33,61)
 fons2 = (80, 80, 255)
 gris=(50,50,50)
 pedra = (139,140,122)
+groc2 = (159,120,0)
 
 # Preparar la pantalla
 info = pygame.display.Info() 
@@ -112,89 +113,98 @@ def selecció_nivell(estrelles):
     nivell_seleccionat = 1
     selecció_nivell_acabada = False
     sortir_selecció = False
-    cercle_pos = 0  # Variable per fer seguiment de la posició del cercle vermell
-    cercle_color = vermell  # Color vermell (RGB)
-    cercle_transparència = 150  # Valor d'alfa per la transparència (0 a 255)
+    polygon1 = [pygame.math.Vector2(0, -100),pygame.math.Vector2(0, 50).rotate(72*3) , pygame.math.Vector2(0, -100).rotate(72),pygame.math.Vector2(0, 50).rotate(72*4), pygame.math.Vector2(0, -100).rotate(72*2), pygame.math.Vector2(0, 50), pygame.math.Vector2(0, -100).rotate(72*3),pygame.math.Vector2(0, 50).rotate(72), pygame.math.Vector2(0, -100).rotate(72*4), pygame.math.Vector2(0, 50).rotate(72*2)]
+    for i in polygon1:
+        i*=0.45
+        i +=(pantalla_amplada-50,70)
+    polygon2 = [pygame.math.Vector2(0, -100),pygame.math.Vector2(0, 50).rotate(72*3) , pygame.math.Vector2(0, -100).rotate(72),pygame.math.Vector2(0, 50).rotate(72*4), pygame.math.Vector2(0, -100).rotate(72*2), pygame.math.Vector2(0, 50), pygame.math.Vector2(0, -100).rotate(72*3),pygame.math.Vector2(0, 50).rotate(72), pygame.math.Vector2(0, -100).rotate(72*4), pygame.math.Vector2(0, 50).rotate(72*2)]
+    for i in polygon2:
+        i*=0.3
+        i += (pantalla_amplada-50,70)
+    font = pygame.font.Font(None, 150)
+    text1 = font.render("Nivells", True, taronja)
+    numeros = [str(i) for i in range(1, 13)]
+    textos = [font.render(num, True, taronja) for num in numeros]
+
+    posicions = [(pantalla_amplada // 5, pantalla_alçada * 2 // 5),
+          (pantalla_amplada * 2 // 5, pantalla_alçada * 2 // 5),
+          (pantalla_amplada * 3 // 5, pantalla_alçada * 2 // 5),
+          (pantalla_amplada * 4 // 5, pantalla_alçada * 2 // 5),
+          (pantalla_amplada // 5, pantalla_alçada * 3 // 5),
+          (pantalla_amplada * 2 // 5, pantalla_alçada * 3 // 5),
+          (pantalla_amplada * 3 // 5, pantalla_alçada * 3 // 5),
+          (pantalla_amplada * 4 // 5, pantalla_alçada * 3 // 5),
+          (pantalla_amplada // 5, pantalla_alçada * 4 // 5),
+          (pantalla_amplada * 2 // 5, pantalla_alçada * 4 // 5),
+          (pantalla_amplada * 3 // 5, pantalla_alçada * 4 // 5),
+          (pantalla_amplada * 4 // 5, pantalla_alçada * 4 // 5)]
+
+    font_gran = pygame.font.Font(None, 150)  # Mida de la font més gran
     while not selecció_nivell_acabada:
         for event in pygame.event.get():
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_RIGHT and nivell_seleccionat < 12:
                     nivell_seleccionat += 1
-                    cercle_pos += 1  # Actualitza la posició del cercle a la dreta
                 elif event.key == pygame.K_LEFT and nivell_seleccionat > 1:
                     nivell_seleccionat -= 1
-                    cercle_pos -= 1  # Actualitza la posició del cercle a la dreta
                 elif event.key == pygame.K_DOWN and nivell_seleccionat < 12:
                     nivell_seleccionat += 4
-                    cercle_pos += 4  # Actualitza la posició del cercle a la dreta
                     if nivell_seleccionat > 12:
                         nivell_seleccionat = 12
-                        cercle_pos = 11
                 elif event.key == pygame.K_UP and nivell_seleccionat > 1:
                     nivell_seleccionat -= 4
-                    cercle_pos -= 4  # Actualitza la posició del cercle a la dreta
                     if nivell_seleccionat < 1:
                         nivell_seleccionat = 1
-                        cercle_pos = 0
-                elif event.key == pygame.K_SPACE:
+                elif event.key == pygame.K_SPACE and llista_estrelles[nivell_seleccionat-1][1] == False:
                     selecció_nivell_acabada = True
                 elif event.key == pygame.K_ESCAPE:
                     selecció_nivell_acabada = True
                     sortir_selecció = True
-        
+                if event.key == pygame.K_s:
+                    for i in llista_estrelles:
+                        i[1] = False
         pantalla.fill(fons2)
-        if cercle_pos > 8:
-            cercle_radi = 70
-        else:  
-            cercle_radi = 60
-        font = pygame.font.Font(None, 150)
-        text1 = font.render("Nivells", True, taronja)
-
         pantalla.blit(text1, (pantalla_amplada // 2 - text1.get_width() // 2, pantalla_alçada // 5 - text1.get_height() // 2 ))
-
         # Crear una llista de textos de números de l'1 al 12
-        numeros = [str(i) for i in range(1, 13)]
-        textos = [font.render(num, True, taronja) for num in numeros]
-
-        posicions = [(pantalla_amplada // 5, pantalla_alçada * 2 // 5),
-              (pantalla_amplada * 2 // 5, pantalla_alçada * 2 // 5),
-              (pantalla_amplada * 3 // 5, pantalla_alçada * 2 // 5),
-              (pantalla_amplada * 4 // 5, pantalla_alçada * 2 // 5),
-              (pantalla_amplada // 5, pantalla_alçada * 3 // 5),
-              (pantalla_amplada * 2 // 5, pantalla_alçada * 3 // 5),
-              (pantalla_amplada * 3 // 5, pantalla_alçada * 3 // 5),
-              (pantalla_amplada * 4 // 5, pantalla_alçada * 3 // 5),
-              (pantalla_amplada // 5, pantalla_alçada * 4 // 5),
-              (pantalla_amplada * 2 // 5, pantalla_alçada * 4 // 5),
-              (pantalla_amplada * 3 // 5, pantalla_alçada * 4 // 5),
-              (pantalla_amplada * 4 // 5, pantalla_alçada * 4 // 5)]
-
-        font_gran = pygame.font.Font(None, 150)  # Mida de la font més gran
-        cercle_x, cercle_y = posicions[cercle_pos]
-        cercle_superficie = pygame.Surface((cercle_radi * 2, cercle_radi * 2), pygame.SRCALPHA)
-        pygame.draw.circle(cercle_superficie, cercle_color + (cercle_transparència,), (cercle_radi, cercle_radi), cercle_radi)
-        pantalla.blit(cercle_superficie, (cercle_x - cercle_radi, cercle_y - cercle_radi -5))
         for i, text in enumerate(textos):
             pos = posicions[i]
-            num_text = font_gran.render(str(i+1), True, taronja)
-            num_x = pos[0] - num_text.get_width() // 2
-            num_y = pos[1] - num_text.get_height() // 2
-            pantalla.blit(num_text, (num_x, num_y))
+            estrella = llista_estrelles[i][0]
+            nivell_bloquejat = llista_estrelles[i][1]
+            if nivell_bloquejat:
+                color1 = gris
+                color2 = negre
+            elif estrella == 3:
+                color1 = verd
+                color2 = verd_fosc
+            elif estrella == 2:
+                color1 = groc
+                color2 = groc2
+            elif estrella == 1:
+                color1 = taronja
+                color2 = taronja3
+            elif estrella == 0:
+                color1 = vermell
+                color2 = vermell2
+            num_text = font_gran.render(str(i+1), True, color2)
+            if num_text.get_height() > num_text.get_width():
+                amplada = num_text.get_height()*1.2
+            else:
+                amplada = num_text.get_width()*1.2
+            if nivell_seleccionat == i+1:
+                num_text = pygame.transform.scale(num_text, (num_text.get_width()*1.2,num_text.get_height()*1.2))
+                amplada *=1.2
+            rectangle = pygame.Rect((0,0), (amplada, amplada))
+            rectangle.center = pos
+            pygame.draw.rect(pantalla, color1, rectangle)
+            pygame.draw.rect(pantalla, color2, rectangle, 8)
+            rectangle2 = num_text.get_rect(center = pos)
+            pantalla.blit(num_text, rectangle2)
         font = pygame.font.Font(None, 130)
         text4 = font.render(estrelles, True, groc)
         pantalla.blit(text4, (pantalla_amplada-(100+text4.get_width()), 28))
-        z = [pygame.math.Vector2(0, -100),pygame.math.Vector2(0, 50).rotate(72*3) , pygame.math.Vector2(0, -100).rotate(72),pygame.math.Vector2(0, 50).rotate(72*4), pygame.math.Vector2(0, -100).rotate(72*2), pygame.math.Vector2(0, 50), pygame.math.Vector2(0, -100).rotate(72*3),pygame.math.Vector2(0, 50).rotate(72), pygame.math.Vector2(0, -100).rotate(72*4), pygame.math.Vector2(0, 50).rotate(72*2)]
-        for i in z:
-            i*=0.45
-            i +=(pantalla_amplada-50,70)
-        x = [pygame.math.Vector2(0, -100),pygame.math.Vector2(0, 50).rotate(72*3) , pygame.math.Vector2(0, -100).rotate(72),pygame.math.Vector2(0, 50).rotate(72*4), pygame.math.Vector2(0, -100).rotate(72*2), pygame.math.Vector2(0, 50), pygame.math.Vector2(0, -100).rotate(72*3),pygame.math.Vector2(0, 50).rotate(72), pygame.math.Vector2(0, -100).rotate(72*4), pygame.math.Vector2(0, 50).rotate(72*2)]
-        for i in x:
-            i*=0.3
-            i += (pantalla_amplada-50,70)
-        pygame.draw.polygon(pantalla, taronja3, z)
-        pygame.draw.polygon(pantalla, taronja, x)
+        pygame.draw.polygon(pantalla, taronja3, polygon1)
+        pygame.draw.polygon(pantalla, taronja, polygon2)
         pygame.display.flip()
-
     if sortir_selecció:
         return None
     else:
@@ -365,7 +375,7 @@ def reinici():
     camara.principi_nivell = True
     total_estrelles = 0
     for i in llista_estrelles:
-        total_estrelles+=i
+        total_estrelles+=i[0]
 
 #Definim camera
 camara = camera(pantalla_amplada, pantalla_alçada, pantalla)
@@ -399,7 +409,7 @@ nivell12 = [porc_estandar.copy((1000,pantalla_alçada-40), llista_porcs, llista_
 nivells_caixes_i_porcs = {1:nivell1, 2:nivell2, 3:nivell3, 4:nivell4, 5:nivell5, 6:nivell6, 7:nivell7, 8:nivell8, 9:nivell9, 10:nivell10, 11:nivell11, 12:nivell12}
 
 #llista_estrelles_nivells
-llista_estrelles = [0,0,0,0,0,0,0,0,0,0,0,0]
+llista_estrelles = [[0,False],[1,True],[2,True],[3,True],[0,True],[0,True],[0,True],[0,True],[0,True],[0,True],[0,True],[0,True]]
 total_estrelles = 0
 
 # Game GameLoop
@@ -552,11 +562,15 @@ def GameLoop():
                 estrelles+=2
                 if estrelles < 1:
                     estrelles = 1
+                elif estrelles >3:
+                    estrelles = 3
+                llista_estrelles[nivell_actual-1][0] = estrelles
+                if nivell_actual != 12:
+                    llista_estrelles[nivell_actual][1] = True
                 reinici()
                 partida = pantalla_final(True,estrelles, str(total_estrelles))
                 n = 0
                 nombre_porcs_orig = 0
-                llista_estrelles[nivell_actual-1] = estrelles
                 nivell_actual+=1
                 nombre_ocells = 0
                 n2 = 0
