@@ -108,7 +108,7 @@ rectangle_gran_2 = caixa([pantalla_amplada - 180, pantalla_alçada-105], 20, 400
 tnt = caixa([pantalla_amplada - 280, pantalla_alçada-405], 50, 50, True, 0,5, llista_objectes_rectangulars,pantalla)
 
 # Selecció de nivell
-def selecció_nivell():
+def selecció_nivell(estrelles):
     nivell_seleccionat = 1
     selecció_nivell_acabada = False
     sortir_selecció = False
@@ -180,6 +180,19 @@ def selecció_nivell():
             num_x = pos[0] - num_text.get_width() // 2
             num_y = pos[1] - num_text.get_height() // 2
             pantalla.blit(num_text, (num_x, num_y))
+        font = pygame.font.Font(None, 130)
+        text4 = font.render(estrelles, True, groc)
+        pantalla.blit(text4, (pantalla_amplada-(100+text4.get_width()), 28))
+        z = [pygame.math.Vector2(0, -100),pygame.math.Vector2(0, 50).rotate(72*3) , pygame.math.Vector2(0, -100).rotate(72),pygame.math.Vector2(0, 50).rotate(72*4), pygame.math.Vector2(0, -100).rotate(72*2), pygame.math.Vector2(0, 50), pygame.math.Vector2(0, -100).rotate(72*3),pygame.math.Vector2(0, 50).rotate(72), pygame.math.Vector2(0, -100).rotate(72*4), pygame.math.Vector2(0, 50).rotate(72*2)]
+        for i in z:
+            i*=0.45
+            i +=(pantalla_amplada-50,70)
+        x = [pygame.math.Vector2(0, -100),pygame.math.Vector2(0, 50).rotate(72*3) , pygame.math.Vector2(0, -100).rotate(72),pygame.math.Vector2(0, 50).rotate(72*4), pygame.math.Vector2(0, -100).rotate(72*2), pygame.math.Vector2(0, 50), pygame.math.Vector2(0, -100).rotate(72*3),pygame.math.Vector2(0, 50).rotate(72), pygame.math.Vector2(0, -100).rotate(72*4), pygame.math.Vector2(0, 50).rotate(72*2)]
+        for i in x:
+            i*=0.3
+            i += (pantalla_amplada-50,70)
+        pygame.draw.polygon(pantalla, taronja3, z)
+        pygame.draw.polygon(pantalla, taronja, x)
         pygame.display.flip()
 
     if sortir_selecció:
@@ -188,7 +201,7 @@ def selecció_nivell():
         return nivell_seleccionat
 
 # Menú principal
-def menú():
+def menú(estrelles):
     global nivell_actual
     while True:
         for event in pygame.event.get():
@@ -196,7 +209,7 @@ def menú():
                 if event.key == pygame.K_ESCAPE:
                     return False
                 elif event.key == pygame.K_SPACE:
-                    dificultat = selecció_nivell()
+                    dificultat = selecció_nivell(estrelles)
                     if dificultat:
                         print("Dificultat seleccionada:", dificultat)
                         nivell_actual = dificultat
@@ -208,14 +221,27 @@ def menú():
         font = pygame.font.Font(None, 300)
         text = font.render("Angry Birds", True, taronja)
         pantalla.blit(text, (pantalla_amplada // 2 - text.get_width() // 2, pantalla_alçada*2 // 5 - text.get_height() // 2))
-        font = pygame.font.Font(None, 75)
-        text2 = font.render("ESPAI PER CONTINUAR", True, taronja)
+        font3 = pygame.font.Font(None, 75)
+        text2 = font3.render("ESPAI PER CONTINUAR", True, taronja)
         pantalla.blit(text2, (pantalla_amplada *0.3 - text2.get_width() // 2, pantalla_alçada*4 // 5 - text2.get_height() // 2))
-        text3 = font.render("'i' PER INFO", True, taronja)
+        text3 = font3.render("'i' PER INFO", True, taronja)
         pantalla.blit(text3, (pantalla_amplada*0.75 - text3.get_width() // 2, pantalla_alçada*4 // 5 - text3.get_height() // 2))
         font2 = pygame.font.Font(None, 60)
         text1 = font2.render("ESC per a sortir", True, groc)
         pantalla.blit(text1, (text1.get_width()*0.2, text1.get_height()*1.5))
+        font = pygame.font.Font(None, 130)
+        text4 = font.render(estrelles, True, groc)
+        pantalla.blit(text4, (pantalla_amplada-(100+text4.get_width()), 28))
+        z = [pygame.math.Vector2(0, -100),pygame.math.Vector2(0, 50).rotate(72*3) , pygame.math.Vector2(0, -100).rotate(72),pygame.math.Vector2(0, 50).rotate(72*4), pygame.math.Vector2(0, -100).rotate(72*2), pygame.math.Vector2(0, 50), pygame.math.Vector2(0, -100).rotate(72*3),pygame.math.Vector2(0, 50).rotate(72), pygame.math.Vector2(0, -100).rotate(72*4), pygame.math.Vector2(0, 50).rotate(72*2)]
+        for i in z:
+            i*=0.45
+            i +=(pantalla_amplada-50,70)
+        x = [pygame.math.Vector2(0, -100),pygame.math.Vector2(0, 50).rotate(72*3) , pygame.math.Vector2(0, -100).rotate(72),pygame.math.Vector2(0, 50).rotate(72*4), pygame.math.Vector2(0, -100).rotate(72*2), pygame.math.Vector2(0, 50), pygame.math.Vector2(0, -100).rotate(72*3),pygame.math.Vector2(0, 50).rotate(72), pygame.math.Vector2(0, -100).rotate(72*4), pygame.math.Vector2(0, 50).rotate(72*2)]
+        for i in x:
+            i*=0.3
+            i += (pantalla_amplada-50,70)
+        pygame.draw.polygon(pantalla, taronja3, z)
+        pygame.draw.polygon(pantalla, taronja, x)
         pygame.display.flip()
 def info():
     global nivell_actual
@@ -261,7 +287,7 @@ def info():
         text1 = font2.render("ESC per a sortir", True, groc)
         pantalla.blit(text1, (text1.get_width()*0.2, text1.get_height()*1.5))
         pygame.display.flip()
-def pantalla_final(tipo, estrelles):
+def pantalla_final(tipo, estrelles, estrelles2):
     global partida
     if tipo == True:
         texto = "VICTÒRIA"
@@ -308,6 +334,19 @@ def pantalla_final(tipo, estrelles):
             pygame.draw.polygon(pantalla, color_estrella, x)
             n-=1
             color-=1
+        font = pygame.font.Font(None, 130)
+        text4 = font.render(estrelles2, True, groc)
+        pantalla.blit(text4, (pantalla_amplada-(100+text4.get_width()), 28))
+        z = [pygame.math.Vector2(0, -100),pygame.math.Vector2(0, 50).rotate(72*3) , pygame.math.Vector2(0, -100).rotate(72),pygame.math.Vector2(0, 50).rotate(72*4), pygame.math.Vector2(0, -100).rotate(72*2), pygame.math.Vector2(0, 50), pygame.math.Vector2(0, -100).rotate(72*3),pygame.math.Vector2(0, 50).rotate(72), pygame.math.Vector2(0, -100).rotate(72*4), pygame.math.Vector2(0, 50).rotate(72*2)]
+        for i in z:
+            i*=0.45
+            i +=(pantalla_amplada-50,70)
+        x = [pygame.math.Vector2(0, -100),pygame.math.Vector2(0, 50).rotate(72*3) , pygame.math.Vector2(0, -100).rotate(72),pygame.math.Vector2(0, 50).rotate(72*4), pygame.math.Vector2(0, -100).rotate(72*2), pygame.math.Vector2(0, 50), pygame.math.Vector2(0, -100).rotate(72*3),pygame.math.Vector2(0, 50).rotate(72), pygame.math.Vector2(0, -100).rotate(72*4), pygame.math.Vector2(0, 50).rotate(72*2)]
+        for i in x:
+            i*=0.3
+            i += (pantalla_amplada-50,70)
+        pygame.draw.polygon(pantalla, taronja3, z)
+        pygame.draw.polygon(pantalla, taronja, x)
         pygame.display.flip()
     return y
 #Definim reinici al sortir del nivell
@@ -315,6 +354,7 @@ def reinici():
     global llista_objectes_pantalla
     global sprites
     global llista_ocells_llançats
+    global total_estrelles
     for i in sprites:
         i.reinici()
     llista_objectes_pantalla = [terra, paret_dreta, paret_esquerra]
@@ -323,6 +363,9 @@ def reinici():
     camara.diferencia *= 0 
     camara.rectangle_camara.topleft = camara.rectangle_camara_orig
     camara.principi_nivell = True
+    total_estrelles = 0
+    for i in llista_estrelles:
+        total_estrelles+=i
 
 #Definim camera
 camara = camera(pantalla_amplada, pantalla_alçada, pantalla)
@@ -355,6 +398,10 @@ nivell11 = [porc_estandar.copy((1000,pantalla_alçada-40), llista_porcs, llista_
 nivell12 = [porc_estandar.copy((1000,pantalla_alçada-40), llista_porcs, llista_objectes_rodons)]
 nivells_caixes_i_porcs = {1:nivell1, 2:nivell2, 3:nivell3, 4:nivell4, 5:nivell5, 6:nivell6, 7:nivell7, 8:nivell8, 9:nivell9, 10:nivell10, 11:nivell11, 12:nivell12}
 
+#llista_estrelles_nivells
+llista_estrelles = [0,0,0,0,0,0,0,0,0,0,0,0]
+total_estrelles = 0
+
 # Game GameLoop
 def GameLoop():
     global nivell_actual
@@ -369,7 +416,7 @@ def GameLoop():
     while True:
         rellotge.tick(FPS)
         if not partida:
-            if not menú():
+            if not menú(str(total_estrelles)):
                 break
             reinici()
             partida = True
@@ -505,10 +552,11 @@ def GameLoop():
                 estrelles+=2
                 if estrelles < 1:
                     estrelles = 1
-                partida = pantalla_final(True,estrelles)
                 reinici()
+                partida = pantalla_final(True,estrelles, str(total_estrelles))
                 n = 0
                 nombre_porcs_orig = 0
+                llista_estrelles[nivell_actual-1] = estrelles
                 nivell_actual+=1
                 nombre_ocells = 0
                 n2 = 0
@@ -520,7 +568,7 @@ def GameLoop():
                 nombre_porcs = 0
                 nombre_porcs_orig = 0
                 n2 = 0
-                partida = pantalla_final(False,0)
+                partida = pantalla_final(False,0, str(total_estrelles))
          # Recarregar la pantalla
         pygame.display.flip()
     # Sortir del joc

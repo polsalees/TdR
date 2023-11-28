@@ -294,6 +294,7 @@ def colisió_cercles(self,x, llista_ocells, llista_objectes_rectangulars, llista
                                         xmeitat1 +=1 
                         if xmeitat1 > xmeitat2:
                             x.rotar = True
+                            x.n = 0
                             if n != 0:    
                                 if abs(xcentre4[2].length() - 0.5*x.amplada) < abs(xcentre4[2].length() - 0.5*x.alçada):
                                     xvelocitat_angle = -abs((x.velocitat[1]) * xmeitat1*0.5)/xtotal
@@ -321,6 +322,7 @@ def colisió_cercles(self,x, llista_ocells, llista_objectes_rectangulars, llista
                                     x.suma_pes.clear()    
                         elif xmeitat1 < xmeitat2:
                             x.rotar = True
+                            x.n = 0
                             if n != 0:    
                                 if abs(xcentre4[2].length() - 0.5*x.amplada) < abs(xcentre4[2].length() - 0.5*x.alçada):
                                     xvelocitat_angle = abs((x.velocitat[1]) * xmeitat2*0.5)/xtotal
