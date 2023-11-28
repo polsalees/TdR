@@ -409,7 +409,7 @@ nivell12 = [porc_estandar.copy((1000,pantalla_alçada-40), llista_porcs, llista_
 nivells_caixes_i_porcs = {1:nivell1, 2:nivell2, 3:nivell3, 4:nivell4, 5:nivell5, 6:nivell6, 7:nivell7, 8:nivell8, 9:nivell9, 10:nivell10, 11:nivell11, 12:nivell12}
 
 #llista_estrelles_nivells
-llista_estrelles = [[0,False],[1,True],[2,True],[3,True],[0,True],[0,True],[0,True],[0,True],[0,True],[0,True],[0,True],[0,True]]
+llista_estrelles = [[0,False],[0,True],[0,True],[0,True],[0,True],[0,True],[0,True],[0,True],[0,True],[0,True],[0,True],[0,True]]
 total_estrelles = 0
 
 # Game GameLoop
@@ -566,7 +566,7 @@ def GameLoop():
                     estrelles = 3
                 llista_estrelles[nivell_actual-1][0] = estrelles
                 if nivell_actual != 12:
-                    llista_estrelles[nivell_actual][1] = True
+                    llista_estrelles[nivell_actual][1] = False
                 reinici()
                 partida = pantalla_final(True,estrelles, str(total_estrelles))
                 n = 0

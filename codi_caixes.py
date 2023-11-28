@@ -176,9 +176,9 @@ class caixa():
                 angle =(self.posició_no_rotació-self.rectangle.center).angle_to((-1,0)) 
                 if angle >=180:
                     angle -=180
-                if abs(angle - self.angle_no_rotar) > 5:
-                    self.rotar = True
+                if abs(angle - self.angle_no_rotar) > 5 and (abs(self.rectangle.center[0] - self.rectangle_orig[0])>1 or abs(self.rectangle.center[1] - self.rectangle_orig[1])>1):
                     self.n = 0
+                    self.rotar = True
             if self.velocitat_angle != 0: 
                 self.pivot_pantalla += self.velocitat
                 self.rectangle_2 = self.superficie_rectangle.get_rect(topleft = (self.pivot_pantalla[0]- self.pivot[0], self.pivot_pantalla[1]- self.pivot[1]))
@@ -385,7 +385,8 @@ class caixa():
                     if nx == 1:
                         nx -=1
                         n -=1
-                    if self.rotar:    
+                    if self.rotar:
+                        self.velocitat_angle = 0    
                         self.rotar = False
                         self.centre_no_rotar = centre
                         nou_angle = abs(round(x.angle)%90 + -1*(round(self.angle)%90))
@@ -408,6 +409,7 @@ class caixa():
                         n -=1
                     posició_xoc = (xesquines_xoc[0]-xesquines_xoc[1])*0.5 +xesquines_xoc[1]
                     if x.rotar:    
+                        x.velocitat_angle = 0
                         x.rotar = False
                         nou_angle = abs(round(x.angle)%90 + -1*(round(self.angle)%90))
                         nou_angle2 = abs(-1*(round(x.angle)%90)+round(self.angle)%90)

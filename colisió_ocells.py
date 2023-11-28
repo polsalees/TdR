@@ -122,7 +122,10 @@ def colisió_cercles(self,x, llista_ocells, llista_objectes_rectangulars, llista
                     rampa = x
                     if n == 2:
                         x.rotar = False
-                        x.centre_no_rotar = xcentre 
+                        x.centre_no_rotar = xcentre
+                        x.rotacions.append((-1,0))
+                        x.rotacions.append((1,0))
+                        x.velocitat_angle = 0 
                 if rampa == self:
                     self.angle_rampa = calcul_angle_cercle(self,posició_xoc)
                 else:

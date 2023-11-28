@@ -211,7 +211,6 @@ def rotacions(self,x, posició_xoc_s, ns, nx, rectangle_xoc, centre1,centre2,cen
                         meitat2 = meitat5
             if meitat1 > meitat2:
                 self.rotar = True
-                self.n = 0
                 if posició_xoc_s in esquines:    
                     if abs(centre4[2].length() - 0.5*self.amplada) < abs(centre4[2].length() - 0.5*self.alçada):
                         svelocitat_angle = -abs(meitat1*0.5)/(total*self.amplada/100)
@@ -237,10 +236,11 @@ def rotacions(self,x, posició_xoc_s, ns, nx, rectangle_xoc, centre1,centre2,cen
                         else:
                             colisió_centre_2 = (pygame.math.Vector2(colisió_centre[0],colisió_centre[1]) - antic_centre).rotate(180) + antic_centre
                             self.centre_no_rotar = [colisió_centre[0], colisió_centre[1], colisió_centre_2[0], colisió_centre_2[1]]
-                        self.suma_pes.clear()    
+                        self.suma_pes.clear() 
+                else:
+                    self.n = 0   
             elif meitat1 < meitat2:
                 self.rotar = True
-                self.n = 0
                 if posició_xoc_s in esquines:    
                     if abs(centre3[2].length() - 0.5*self.amplada) < abs(centre3[2].length() - 0.5*self.alçada):
                         svelocitat_angle = abs(meitat2*0.5)/(total*self.amplada/70)
@@ -266,7 +266,9 @@ def rotacions(self,x, posició_xoc_s, ns, nx, rectangle_xoc, centre1,centre2,cen
                         else:
                             colisió_centre_2 = (pygame.math.Vector2(colisió_centre[0],colisió_centre[1]) - antic_centre).rotate(180) + antic_centre
                             self.centre_no_rotar = [colisió_centre[0], colisió_centre[1], colisió_centre_2[0], colisió_centre_2[1]]
-                        self.suma_pes.clear()    
+                        self.suma_pes.clear()
+                else:
+                    self.n = 0    
     elif self.rotar:
         self.angle = round(self.angle)
         self.velocitat_angle = 0
