@@ -126,7 +126,7 @@ class ocell():
     def colisió(self,x, llista_ocells, llista_objectes_rectangulars, llista_objectes_rodons, llista_porcs,nombre_porcs,llista_objectes_pantalla):
         nombre_porcs = colisió_cercles(self,x, llista_ocells, llista_objectes_rectangulars, llista_objectes_rodons, llista_porcs, nombre_porcs,llista_objectes_pantalla)
         return nombre_porcs
-    def calcul_linea_direció(self, diferencia, factor_de_potencia):
+    def calcul_linea_direció(self, diferencia, factor_de_potencia, pantalla):
         self.linea_direció_radi = 5
         self.linea_direció_posició = [self.posició_inicial[0], self.posició_inicial[1]] + diferencia
         self.potencia = distancia_ocell_ratoli(self) - self.radi
@@ -141,13 +141,13 @@ class ocell():
             self.linea_direció_velocitat[1]  += gravetat * 0.2 *(self.linea_direció_moviment%30)
             self.linea_direció_posició[0] += self.linea_direció_velocitat[0] * 0.2 *(self.linea_direció_moviment%30)
             self.linea_direció_posició[1] += self.linea_direció_velocitat[1] * 0.2 *(self.linea_direció_moviment%30)
-            pygame.draw.circle(self.pantalla, blanc, self.linea_direció_posició, self.linea_direció_radi)    
+            pygame.draw.circle(pantalla, blanc, self.linea_direció_posició, self.linea_direció_radi)    
             while self.linea_direció_radi >1:   
                 self.linea_direció_radi -= 0.2
                 self.linea_direció_velocitat[1]  += gravetat * 6
                 self.linea_direció_posició[0] += self.linea_direció_velocitat[0] * 6
                 self.linea_direció_posició[1] += self.linea_direció_velocitat[1] * 6
-                pygame.draw.circle(self.pantalla, blanc, self.linea_direció_posició, self.linea_direció_radi)
+                pygame.draw.circle(pantalla, blanc, self.linea_direció_posició, self.linea_direció_radi)
             self.linea_direció_moviment +=0.5
     def posar_skin(self, imatge):
         if self.skin == False:
@@ -158,9 +158,9 @@ class ocell():
             self.rectangle_skin = self.imatge_skin.get_rect()
         else:
             self.skin = False
-    def estela(self,diferencia): 
+    def estela(self,diferencia, pantalla): 
         for i in self.llista_estela:
-            pygame.draw.circle(self.pantalla, blanc, i[0]+diferencia ,i[1])
+            pygame.draw.circle(pantalla, blanc, i[0]+diferencia ,i[1])
     
     def update(self, nombre_ocells, llista_objectes_pantalla):
         if self.c == 1:
@@ -213,23 +213,37 @@ class ocell():
             self.n+=1
         return nombre_ocells
 
-    def dibuixar(self, diferencia, factor_de_potencia):
+    def dibuixar(self, diferencia, factor_de_potencia, pantalla):
         if self.linea_direció:
-            self.calcul_linea_direció(diferencia, factor_de_potencia)
-        rectangle = self.rectangle_2.copy()   
-        rectangle.topleft += diferencia  
-        if rectangle.colliderect(self.pantalla_rect):  
-            self.pantalla.blit(self.ocell_nou, rectangle)
+            self.calcul_linea_direció(diferencia, factor_de_potencia, pantalla) 
+        if pantalla == self.pantalla:  
+            rectangle = self.rectangle_2.copy()   
+            rectangle.topleft += diferencia   
+            if rectangle.colliderect(self.pantalla_rect):  
+                self.pantalla.blit(self.ocell_nou, rectangle)
+                if self.skin:
+                    imatge_skin_rotada = pygame.transform.rotate(self.imatge_skin, self.angle)
+                    if self.llançat and self.tocat_objecte == False:
+                        self.rectangle_skin = imatge_skin_rotada.get_rect(center =self.rectangle_2.center + diferencia + self.skin_offset.rotate(-self.angle)+pygame.math.Vector2((8/3-2)*self.radi,0).rotate(-self.angle))
+                    else:
+                        self.rectangle_skin = imatge_skin_rotada.get_rect(center =self.rectangle_2.center + diferencia + self.skin_offset.rotate(-self.angle))
+                    self.pantalla.blit(imatge_skin_rotada, self.rectangle_skin)
+                if self.animació:
+                    for i in self.objecte_animació:
+                        pygame.draw.circle(self.pantalla,self.color_animació,i[1]+diferencia,i[0])
+        else:
+            rectangle = self.rectangle_2.topleft + diferencia
+            pantalla.blit(self.ocell_nou, rectangle)
             if self.skin:
                 imatge_skin_rotada = pygame.transform.rotate(self.imatge_skin, self.angle)
                 if self.llançat and self.tocat_objecte == False:
                     self.rectangle_skin = imatge_skin_rotada.get_rect(center =self.rectangle_2.center + diferencia + self.skin_offset.rotate(-self.angle)+pygame.math.Vector2((8/3-2)*self.radi,0).rotate(-self.angle))
                 else:
                     self.rectangle_skin = imatge_skin_rotada.get_rect(center =self.rectangle_2.center + diferencia + self.skin_offset.rotate(-self.angle))
-                self.pantalla.blit(imatge_skin_rotada, self.rectangle_skin)
+                pantalla.blit(imatge_skin_rotada, self.rectangle_skin)
             if self.animació:
                 for i in self.objecte_animació:
-                    pygame.draw.circle(self.pantalla,self.color_animació,i[1]+diferencia,i[0])
+                    pygame.draw.circle(pantalla,self.color_animació,i[1]+diferencia,i[0])
 
     def llançament(self, factor_de_potencia):
         self.rectangle.center = self.posició_inicial

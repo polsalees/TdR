@@ -95,15 +95,23 @@ class porc():
                 if self.animació[0][0] <=1:
                     llista_objectes_pantalla.remove(self)
             self.n+=1
-    def dibuixar(self,diferencia):
-        rectangle = self.rectangle_2.copy()
-        rectangle.topleft += diferencia   
-        if rectangle.colliderect(self.pantalla_rect):    
+    def dibuixar(self,diferencia, pantalla):
+        if self.pantalla == pantalla:    
+            rectangle = self.rectangle_2.copy()
+            rectangle.topleft += diferencia   
+            if rectangle.colliderect(self.pantalla_rect):    
+                if self.porc:    
+                    pantalla.blit(self.porc_nou, rectangle)
+                else:    
+                    for i in self.animació:
+                        pygame.draw.circle(pantalla,cian,i[1]+diferencia,i[0])
+        else:
+            rectangle = self.rectangle_2.topleft + diferencia
             if self.porc:    
-                self.pantalla.blit(self.porc_nou, rectangle)
+                pantalla.blit(self.porc_nou, rectangle)
             else:    
                 for i in self.animació:
-                    pygame.draw.circle(self.pantalla,cian,i[1]+diferencia,i[0])
+                    pygame.draw.circle(pantalla,cian,i[1]+diferencia,i[0])
     def reinici(self):
         self.velocitat *= 0
         if self.movible:

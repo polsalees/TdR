@@ -213,15 +213,23 @@ class caixa():
                 self.rectangle = self.rectangle_nou.get_rect(center = self.posició_real)
                 self.mask = pygame.mask.from_surface(self.rectangle_nou)
 
-    def dibuixar(self, diferencia):
-        rectangle = self.rectangle.copy()
-        rectangle.topleft+=diferencia  
-        if rectangle.colliderect(self.pantalla_rect):    
+    def dibuixar(self, diferencia, pantalla):  
+        if self.pantalla == pantalla: 
+            rectangle = self.rectangle.copy()
+            rectangle.topleft+=diferencia   
+            if rectangle.colliderect(self.pantalla_rect):    
+                if self.caixa: 
+                    pantalla.blit(self.rectangle_nou, rectangle)
+                else:
+                    for i in self.animació:
+                        pygame.draw.circle(pantalla,self.color_animació,i[1]+diferencia,i[0])
+        else:
+            rectangle = self.rectangle.topleft + diferencia
             if self.caixa: 
-                self.pantalla.blit(self.rectangle_nou, rectangle)
+                pantalla.blit(self.rectangle_nou, rectangle)
             else:
                 for i in self.animació:
-                    pygame.draw.circle(self.pantalla,self.color_animació,i[1]+diferencia,i[0])
+                    pygame.draw.circle(pantalla,self.color_animació,i[1]+diferencia,i[0])
     def calcul_angle_rampa(self, pos):
         pos_centre1 = self.vector_centre1.rotate(-self.angle)+ self.rectangle.center
         pos_centre2 = self.vector_centre2.rotate(-self.angle)+ self.rectangle.center
