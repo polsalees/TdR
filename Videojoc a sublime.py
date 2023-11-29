@@ -138,7 +138,6 @@ def selecció_nivell(estrelles):
           (pantalla_amplada * 2 // 5, pantalla_alçada * 4 // 5),
           (pantalla_amplada * 3 // 5, pantalla_alçada * 4 // 5),
           (pantalla_amplada * 4 // 5, pantalla_alçada * 4 // 5)]
-
     font_gran = pygame.font.Font(None, 150)  # Mida de la font més gran
     while not selecció_nivell_acabada:
         for event in pygame.event.get():
@@ -200,7 +199,7 @@ def selecció_nivell(estrelles):
             rectangle2 = num_text.get_rect(center = pos)
             pantalla.blit(num_text, rectangle2)
         font = pygame.font.Font(None, 130)
-        text4 = font.render(estrelles, True, groc)
+        text4 = font.render(str(estrelles-estrelles_gastades), True, groc)
         pantalla.blit(text4, (pantalla_amplada-(100+text4.get_width()), 28))
         pygame.draw.polygon(pantalla, taronja3, polygon1)
         pygame.draw.polygon(pantalla, taronja, polygon2)
@@ -226,21 +225,25 @@ def menú(estrelles):
                         return True
                 elif event.key == pygame.K_i:
                     info()
+                elif event.key == pygame.K_t:
+                    tenda(estrelles)
         pantalla.fill(fons2)
 
         font = pygame.font.Font(None, 300)
         text = font.render("Angry Birds", True, taronja)
         pantalla.blit(text, (pantalla_amplada // 2 - text.get_width() // 2, pantalla_alçada*2 // 5 - text.get_height() // 2))
         font3 = pygame.font.Font(None, 75)
-        text2 = font3.render("ESPAI PER CONTINUAR", True, taronja)
-        pantalla.blit(text2, (pantalla_amplada *0.3 - text2.get_width() // 2, pantalla_alçada*4 // 5 - text2.get_height() // 2))
+        text2 = font3.render("ESPAI PER NIVELLS", True, taronja)
+        pantalla.blit(text2, (pantalla_amplada *0.25 - text2.get_width() // 2, pantalla_alçada*3.5 // 5 - text2.get_height() // 2))
         text3 = font3.render("'i' PER INFO", True, taronja)
-        pantalla.blit(text3, (pantalla_amplada*0.75 - text3.get_width() // 2, pantalla_alçada*4 // 5 - text3.get_height() // 2))
+        pantalla.blit(text3, (pantalla_amplada*0.75 - text3.get_width() // 2, pantalla_alçada*3.5 // 5 - text3.get_height() // 2))
+        text5 = font3.render("'t' PER TENDA", True, taronja)
+        pantalla.blit(text5, (pantalla_amplada*0.5 - text5.get_width() // 2, pantalla_alçada*4.2 // 5 - text5.get_height() // 2))
         font2 = pygame.font.Font(None, 60)
         text1 = font2.render("ESC per a sortir", True, groc)
         pantalla.blit(text1, (text1.get_width()*0.2, text1.get_height()*1.5))
         font = pygame.font.Font(None, 130)
-        text4 = font.render(estrelles, True, groc)
+        text4 = font.render(str(estrelles-estrelles_gastades), True, groc)
         pantalla.blit(text4, (pantalla_amplada-(100+text4.get_width()), 28))
         z = [pygame.math.Vector2(0, -100),pygame.math.Vector2(0, 50).rotate(72*3) , pygame.math.Vector2(0, -100).rotate(72),pygame.math.Vector2(0, 50).rotate(72*4), pygame.math.Vector2(0, -100).rotate(72*2), pygame.math.Vector2(0, 50), pygame.math.Vector2(0, -100).rotate(72*3),pygame.math.Vector2(0, 50).rotate(72), pygame.math.Vector2(0, -100).rotate(72*4), pygame.math.Vector2(0, 50).rotate(72*2)]
         for i in z:
@@ -306,6 +309,16 @@ def pantalla_final(tipo, estrelles, estrelles2):
         texto = "DERROTA"
         texto2 = "Espai per a repetir nivell"
     final = True
+    font4 = pygame.font.Font(None, 130)
+    z2 = [pygame.math.Vector2(0, -100),pygame.math.Vector2(0, 50).rotate(72*3) , pygame.math.Vector2(0, -100).rotate(72),pygame.math.Vector2(0, 50).rotate(72*4), pygame.math.Vector2(0, -100).rotate(72*2), pygame.math.Vector2(0, 50), pygame.math.Vector2(0, -100).rotate(72*3),pygame.math.Vector2(0, 50).rotate(72), pygame.math.Vector2(0, -100).rotate(72*4), pygame.math.Vector2(0, 50).rotate(72*2)]
+    for i in z2:
+        i*=0.45
+        i +=(pantalla_amplada-50,70)
+    x2 = [pygame.math.Vector2(0, -100),pygame.math.Vector2(0, 50).rotate(72*3) , pygame.math.Vector2(0, -100).rotate(72),pygame.math.Vector2(0, 50).rotate(72*4), pygame.math.Vector2(0, -100).rotate(72*2), pygame.math.Vector2(0, 50), pygame.math.Vector2(0, -100).rotate(72*3),pygame.math.Vector2(0, 50).rotate(72), pygame.math.Vector2(0, -100).rotate(72*4), pygame.math.Vector2(0, 50).rotate(72*2)]
+    for i in x2:
+        i*=0.3
+        i += (pantalla_amplada-50,70)
+    text4 = font4.render(str(estrelles2-estrelles_gastades), True, groc)
     while final:
         color = estrelles
         n = 3
@@ -325,9 +338,8 @@ def pantalla_final(tipo, estrelles, estrelles2):
         text1 = font2.render(texto1, True, groc)
         text2 = font2.render(texto2, True, groc)
         pantalla.blit(text, (pantalla_amplada // 2 - text.get_width() // 2, pantalla_alçada // 2.5 - text.get_height() // 2))
-        pantalla.blit(text1, (pantalla_amplada/2-(text1.get_width()+(pantalla_amplada - text2.get_width()-50-pantalla_amplada/2)), 100))
-        pantalla.blit(text2, (pantalla_amplada - text2.get_width()-50, 100))
-
+        pantalla.blit(text1, (pantalla_amplada/2-(text1.get_width()+(pantalla_amplada - text2.get_width()-50-pantalla_amplada/2)), 120))
+        pantalla.blit(text2, (pantalla_amplada - text2.get_width()-50, 120))
         while n >0:
             if color >0:
                 color_estrella = taronja
@@ -344,21 +356,100 @@ def pantalla_final(tipo, estrelles, estrelles2):
             pygame.draw.polygon(pantalla, color_estrella, x)
             n-=1
             color-=1
-        font = pygame.font.Font(None, 130)
-        text4 = font.render(estrelles2, True, groc)
         pantalla.blit(text4, (pantalla_amplada-(100+text4.get_width()), 28))
-        z = [pygame.math.Vector2(0, -100),pygame.math.Vector2(0, 50).rotate(72*3) , pygame.math.Vector2(0, -100).rotate(72),pygame.math.Vector2(0, 50).rotate(72*4), pygame.math.Vector2(0, -100).rotate(72*2), pygame.math.Vector2(0, 50), pygame.math.Vector2(0, -100).rotate(72*3),pygame.math.Vector2(0, 50).rotate(72), pygame.math.Vector2(0, -100).rotate(72*4), pygame.math.Vector2(0, 50).rotate(72*2)]
-        for i in z:
-            i*=0.45
-            i +=(pantalla_amplada-50,70)
-        x = [pygame.math.Vector2(0, -100),pygame.math.Vector2(0, 50).rotate(72*3) , pygame.math.Vector2(0, -100).rotate(72),pygame.math.Vector2(0, 50).rotate(72*4), pygame.math.Vector2(0, -100).rotate(72*2), pygame.math.Vector2(0, 50), pygame.math.Vector2(0, -100).rotate(72*3),pygame.math.Vector2(0, 50).rotate(72), pygame.math.Vector2(0, -100).rotate(72*4), pygame.math.Vector2(0, 50).rotate(72*2)]
-        for i in x:
-            i*=0.3
-            i += (pantalla_amplada-50,70)
-        pygame.draw.polygon(pantalla, taronja3, z)
-        pygame.draw.polygon(pantalla, taronja, x)
+        pygame.draw.polygon(pantalla, taronja3, z2)
+        pygame.draw.polygon(pantalla, taronja, x2)
         pygame.display.flip()
     return y
+def tenda(estrelles):
+    tenda = True
+    global estrelles_gastades
+    nivell_seleccionat = 1
+    font = pygame.font.Font(None, 130)
+    z = [pygame.math.Vector2(0, -100),pygame.math.Vector2(0, 50).rotate(72*3) , pygame.math.Vector2(0, -100).rotate(72),pygame.math.Vector2(0, 50).rotate(72*4), pygame.math.Vector2(0, -100).rotate(72*2), pygame.math.Vector2(0, 50), pygame.math.Vector2(0, -100).rotate(72*3),pygame.math.Vector2(0, 50).rotate(72), pygame.math.Vector2(0, -100).rotate(72*4), pygame.math.Vector2(0, 50).rotate(72*2)]
+    for i in z:
+        i*=0.45
+        i +=(pantalla_amplada-50,70)
+    x = [pygame.math.Vector2(0, -100),pygame.math.Vector2(0, 50).rotate(72*3) , pygame.math.Vector2(0, -100).rotate(72),pygame.math.Vector2(0, 50).rotate(72*4), pygame.math.Vector2(0, -100).rotate(72*2), pygame.math.Vector2(0, 50), pygame.math.Vector2(0, -100).rotate(72*3),pygame.math.Vector2(0, 50).rotate(72), pygame.math.Vector2(0, -100).rotate(72*4), pygame.math.Vector2(0, 50).rotate(72*2)]
+    for i in x:
+        i*=0.3
+        i += (pantalla_amplada-50,70)
+    numeros = [str(i) for i in range(1, 13)]
+    textos = [font.render(num, True, taronja) for num in numeros]
+    posicions = [(pantalla_amplada // 5, pantalla_alçada * 2 // 5),
+          (pantalla_amplada * 2 // 5, pantalla_alçada * 2 // 5),
+          (pantalla_amplada * 3 // 5, pantalla_alçada * 2 // 5),
+          (pantalla_amplada * 4 // 5, pantalla_alçada * 2 // 5),
+          (pantalla_amplada // 5, pantalla_alçada * 3 // 5),
+          (pantalla_amplada * 2 // 5, pantalla_alçada * 3 // 5),
+          (pantalla_amplada * 3 // 5, pantalla_alçada * 3 // 5),
+          (pantalla_amplada * 4 // 5, pantalla_alçada * 3 // 5),
+          (pantalla_amplada // 5, pantalla_alçada * 4 // 5),
+          (pantalla_amplada * 2 // 5, pantalla_alçada * 4 // 5),
+          (pantalla_amplada * 3 // 5, pantalla_alçada * 4 // 5),
+          (pantalla_amplada * 4 // 5, pantalla_alçada * 4 // 5)]
+    font_gran = pygame.font.Font(None, 150)  # Mida de la font més gran
+    compra = False
+    text1 = font.render("Tenda", True, taronja)
+    while tenda:
+        for event in pygame.event.get():
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    tenda = False
+                elif event.key == pygame.K_SPACE:
+                    compra = True
+                elif event.key == pygame.K_RIGHT and nivell_seleccionat < 12:
+                    nivell_seleccionat += 1
+                elif event.key == pygame.K_LEFT and nivell_seleccionat > 1:
+                    nivell_seleccionat -= 1
+                elif event.key == pygame.K_DOWN and nivell_seleccionat < 12:
+                    nivell_seleccionat += 4
+                    if nivell_seleccionat > 12:
+                        nivell_seleccionat = 12
+                elif event.key == pygame.K_UP and nivell_seleccionat > 1:
+                    nivell_seleccionat -= 4
+                    if nivell_seleccionat < 1:
+                        nivell_seleccionat = 1
+        pantalla.fill(fons2)
+        text4 = font.render(str(estrelles-estrelles_gastades), True, groc)
+        pantalla.blit(text4, (pantalla_amplada-(100+text4.get_width()), 28))
+        pantalla.blit(text1, (pantalla_amplada // 2 - text1.get_width() // 2, pantalla_alçada // 5 - text1.get_height() // 2 ))
+        pygame.draw.polygon(pantalla, taronja3, z)
+        pygame.draw.polygon(pantalla, taronja, x)
+        for i, text in enumerate(textos):
+            pos = posicions[i]
+            comprat = llista_objectes_comprats[i][0]
+            numero = llista_objectes_comprats[i][1]
+            if comprat:
+                color1 = blau
+                color2 = blau_fosc
+            elif int(estrelles- estrelles_gastades)<numero:
+                color1 = vermell
+                color2 = vermell2
+            else:
+                color1 = verd
+                color2 = verd_fosc
+            num_text = font_gran.render(str(numero), True, color2)
+            if num_text.get_height() > num_text.get_width():
+                amplada = num_text.get_height()*1.2
+            else:
+                amplada = num_text.get_width()*1.2
+            if nivell_seleccionat == i+1:
+                num_text = pygame.transform.scale(num_text, (num_text.get_width()*1.2,num_text.get_height()*1.2))
+                amplada *=1.2
+                if compra == True:
+                    compra = False
+                    if color1 == verd:
+                        llista_objectes_comprats[i][0] = True
+                        estrelles_gastades += numero
+            rectangle = pygame.Rect((0,0), (amplada, amplada))
+            rectangle.center = pos
+            pygame.draw.rect(pantalla, color1, rectangle)
+            pygame.draw.rect(pantalla, color2, rectangle, 8)
+            rectangle2 = num_text.get_rect(center = pos)
+            pantalla.blit(num_text, rectangle2)
+        pygame.display.flip()
+
 #Definim reinici al sortir del nivell
 def reinici():
     global llista_objectes_pantalla
@@ -391,7 +482,7 @@ ocells8 = [racista.copy(llista_ocells,llista_objectes_rodons),racista.copy(llist
 ocells9 = [vermellet.copy(llista_ocells, llista_objectes_rodons), vermellet.copy(llista_ocells, llista_objectes_rodons), vermellet.copy(llista_ocells, llista_objectes_rodons), vermellet.copy(llista_ocells, llista_objectes_rodons), vermellet.copy(llista_ocells, llista_objectes_rodons), vermellet.copy(llista_ocells, llista_objectes_rodons), vermellet.copy(llista_ocells, llista_objectes_rodons), vermellet.copy(llista_ocells, llista_objectes_rodons), vermellet.copy(llista_ocells, llista_objectes_rodons), vermellet.copy(llista_ocells, llista_objectes_rodons)]
 ocells10 = [vermellet.copy(llista_ocells, llista_objectes_rodons)]
 ocells11 = [vermellet.copy(llista_ocells, llista_objectes_rodons)]
-ocells12 = [vermellet.copy(llista_ocells, llista_objectes_rodons)]
+ocells12 = [vermellet.copy(llista_ocells, llista_objectes_rodons), vermellet.copy(llista_ocells, llista_objectes_rodons)]
 nivells_ocells = {1:ocells1, 2:ocells2, 3:ocells3, 4:ocells4, 5:ocells5, 6:ocells6, 7:ocells7, 8:ocells8, 9:ocells9, 10:ocells10, 11:ocells11, 12:ocells12}
 
 nivell6 = [quadrat_petit.copy([pantalla_amplada - 405, pantalla_alçada-48], llista_objectes_rectangulars),quadrat_petit.copy([pantalla_amplada - 255, pantalla_alçada-48], llista_objectes_rectangulars),rectangle_petit.copy([pantalla_amplada - 380, pantalla_alçada-175], llista_objectes_rectangulars),rectangle_petit.copy([pantalla_amplada - 280, pantalla_alçada-175], llista_objectes_rectangulars),rectangle_normal.copy([pantalla_amplada - 330, pantalla_alçada-245], llista_objectes_rectangulars),quadrat_gran.copy([pantalla_amplada - 330, pantalla_alçada-315], llista_objectes_rectangulars),rectangle_gran.copy([pantalla_amplada - 330, pantalla_alçada-105], llista_objectes_rectangulars), porc_estandar.copy((pantalla_amplada - 330, pantalla_alçada - 160), llista_porcs, llista_objectes_rodons), quadrat_petit.copy([pantalla_amplada - 5, pantalla_alçada-48], llista_objectes_rectangulars),quadrat_petit.copy([pantalla_amplada + 145, pantalla_alçada-48], llista_objectes_rectangulars),rectangle_petit.copy([pantalla_amplada + 20, pantalla_alçada-175], llista_objectes_rectangulars),rectangle_petit.copy([pantalla_amplada +120, pantalla_alçada-175], llista_objectes_rectangulars),rectangle_normal.copy([pantalla_amplada +70, pantalla_alçada-245], llista_objectes_rectangulars),quadrat_gran.copy([pantalla_amplada +70, pantalla_alçada-315], llista_objectes_rectangulars),rectangle_gran.copy([pantalla_amplada +70, pantalla_alçada-105], llista_objectes_rectangulars), porc_estandar.copy((pantalla_amplada +70, pantalla_alçada - 160), llista_porcs, llista_objectes_rodons), quadrat_petit.copy([pantalla_amplada +395, pantalla_alçada-48], llista_objectes_rectangulars),quadrat_petit.copy([pantalla_amplada +545, pantalla_alçada-48], llista_objectes_rectangulars),rectangle_petit.copy([pantalla_amplada + 420, pantalla_alçada-175], llista_objectes_rectangulars),rectangle_petit.copy([pantalla_amplada +520, pantalla_alçada-175], llista_objectes_rectangulars),rectangle_normal.copy([pantalla_amplada + 470, pantalla_alçada-245], llista_objectes_rectangulars),quadrat_gran.copy([pantalla_amplada +470, pantalla_alçada-315], llista_objectes_rectangulars),rectangle_gran.copy([pantalla_amplada +470, pantalla_alçada-105], llista_objectes_rectangulars), porc_estandar.copy((pantalla_amplada +470, pantalla_alçada - 160), llista_porcs, llista_objectes_rodons), quadrat_petit.copy([pantalla_amplada + 795, pantalla_alçada-48], llista_objectes_rectangulars),quadrat_petit.copy([pantalla_amplada +945, pantalla_alçada-48], llista_objectes_rectangulars),rectangle_petit.copy([pantalla_amplada + 820, pantalla_alçada-175], llista_objectes_rectangulars),rectangle_petit.copy([pantalla_amplada + 920, pantalla_alçada-175], llista_objectes_rectangulars),rectangle_normal.copy([pantalla_amplada  + 870, pantalla_alçada-245], llista_objectes_rectangulars),quadrat_gran.copy([pantalla_amplada +870, pantalla_alçada-315], llista_objectes_rectangulars),rectangle_gran.copy([pantalla_amplada + 870, pantalla_alçada-105], llista_objectes_rectangulars), porc_estandar.copy((pantalla_amplada + 870, pantalla_alçada - 160), llista_porcs, llista_objectes_rodons)]
@@ -405,13 +496,14 @@ nivell8 = [porc_estandar.copy((3000,pantalla_alçada-40), llista_porcs, llista_o
 nivell9 = [porc_movible.copy((1000,pantalla_alçada-40), llista_porcs, llista_objectes_rodons),porc_movible.copy((1200,pantalla_alçada-40), llista_porcs, llista_objectes_rodons),porc_movible.copy((1400,pantalla_alçada-40), llista_porcs, llista_objectes_rodons),porc_movible.copy((1600,pantalla_alçada-40), llista_porcs, llista_objectes_rodons),porc_movible.copy((1800,pantalla_alçada-40), llista_porcs, llista_objectes_rodons),porc_movible.copy((2000,pantalla_alçada-40), llista_porcs, llista_objectes_rodons), caixa((2400,pantalla_alçada-230),50,450,False,90,2,llista_objectes_rectangulars,pantalla), caixa((900,pantalla_alçada-230),50,450,False,90,2,llista_objectes_rectangulars,pantalla), caixa((1000, pantalla_alçada-500), 20, 40, False,90,2,llista_objectes_rectangulars,pantalla), caixa((1100, pantalla_alçada-500), 20, 40, False,90,2,llista_objectes_rectangulars,pantalla), rectangle_gran_3.copy((1050,pantalla_alçada-530),llista_objectes_rectangulars), quadrat_gran_3.copy((1050, pantalla_alçada-560),llista_objectes_rectangulars), caixa((1200, pantalla_alçada-700), 20, 40, False,90,2,llista_objectes_rectangulars,pantalla), caixa((1300, pantalla_alçada-700), 20, 40, False,90,2,llista_objectes_rectangulars,pantalla), rectangle_gran_3.copy((1250,pantalla_alçada-730),llista_objectes_rectangulars), quadrat_gran_3.copy((1250, pantalla_alçada-760),llista_objectes_rectangulars),caixa((1400, pantalla_alçada-500), 20, 40, False,90,2,llista_objectes_rectangulars,pantalla), caixa((1500, pantalla_alçada-500), 20, 40, False,90,2,llista_objectes_rectangulars,pantalla), rectangle_gran_3.copy((1450,pantalla_alçada-530),llista_objectes_rectangulars), quadrat_gran_3.copy((1450, pantalla_alçada-560),llista_objectes_rectangulars),caixa((1600, pantalla_alçada-700), 20, 40, False,90,2,llista_objectes_rectangulars,pantalla), caixa((1700, pantalla_alçada-700), 20, 40, False,90,2,llista_objectes_rectangulars,pantalla), rectangle_gran_3.copy((1650,pantalla_alçada-730),llista_objectes_rectangulars), quadrat_gran_3.copy((1650, pantalla_alçada-760),llista_objectes_rectangulars),caixa((1800, pantalla_alçada-500), 20, 40, False,90,2,llista_objectes_rectangulars,pantalla), caixa((1900, pantalla_alçada-500), 20, 40, False,90,2,llista_objectes_rectangulars,pantalla), rectangle_gran_3.copy((1850,pantalla_alçada-530),llista_objectes_rectangulars), quadrat_gran_3.copy((1850, pantalla_alçada-560),llista_objectes_rectangulars),caixa((2000, pantalla_alçada-700), 20, 40, False,90,2,llista_objectes_rectangulars,pantalla), caixa((2100, pantalla_alçada-700), 20, 40, False,90,2,llista_objectes_rectangulars,pantalla), rectangle_gran_3.copy((2050,pantalla_alçada-730),llista_objectes_rectangulars), quadrat_gran_3.copy((2050, pantalla_alçada-760),llista_objectes_rectangulars),caixa((2200, pantalla_alçada-500), 20, 40, False,90,2,llista_objectes_rectangulars,pantalla), caixa((2300, pantalla_alçada-500), 20, 40, False,90,2,llista_objectes_rectangulars,pantalla), rectangle_gran_3.copy((2250,pantalla_alçada-530),llista_objectes_rectangulars), quadrat_gran_3.copy((2250, pantalla_alçada-560),llista_objectes_rectangulars),caixa((1500, pantalla_alçada-900), 20, 40, False,90,2,llista_objectes_rectangulars,pantalla), caixa((1600, pantalla_alçada-900), 20, 40, False,90,2,llista_objectes_rectangulars,pantalla), rectangle_gran_3.copy((1550,pantalla_alçada-930),llista_objectes_rectangulars), quadrat_gran_3.copy((1550, pantalla_alçada-960),llista_objectes_rectangulars), caixa((1700, pantalla_alçada-900), 20, 40, False,90,2,llista_objectes_rectangulars,pantalla), caixa((1800, pantalla_alçada-900), 20, 40, False,90,2,llista_objectes_rectangulars,pantalla), rectangle_gran_3.copy((1750,pantalla_alçada-930),llista_objectes_rectangulars), quadrat_gran_3.copy((1750, pantalla_alçada-960),llista_objectes_rectangulars)]
 nivell10 = [porc_estandar.copy((1000,pantalla_alçada-40), llista_porcs, llista_objectes_rodons)]
 nivell11 = [porc_estandar.copy((1000,pantalla_alçada-40), llista_porcs, llista_objectes_rodons)]
-nivell12 = [porc_estandar.copy((1000,pantalla_alçada-40), llista_porcs, llista_objectes_rodons)]
+nivell12 = [porc_estandar.copy((1000,pantalla_alçada-40), llista_porcs, llista_objectes_rodons), porc_estandar.copy((600,pantalla_alçada-40), llista_porcs, llista_objectes_rodons)]
 nivells_caixes_i_porcs = {1:nivell1, 2:nivell2, 3:nivell3, 4:nivell4, 5:nivell5, 6:nivell6, 7:nivell7, 8:nivell8, 9:nivell9, 10:nivell10, 11:nivell11, 12:nivell12}
 
 #llista_estrelles_nivells
 llista_estrelles = [[0,False],[0,True],[0,True],[0,True],[0,True],[0,True],[0,True],[0,True],[0,True],[0,True],[0,True],[0,True]]
 total_estrelles = 0
-
+llista_objectes_comprats = [[False,1],[False,3],[False,2],[False,3],[False,2],[False,1],[False,4],[False,2],[False,2],[False,2],[False,2],[False,5]]
+estrelles_gastades = 0
 # Game GameLoop
 def GameLoop():
     global nivell_actual
@@ -426,7 +518,7 @@ def GameLoop():
     while True:
         rellotge.tick(FPS)
         if not partida:
-            if not menú(str(total_estrelles)):
+            if not menú(total_estrelles):
                 break
             reinici()
             partida = True
@@ -568,7 +660,7 @@ def GameLoop():
                 if nivell_actual != 12:
                     llista_estrelles[nivell_actual][1] = False
                 reinici()
-                partida = pantalla_final(True,estrelles, str(total_estrelles))
+                partida = pantalla_final(True,estrelles, total_estrelles)
                 n = 0
                 nombre_porcs_orig = 0
                 nivell_actual+=1
@@ -582,7 +674,7 @@ def GameLoop():
                 nombre_porcs = 0
                 nombre_porcs_orig = 0
                 n2 = 0
-                partida = pantalla_final(False,0, str(total_estrelles))
+                partida = pantalla_final(False,0, total_estrelles)
          # Recarregar la pantalla
         pygame.display.flip()
     # Sortir del joc
