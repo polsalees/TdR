@@ -38,7 +38,7 @@ pantalla_amplada,pantalla_alçada = info.current_w,info.current_h
 from pygame.locals import *
 flags = FULLSCREEN | DOUBLEBUF
 pantalla = pygame.display.set_mode((pantalla_amplada, pantalla_alçada), flags, 16)
-pygame.display.set_caption("Angry Birds")
+pygame.display.set_caption("Galactic Pius")
 from codi_ocells import ocell
 from codi_porcs import porc
 from codi_caixes import caixa
@@ -242,8 +242,8 @@ def menú(estrelles):
                             i.treure_skin()
         pantalla.fill(fons2)
 
-        font = pygame.font.Font(None, 300)
-        text = font.render("Angry Birds", True, taronja)
+        font = pygame.font.Font(None, 250)
+        text = font.render("Galactic Pius", True, taronja)
         pantalla.blit(text, (pantalla_amplada // 2 - text.get_width() // 2, pantalla_alçada*2 // 5 - text.get_height() // 2))
         font3 = pygame.font.Font(None, 75)
         text2 = font3.render("ESPAI PER NIVELLS", True, taronja)
@@ -474,11 +474,12 @@ def tenda(estrelles):
             imatge_compra = pygame.transform.scale(llista_objectes_comprats[i][2],(amplada,amplada))
             rectangle3 = imatge_compra.get_rect(center = pos)
             rectangle3.center += pygame.math.Vector2(0,18) 
-            if posar_tick:
-                pantalla.blit(tick_imatge,posicio_tick)
             pantalla.blit(imatge_compra, rectangle3)
             if nivell_seleccionat == i+1 and color1 != blau:
                 pantalla.blit(num_text, rectangle2)
+            if posar_tick and posicio_tick == pos:
+                tick_2 = pygame.transform.scale(tick_imatge,(amplada/2,amplada/2))
+                pantalla.blit(tick_2,posicio_tick)
         pygame.display.flip()
     return imatge_skin
 
