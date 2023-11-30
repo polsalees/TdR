@@ -150,14 +150,13 @@ class ocell():
                 pygame.draw.circle(pantalla, blanc, self.linea_direció_posició, self.linea_direció_radi)
             self.linea_direció_moviment +=0.5
     def posar_skin(self, imatge):
-        if self.skin == False:
-            self.imatge_skin = pygame.transform.scale(imatge,(self.radi*2, self.radi*2+(9/5)*self.radi))
-            self.skin_offset = pygame.math.Vector2(0,-0.45*self.radi)
-            self.diferencia_skin = pygame.math.Vector2(0,-1.25*self.radi)
-            self.skin = True
-            self.rectangle_skin = self.imatge_skin.get_rect()
-        else:
-            self.skin = False
+        self.imatge_skin = pygame.transform.scale(imatge,(self.radi*2, self.radi*2+(9/5)*self.radi))
+        self.skin_offset = pygame.math.Vector2(0,-0.45*self.radi)
+        self.diferencia_skin = pygame.math.Vector2(0,-1.25*self.radi)
+        self.skin = True
+        self.rectangle_skin = self.imatge_skin.get_rect()
+    def treure_skin(self):
+        self.skin = False
     def estela(self,diferencia, pantalla): 
         for i in self.llista_estela:
             pygame.draw.circle(pantalla, blanc, i[0]+diferencia ,i[1])

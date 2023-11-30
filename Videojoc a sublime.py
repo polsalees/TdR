@@ -53,7 +53,11 @@ llista_ocells = []
 llista_porcs = [] 
 #carregem skins
 skin = pygame.image.load("Grafics/art4.png").convert_alpha()
-
+tick = pygame.image.load("Grafics/tick.png").convert_alpha()
+tick_imatge = pygame.transform.scale(tick, pygame.math.Vector2(tick.get_width(), tick.get_height())/3)
+posar_tick = False
+posicio_tick = 0
+imatge_skin = None
 #Posició inicial ocells
 posició_inicial = [150, pantalla_alçada-150]
 nombre_porcs = 0
@@ -226,7 +230,13 @@ def menú(estrelles):
                 elif event.key == pygame.K_i:
                     info()
                 elif event.key == pygame.K_t:
-                    tenda(estrelles)
+                    aparença = tenda(estrelles)
+                    if aparença != None:
+                        for i in llista_ocells:
+                            i.posar_skin(aparença)
+                    else:
+                        for i in llista_ocells:
+                            i.treure_skin()
         pantalla.fill(fons2)
 
         font = pygame.font.Font(None, 300)
@@ -364,6 +374,9 @@ def pantalla_final(tipo, estrelles, estrelles2):
 def tenda(estrelles):
     tenda = True
     global estrelles_gastades
+    global posar_tick
+    global posicio_tick
+    global imatge_skin
     nivell_seleccionat = 1
     font = pygame.font.Font(None, 130)
     z = [pygame.math.Vector2(0, -100),pygame.math.Vector2(0, 50).rotate(72*3) , pygame.math.Vector2(0, -100).rotate(72),pygame.math.Vector2(0, 50).rotate(72*4), pygame.math.Vector2(0, -100).rotate(72*2), pygame.math.Vector2(0, 50), pygame.math.Vector2(0, -100).rotate(72*3),pygame.math.Vector2(0, 50).rotate(72), pygame.math.Vector2(0, -100).rotate(72*4), pygame.math.Vector2(0, 50).rotate(72*2)]
@@ -429,7 +442,7 @@ def tenda(estrelles):
             else:
                 color1 = verd
                 color2 = verd_fosc
-            num_text = font_gran.render(str(numero), True, color2)
+            num_text = font_gran.render(str(numero), True, blanc)
             if num_text.get_height() > num_text.get_width():
                 amplada = num_text.get_height()*1.2
             else:
@@ -440,15 +453,31 @@ def tenda(estrelles):
                 if compra == True:
                     compra = False
                     if color1 == verd:
-                        llista_objectes_comprats[i][0] = True
                         estrelles_gastades += numero
+                        llista_objectes_comprats[i][0] = True
+                    if color1 == verd or color1 == blau:    
+                        if posicio_tick != pos or posar_tick == False:
+                            posar_tick = True
+                            imatge_skin = llista_objectes_comprats[i][2]
+                        else:
+                            posar_tick = False
+                            imatge_skin = None
+                        posicio_tick = pos
             rectangle = pygame.Rect((0,0), (amplada, amplada))
             rectangle.center = pos
             pygame.draw.rect(pantalla, color1, rectangle)
             pygame.draw.rect(pantalla, color2, rectangle, 8)
             rectangle2 = num_text.get_rect(center = pos)
-            pantalla.blit(num_text, rectangle2)
+            imatge_compra = pygame.transform.scale(llista_objectes_comprats[i][2],(amplada,amplada))
+            rectangle3 = imatge_compra.get_rect(center = pos)
+            rectangle3.center += pygame.math.Vector2(0,18) 
+            if posar_tick:
+                pantalla.blit(tick_imatge,posicio_tick)
+            pantalla.blit(imatge_compra, rectangle3)
+            if nivell_seleccionat == i+1 and color1 != blau:
+                pantalla.blit(num_text, rectangle2)
         pygame.display.flip()
+    return imatge_skin
 
 #Definim reinici al sortir del nivell
 def reinici():
@@ -500,9 +529,9 @@ nivell12 = [porc_estandar.copy((1000,pantalla_alçada-40), llista_porcs, llista_
 nivells_caixes_i_porcs = {1:nivell1, 2:nivell2, 3:nivell3, 4:nivell4, 5:nivell5, 6:nivell6, 7:nivell7, 8:nivell8, 9:nivell9, 10:nivell10, 11:nivell11, 12:nivell12}
 
 #llista_estrelles_nivells
-llista_estrelles = [[0,False],[0,True],[0,True],[0,True],[0,True],[0,True],[0,True],[0,True],[0,True],[0,True],[0,True],[0,True]]
+llista_estrelles = [[3,False],[3,True],[3,True],[0,True],[0,True],[0,True],[0,True],[0,True],[0,True],[0,True],[0,True],[0,True]]
 total_estrelles = 0
-llista_objectes_comprats = [[False,1],[False,3],[False,2],[False,3],[False,2],[False,1],[False,4],[False,2],[False,2],[False,2],[False,2],[False,5]]
+llista_objectes_comprats = [[False,1,skin],[False,3,skin],[False,2,skin],[False,3,skin],[False,2,skin],[False,1,skin],[False,4,skin],[False,2,skin],[False,2,skin],[False,2,skin],[False,2,skin],[False,5,skin]]
 estrelles_gastades = 0
 # Game GameLoop
 def GameLoop():
@@ -567,9 +596,6 @@ def GameLoop():
                     if event.key == pygame.K_SPACE:
                         camara.principi_nivell = False
                         camara.tornar_ocell = True
-                    if event.key == pygame.K_t:
-                        for i in llista_ocells:
-                            i.posar_skin(skin)
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     if zona_ocell:    
                         mantenint_ocell = True
