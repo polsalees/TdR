@@ -150,11 +150,11 @@ class ocell():
                 pygame.draw.circle(pantalla, blanc, self.linea_direció_posició, self.linea_direció_radi)
             self.linea_direció_moviment +=0.5
     def posar_skin(self, imatge):
-        self.imatge_skin = pygame.transform.scale(imatge,(self.radi*2, self.radi*2+(9/5)*self.radi))
+        self.imatge_skin = pygame.transform.scale(imatge,(imatge.get_width()/285*2.8*self.radi, imatge.get_height()/345*2.8*self.radi))
         self.skin_offset = pygame.math.Vector2(0,-0.45*self.radi)
-        self.diferencia_skin = pygame.math.Vector2(0,-1.25*self.radi)
+        self.diferencia_skin = pygame.math.Vector2(0,0)
         self.skin = True
-        self.rectangle_skin = self.imatge_skin.get_rect()
+        self.rectangle_skin = self.imatge_skin.get_rect(center = self.rectangle.center)
     def treure_skin(self):
         self.skin = False
     def estela(self,diferencia, pantalla): 
@@ -226,6 +226,11 @@ class ocell():
                         self.rectangle_skin = imatge_skin_rotada.get_rect(center =self.rectangle_2.center + diferencia + self.skin_offset.rotate(-self.angle)+pygame.math.Vector2((8/3-2)*self.radi,0).rotate(-self.angle))
                     else:
                         self.rectangle_skin = imatge_skin_rotada.get_rect(center =self.rectangle_2.center + diferencia + self.skin_offset.rotate(-self.angle))
+                    if self.superficie_ocell == self.superficie_ocell_2:
+                        if self.color == vermell:    
+                            self.rectangle_skin.center +=  pygame.math.Vector2(0,0.4*self.radi).rotate(-self.angle)
+                        elif self.color == negre or self.color == blanc:
+                            self.rectangle_skin.center +=  pygame.math.Vector2(-0.4*self.radi,0).rotate(-self.angle)
                     self.pantalla.blit(imatge_skin_rotada, self.rectangle_skin)
                 if self.animació:
                     for i in self.objecte_animació:
@@ -373,7 +378,6 @@ class ocell():
         x = ocell(self.radi, self.color, llista_ocells, llista_objectes_rodons, self.posició_inicial, self.pantalla)
         return x
     def reinici(self):
-        self.skin = False
         self.temps_desde_tocar_objectes = 0
         self.activat = False
         self.aire = False
