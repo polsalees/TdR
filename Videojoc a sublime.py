@@ -56,6 +56,9 @@ skin = pygame.image.load("Grafics/art4.png").convert_alpha()
 skin2 = pygame.image.load("Grafics/skin2.png").convert_alpha()
 skin3 = pygame.image.load("Grafics/skin3.png").convert_alpha()
 skin4 = pygame.image.load("Grafics/skin4.png").convert_alpha()
+skin5 = pygame.image.load("Grafics/skin5.png").convert_alpha()
+skin6 = pygame.image.load("Grafics/skin6.png").convert_alpha()
+skin7 = pygame.image.load("Grafics/skin7.png").convert_alpha()
 tick = pygame.image.load("Grafics/tick.png").convert_alpha()
 tick_imatge = pygame.transform.scale(tick, pygame.math.Vector2(tick.get_width(), tick.get_height())/3)
 posar_tick = False
@@ -535,7 +538,7 @@ nivells_caixes_i_porcs = {1:nivell1, 2:nivell2, 3:nivell3, 4:nivell4, 5:nivell5,
 #llista_estrelles_nivells
 llista_estrelles = [[0,False],[0,True],[0,True],[0,True],[0,True],[0,True],[0,True],[0,True],[0,True],[0,True],[0,True],[0,True]]
 total_estrelles = 0
-llista_objectes_comprats = [[False,2,skin],[False,2,skin],[False,2,skin],[False,2,skin],[False,3,skin2],[False,3,skin],[False,3,skin],[False,3,skin],[False,4,skin3],[False,4,skin],[False,4,skin],[False,4,skin4]]
+llista_objectes_comprats = [[False,2,skin],[False,2,skin5],[False,2,skin],[False,2,skin],[False,3,skin2],[False,3,skin6],[False,3,skin7],[False,3,skin],[False,4,skin3],[False,4,skin],[False,4,skin],[False,4,skin4]]
 estrelles_gastades = 0
 # Game GameLoop
 def GameLoop():

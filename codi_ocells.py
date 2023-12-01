@@ -226,9 +226,10 @@ class ocell():
                         self.rectangle_skin = imatge_skin_rotada.get_rect(center =self.rectangle_2.center + diferencia + self.skin_offset.rotate(-self.angle)+pygame.math.Vector2((8/3-2)*self.radi,0).rotate(-self.angle))
                     else:
                         self.rectangle_skin = imatge_skin_rotada.get_rect(center =self.rectangle_2.center + diferencia + self.skin_offset.rotate(-self.angle))
+                    self.rectangle_skin.center +=  pygame.math.Vector2(0,0.1*self.radi).rotate(-self.angle)
                     if self.superficie_ocell == self.superficie_ocell_2:
                         if self.color == vermell:    
-                            self.rectangle_skin.center +=  pygame.math.Vector2(0,0.4*self.radi).rotate(-self.angle)
+                            self.rectangle_skin.center +=  pygame.math.Vector2(0,0.5*self.radi).rotate(-self.angle)
                         elif self.color == negre or self.color == blanc:
                             self.rectangle_skin.center +=  pygame.math.Vector2(-0.4*self.radi,0).rotate(-self.angle)
                     self.pantalla.blit(imatge_skin_rotada, self.rectangle_skin)

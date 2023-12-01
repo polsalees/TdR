@@ -13,6 +13,7 @@ def linea_ocells(ordre_ocells, diferencia, llista_ocells_llançats,pantalla, pos
             if i.skin:
                 rectangle2 = i.ocell_nou.get_rect(topleft =(posició_inicial[0] - n*50-i.radi*1.1 + diferencia.x, pantalla_alçada - i.radi*2-5+diferencia.y+i.diferencia_skin.y -0.45*i.radi))
                 rectangle = i.imatge_skin.get_rect(center=rectangle2.center)
+                rectangle.center += pygame.math.Vector2(0,0.1*i.radi)
                 pantalla.blit(i.imatge_skin, rectangle)
             n+=1
 #Tirachines
