@@ -52,7 +52,7 @@ sprites = []
 llista_ocells = []
 llista_porcs = [] 
 #carregem skins
-skin = pygame.image.load("Grafics/art4.png").convert_alpha()
+skin1 = pygame.image.load("Grafics/skin1.png").convert_alpha()
 skin2 = pygame.image.load("Grafics/skin2.png").convert_alpha()
 skin3 = pygame.image.load("Grafics/skin3.png").convert_alpha()
 skin4 = pygame.image.load("Grafics/skin4.png").convert_alpha()
@@ -552,7 +552,7 @@ nivells_caixes_i_porcs = {1:nivell1, 2:nivell2, 3:nivell3, 4:nivell4, 5:nivell5,
 #llista_estrelles_nivells
 llista_estrelles = [[0,False],[0,True],[0,True],[0,True],[0,True],[0,True],[0,True],[0,True],[0,True],[0,True],[0,True],[0,True]]
 total_estrelles = 0
-llista_objectes_comprats = [[False,2,skin],[False,2,skin2],[False,2,skin3],[False,2,skin6],[False,2,skin5],[False,3,skin10],[False,3,skin7],[False,3,skin11],[False,3,skin4],[False,3,skin12],[False,5,skin9],[False,6,skin8]]
+llista_objectes_comprats = [[False,2,skin1],[False,2,skin2],[False,2,skin3],[False,2,skin6],[False,2,skin5],[False,3,skin10],[False,3,skin7],[False,3,skin11],[False,3,skin4],[False,3,skin12],[False,5,skin9],[False,6,skin8]]
 estrelles_gastades = 0
 # Game GameLoop
 def GameLoop():
