@@ -32,6 +32,8 @@ pequeñin_skin3 = pygame.image.load("Grafics/Hielo3.png").convert_alpha()
 estrella = pygame.image.load("Grafics/estrella.png").convert_alpha()
 estrella2 = pygame.image.load("Grafics/estrella2.png").convert_alpha()
 estrella3 = pygame.image.load("Grafics/estrella3.png").convert_alpha()
+skin8 = pygame.image.load("Grafics/skin8.png").convert_alpha()
+
 def calcular_angle(self):
     angle = math.degrees(math.atan2(pygame.mouse.get_pos()[0] - (self.posició_inicial[0]), pygame.mouse.get_pos()[1] - (self.posició_inicial[1])))
     return angle
@@ -150,7 +152,7 @@ class ocell():
                 pygame.draw.circle(pantalla, blanc, self.linea_direció_posició, self.linea_direció_radi)
             self.linea_direció_moviment +=0.5
     def posar_skin(self, imatge):
-        self.imatge_skin = pygame.transform.scale(imatge,(imatge.get_width()/285*2.8*self.radi, imatge.get_height()/345*2.8*self.radi))
+        self.imatge_skin = pygame.transform.scale(imatge,pygame.math.Vector2(285/447.5, 345/447.5)*self.radi*3.3)
         self.skin_offset = pygame.math.Vector2(0,-0.45*self.radi)
         self.diferencia_skin = pygame.math.Vector2(0,0)
         self.skin = True
@@ -219,33 +221,39 @@ class ocell():
             rectangle = self.rectangle_2.copy()   
             rectangle.topleft += diferencia   
             if rectangle.colliderect(self.pantalla_rect):  
-                self.pantalla.blit(self.ocell_nou, rectangle)
                 if self.skin:
-                    imatge_skin_rotada = pygame.transform.rotate(self.imatge_skin, self.angle)
-                    if self.llançat and self.tocat_objecte == False:
-                        self.rectangle_skin = imatge_skin_rotada.get_rect(center =self.rectangle_2.center + diferencia + self.skin_offset.rotate(-self.angle)+pygame.math.Vector2((8/3-2)*self.radi,0).rotate(-self.angle))
-                    else:
-                        self.rectangle_skin = imatge_skin_rotada.get_rect(center =self.rectangle_2.center + diferencia + self.skin_offset.rotate(-self.angle))
-                    self.rectangle_skin.center +=  pygame.math.Vector2(0,0.1*self.radi).rotate(-self.angle)
-                    if self.superficie_ocell == self.superficie_ocell_2:
-                        if self.color == vermell:    
-                            self.rectangle_skin.center +=  pygame.math.Vector2(0,0.5*self.radi).rotate(-self.angle)
-                        elif self.color == negre or self.color == blanc:
-                            self.rectangle_skin.center +=  pygame.math.Vector2(-0.4*self.radi,0).rotate(-self.angle)
-                    self.pantalla.blit(imatge_skin_rotada, self.rectangle_skin)
+                    if self.invisible == False:
+                        self.pantalla.blit(self.ocell_nou, rectangle)
+                        imatge_skin_rotada = pygame.transform.rotate(self.imatge_skin, self.angle)
+                        if self.llançat and self.tocat_objecte == False:
+                            self.rectangle_skin = imatge_skin_rotada.get_rect(center =self.rectangle_2.center + diferencia + self.skin_offset.rotate(-self.angle)+pygame.math.Vector2((8/3-2)*self.radi,0).rotate(-self.angle))
+                        else:
+                            self.rectangle_skin = imatge_skin_rotada.get_rect(center =self.rectangle_2.center + diferencia + self.skin_offset.rotate(-self.angle))
+                        self.rectangle_skin.center +=  pygame.math.Vector2(0,0.1*self.radi).rotate(-self.angle)
+                        if self.superficie_ocell == self.superficie_ocell_2:
+                            if self.color == vermell:    
+                                self.rectangle_skin.center +=  pygame.math.Vector2(0,0.5*self.radi).rotate(-self.angle)
+                            elif self.color == negre or self.color == blanc:
+                                self.rectangle_skin.center +=  pygame.math.Vector2(-0.4*self.radi,0).rotate(-self.angle)
+                        self.pantalla.blit(imatge_skin_rotada, self.rectangle_skin)
+                else:
+                    self.pantalla.blit(self.ocell_nou, rectangle)
                 if self.animació:
                     for i in self.objecte_animació:
                         pygame.draw.circle(self.pantalla,self.color_animació,i[1]+diferencia,i[0])
         else:
             rectangle = self.rectangle_2.topleft + diferencia
-            pantalla.blit(self.ocell_nou, rectangle)
             if self.skin:
-                imatge_skin_rotada = pygame.transform.rotate(self.imatge_skin, self.angle)
-                if self.llançat and self.tocat_objecte == False:
-                    self.rectangle_skin = imatge_skin_rotada.get_rect(center =self.rectangle_2.center + diferencia + self.skin_offset.rotate(-self.angle)+pygame.math.Vector2((8/3-2)*self.radi,0).rotate(-self.angle))
-                else:
-                    self.rectangle_skin = imatge_skin_rotada.get_rect(center =self.rectangle_2.center + diferencia + self.skin_offset.rotate(-self.angle))
-                pantalla.blit(imatge_skin_rotada, self.rectangle_skin)
+                if self.invisible == False:
+                    pantalla.blit(self.ocell_nou, rectangle)
+                    imatge_skin_rotada = pygame.transform.rotate(self.imatge_skin, self.angle)
+                    if self.llançat and self.tocat_objecte == False:
+                        self.rectangle_skin = imatge_skin_rotada.get_rect(center =self.rectangle_2.center + diferencia + self.skin_offset.rotate(-self.angle)+pygame.math.Vector2((8/3-2)*self.radi,0).rotate(-self.angle))
+                    else:
+                        self.rectangle_skin = imatge_skin_rotada.get_rect(center =self.rectangle_2.center + diferencia + self.skin_offset.rotate(-self.angle))
+                    pantalla.blit(imatge_skin_rotada, self.rectangle_skin)
+            else:
+                pantalla.blit(self.ocell_nou, rectangle)
             if self.animació:
                 for i in self.objecte_animació:
                     pygame.draw.circle(pantalla,self.color_animació,i[1]+diferencia,i[0])

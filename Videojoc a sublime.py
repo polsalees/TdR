@@ -59,6 +59,11 @@ skin4 = pygame.image.load("Grafics/skin4.png").convert_alpha()
 skin5 = pygame.image.load("Grafics/skin5.png").convert_alpha()
 skin6 = pygame.image.load("Grafics/skin6.png").convert_alpha()
 skin7 = pygame.image.load("Grafics/skin7.png").convert_alpha()
+skin8 = pygame.image.load("Grafics/skin8.png").convert_alpha()
+skin9 = pygame.image.load("Grafics/skin9.png").convert_alpha()
+skin10 = pygame.image.load("Grafics/skin10.png").convert_alpha()
+skin11 = pygame.image.load("Grafics/skin11.png").convert_alpha()
+skin12 = pygame.image.load("Grafics/skin12.png").convert_alpha()
 tick = pygame.image.load("Grafics/tick.png").convert_alpha()
 tick_imatge = pygame.transform.scale(tick, pygame.math.Vector2(tick.get_width(), tick.get_height())/3)
 posar_tick = False
@@ -238,8 +243,16 @@ def menú(estrelles):
                 elif event.key == pygame.K_t:
                     aparença = tenda(estrelles)
                     if aparença != None:
+                        if aparença == skin8:
+                            invisible = True
+                        else:
+                            invisible = False
                         for i in llista_ocells:
                             i.posar_skin(aparença)
+                            if invisible:
+                                i.invisible = True
+                            else:
+                                i.invisible = False
                     else:
                         for i in llista_ocells:
                             i.treure_skin()
@@ -476,7 +489,8 @@ def tenda(estrelles):
             rectangle2 = num_text.get_rect(center = pos)
             imatge_compra = pygame.transform.scale(llista_objectes_comprats[i][2],(amplada,amplada))
             rectangle3 = imatge_compra.get_rect(center = pos)
-            rectangle3.center += pygame.math.Vector2(0,18) 
+            if i != 11:    
+                rectangle3.center += pygame.math.Vector2(0,18) 
             pantalla.blit(imatge_compra, rectangle3)
             if nivell_seleccionat == i+1 and color1 != blau:
                 pantalla.blit(num_text, rectangle2)
@@ -512,7 +526,7 @@ ocells1 = [vermellet.copy(llista_ocells, llista_objectes_rodons), vermellet.copy
 ocells3 = [racista.copy(llista_ocells, llista_objectes_rodons),racista.copy(llista_ocells, llista_objectes_rodons),racista.copy(llista_ocells, llista_objectes_rodons),vermellet.copy(llista_ocells, llista_objectes_rodons), vermellet.copy(llista_ocells, llista_objectes_rodons)]
 ocells4 = [pequeñin.copy(llista_ocells, llista_objectes_rodons),pequeñin.copy(llista_ocells, llista_objectes_rodons),pequeñin.copy(llista_ocells, llista_objectes_rodons),pequeñin.copy(llista_ocells, llista_objectes_rodons), vermellet.copy(llista_ocells, llista_objectes_rodons), vermellet.copy(llista_ocells, llista_objectes_rodons)]
 ocells5 = [racista.copy(llista_ocells, llista_objectes_rodons), racista.copy(llista_ocells, llista_objectes_rodons), pequeñin.copy(llista_ocells, llista_objectes_rodons), racista.copy(llista_ocells, llista_objectes_rodons), racista.copy(llista_ocells, llista_objectes_rodons), pequeñin.copy(llista_ocells, llista_objectes_rodons), vermellet.copy(llista_ocells, llista_objectes_rodons), vermellet.copy(llista_ocells, llista_objectes_rodons)]
-ocells2 = [vermellet.copy(llista_ocells, llista_objectes_rodons), vermellet.copy(llista_ocells, llista_objectes_rodons), vermellet.copy(llista_ocells, llista_objectes_rodons), vermellet.copy(llista_ocells, llista_objectes_rodons)]  
+ocells2 = [vermellet.copy(llista_ocells, llista_objectes_rodons), vermellet.copy(llista_ocells, llista_objectes_rodons), vermellet.copy(llista_ocells, llista_objectes_rodons), vermellet.copy(llista_ocells, llista_objectes_rodons), racista.copy(llista_ocells, llista_objectes_rodons), racista.copy(llista_ocells, llista_objectes_rodons)]  
 ocells7 = [bombardero.copy(llista_ocells, llista_objectes_rodons), bombardero.copy(llista_ocells, llista_objectes_rodons), bombardero.copy(llista_ocells, llista_objectes_rodons),bombardero.copy(llista_ocells, llista_objectes_rodons),bombardero.copy(llista_ocells, llista_objectes_rodons), bombardero.copy(llista_ocells, llista_objectes_rodons), bombardero.copy(llista_ocells, llista_objectes_rodons),  bombardero.copy(llista_ocells, llista_objectes_rodons)]
 ocells8 = [racista.copy(llista_ocells,llista_objectes_rodons),racista.copy(llista_ocells,llista_objectes_rodons),pequeñin.copy(llista_ocells, llista_objectes_rodons), vermellet.copy(llista_ocells, llista_objectes_rodons), pequeñin.copy(llista_ocells, llista_objectes_rodons), vermellet.copy(llista_ocells, llista_objectes_rodons),pequeñin.copy(llista_ocells, llista_objectes_rodons), vermellet.copy(llista_ocells, llista_objectes_rodons),pequeñin.copy(llista_ocells, llista_objectes_rodons), vermellet.copy(llista_ocells, llista_objectes_rodons)]
 ocells9 = [vermellet.copy(llista_ocells, llista_objectes_rodons), vermellet.copy(llista_ocells, llista_objectes_rodons), vermellet.copy(llista_ocells, llista_objectes_rodons), vermellet.copy(llista_ocells, llista_objectes_rodons), vermellet.copy(llista_ocells, llista_objectes_rodons), vermellet.copy(llista_ocells, llista_objectes_rodons), vermellet.copy(llista_ocells, llista_objectes_rodons), vermellet.copy(llista_ocells, llista_objectes_rodons), vermellet.copy(llista_ocells, llista_objectes_rodons), vermellet.copy(llista_ocells, llista_objectes_rodons)]
@@ -538,7 +552,7 @@ nivells_caixes_i_porcs = {1:nivell1, 2:nivell2, 3:nivell3, 4:nivell4, 5:nivell5,
 #llista_estrelles_nivells
 llista_estrelles = [[0,False],[0,True],[0,True],[0,True],[0,True],[0,True],[0,True],[0,True],[0,True],[0,True],[0,True],[0,True]]
 total_estrelles = 0
-llista_objectes_comprats = [[False,2,skin],[False,2,skin5],[False,2,skin],[False,2,skin],[False,3,skin2],[False,3,skin6],[False,3,skin7],[False,3,skin],[False,4,skin3],[False,4,skin],[False,4,skin],[False,4,skin4]]
+llista_objectes_comprats = [[False,2,skin],[False,2,skin2],[False,2,skin3],[False,2,skin6],[False,2,skin5],[False,3,skin10],[False,3,skin7],[False,3,skin11],[False,3,skin4],[False,3,skin12],[False,5,skin9],[False,6,skin8]]
 estrelles_gastades = 0
 # Game GameLoop
 def GameLoop():
