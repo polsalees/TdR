@@ -69,6 +69,9 @@ info_imatge = pygame.image.load("Grafics/info.png").convert_alpha()
 tenda_imatge = pygame.image.load("Grafics/tenda.png").convert_alpha()
 play_imatge = pygame.image.load("Grafics/play.png").convert_alpha()
 títol = pygame.image.load("Grafics/GALACTIC-PIUS.png").convert_alpha()
+nivells_imatge = pygame.image.load("Grafics/NIVELLS.png").convert_alpha()
+nivells_imatge = pygame.transform.scale(nivells_imatge,(pantalla_amplada*0.5,pantalla_amplada*0.5*(66/407)))
+nivells_rect = nivells_imatge.get_rect(center = (pantalla_amplada//2, pantalla_alçada//6))
 fons_2 = pygame.image.load("Grafics/fons2.jpg").convert_alpha()
 fons_2 = pygame.transform.scale(fons_2,(pantalla_alçada*(728/410)*1.7, pantalla_alçada*1.7))
 posar_tick = False
@@ -130,6 +133,7 @@ tnt = caixa([pantalla_amplada - 280, pantalla_alçada-405], 50, 50, True, 0,5, l
 
 # Selecció de nivell
 def selecció_nivell(estrelles):
+    ratoli = False
     nivell_seleccionat = 1
     selecció_nivell_acabada = False
     sortir_selecció = False
@@ -163,27 +167,48 @@ def selecció_nivell(estrelles):
         for event in pygame.event.get():
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_RIGHT and nivell_seleccionat < 12:
+                    pygame.mouse.set_visible(False)
+                    ratoli = False 
                     nivell_seleccionat += 1
                 elif event.key == pygame.K_LEFT and nivell_seleccionat > 1:
+                    pygame.mouse.set_visible(False)
+                    ratoli = False 
                     nivell_seleccionat -= 1
                 elif event.key == pygame.K_DOWN and nivell_seleccionat < 12:
                     nivell_seleccionat += 4
+                    pygame.mouse.set_visible(False)
+                    ratoli = False 
                     if nivell_seleccionat > 12:
                         nivell_seleccionat = 12
                 elif event.key == pygame.K_UP and nivell_seleccionat > 1:
                     nivell_seleccionat -= 4
+                    pygame.mouse.set_visible(False)
+                    ratoli = False 
                     if nivell_seleccionat < 1:
                         nivell_seleccionat = 1
                 elif event.key == pygame.K_SPACE and llista_estrelles[nivell_seleccionat-1][1] == False:
-                    selecció_nivell_acabada = True
+                    if ratoli == False:    
+                        selecció_nivell_acabada = True
+                    else:
+                        ratoli = False
+                        pygame.mouse.set_visible(False)    
                 elif event.key == pygame.K_ESCAPE:
                     selecció_nivell_acabada = True
                     sortir_selecció = True
-                if event.key == pygame.K_s:
+                elif event.key == pygame.K_s:
                     for i in llista_estrelles:
                         i[1] = False
-        pantalla.fill(fons2)
-        pantalla.blit(text1, (pantalla_amplada // 2 - text1.get_width() // 2, pantalla_alçada // 5 - text1.get_height() // 2 ))
+            elif event.type == pygame.MOUSEMOTION:
+                ratoli = True
+                pygame.mouse.set_visible(True)
+            elif event.type == pygame.MOUSEBUTTONUP:
+                if ratoli and llista_estrelles[nivell_seleccionat-1][1] == False:    
+                    selecció_nivell_acabada = True
+                else:
+                    ratoli = True
+                    pygame.mouse.set_visible(True)
+        pantalla.blit(fons_2, (0,-pantalla_alçada*0.15))
+        pantalla.blit(nivells_imatge, nivells_rect)
         # Crear una llista de textos de números de l'1 al 12
         for i, text in enumerate(textos):
             pos = posicions[i]
@@ -209,9 +234,17 @@ def selecció_nivell(estrelles):
                 amplada = num_text.get_height()*1.2
             else:
                 amplada = num_text.get_width()*1.2
-            if nivell_seleccionat == i+1:
-                num_text = pygame.transform.scale(num_text, (num_text.get_width()*1.2,num_text.get_height()*1.2))
-                amplada *=1.2
+            if ratoli:
+                rectangle = pygame.Rect((0,0), (amplada, amplada))
+                rectangle.center = pos
+                if rectangle.collidepoint(pygame.mouse.get_pos()):
+                    num_text = pygame.transform.scale(num_text, (num_text.get_width()*1.2,num_text.get_height()*1.2))
+                    amplada *=1.2
+                    nivell_seleccionat = i+1
+            else:     
+                if nivell_seleccionat == i+1:
+                    num_text = pygame.transform.scale(num_text, (num_text.get_width()*1.2,num_text.get_height()*1.2))
+                    amplada *=1.2
             rectangle = pygame.Rect((0,0), (amplada, amplada))
             rectangle.center = pos
             pygame.draw.rect(pantalla, color1, rectangle)
@@ -244,7 +277,7 @@ def menú(estrelles):
     for i in x:
         i*=0.3
         i += (pantalla_amplada-50,70)
-    nivell_seleccionat = 1
+    nivell_seleccionat = 2
     imatges = {0:info_imatge, 1:play_imatge, 2: tenda_imatge}
     seleccionat = False
     selecció = 4
