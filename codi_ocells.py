@@ -152,7 +152,7 @@ class ocell():
                 pygame.draw.circle(pantalla, blanc, self.linea_direció_posició, self.linea_direció_radi)
             self.linea_direció_moviment +=0.5
     def posar_skin(self, imatge):
-        self.imatge_skin = pygame.transform.scale(imatge,pygame.math.Vector2(285/447.5, 345/447.5)*self.radi*3.3)
+        self.imatge_skin = pygame.transform.scale(imatge,pygame.math.Vector2(285/447.5, 345/447.5)*self.radi*4)
         self.skin_offset = pygame.math.Vector2(0,-0.45*self.radi)
         self.diferencia_skin = pygame.math.Vector2(0,0)
         self.skin = True

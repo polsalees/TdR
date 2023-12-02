@@ -70,8 +70,11 @@ tenda_imatge = pygame.image.load("Grafics/tenda.png").convert_alpha()
 play_imatge = pygame.image.load("Grafics/play.png").convert_alpha()
 títol = pygame.image.load("Grafics/GALACTIC-PIUS.png").convert_alpha()
 nivells_imatge = pygame.image.load("Grafics/NIVELLS.png").convert_alpha()
-nivells_imatge = pygame.transform.scale(nivells_imatge,(pantalla_amplada*0.5,pantalla_amplada*0.5*(66/407)))
+nivells_imatge = pygame.transform.scale(nivells_imatge,(pantalla_amplada*0.4,pantalla_amplada*0.4*(66/407)))
 nivells_rect = nivells_imatge.get_rect(center = (pantalla_amplada//2, pantalla_alçada//6))
+tendas_imatg = pygame.image.load("Grafics/TENDA.png").convert_alpha()
+tendas_imatg = pygame.transform.scale(tendas_imatg,(pantalla_amplada*0.4*(291/407),pantalla_amplada*0.4*(66/407)))
+tendas_rect = tendas_imatg.get_rect(center = (pantalla_amplada//2, pantalla_alçada//6))
 fons_2 = pygame.image.load("Grafics/fons2.jpg").convert_alpha()
 fons_2 = pygame.transform.scale(fons_2,(pantalla_alçada*(728/410)*1.7, pantalla_alçada*1.7))
 posar_tick = False
@@ -501,6 +504,7 @@ def pantalla_final(tipo, estrelles, estrelles2):
     return y
 def tenda(estrelles):
     tenda = True
+    ratoli = False
     global estrelles_gastades
     global posar_tick
     global posicio_tick
@@ -531,30 +535,50 @@ def tenda(estrelles):
           (pantalla_amplada * 4 // 5, pantalla_alçada * 4 // 5)]
     font_gran = pygame.font.Font(None, 150)  # Mida de la font més gran
     compra = False
-    text1 = font.render("Tenda", True, taronja)
     while tenda:
         for event in pygame.event.get():
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
                     tenda = False
                 elif event.key == pygame.K_SPACE:
-                    compra = True
+                    if ratoli == False:    
+                        compra = True
+                    else:
+                        ratoli = False
+                        pygame.mouse.set_visible(False)
                 elif event.key == pygame.K_RIGHT and nivell_seleccionat < 12:
+                    ratoli = False
+                    pygame.mouse.set_visible(False) 
                     nivell_seleccionat += 1
                 elif event.key == pygame.K_LEFT and nivell_seleccionat > 1:
+                    ratoli = False
+                    pygame.mouse.set_visible(False) 
                     nivell_seleccionat -= 1
                 elif event.key == pygame.K_DOWN and nivell_seleccionat < 12:
+                    ratoli = False
+                    pygame.mouse.set_visible(False) 
                     nivell_seleccionat += 4
                     if nivell_seleccionat > 12:
                         nivell_seleccionat = 12
                 elif event.key == pygame.K_UP and nivell_seleccionat > 1:
+                    ratoli = False
+                    pygame.mouse.set_visible(False) 
                     nivell_seleccionat -= 4
                     if nivell_seleccionat < 1:
                         nivell_seleccionat = 1
-        pantalla.fill(fons2)
+            elif event.type == pygame.MOUSEMOTION:
+                ratoli = True
+                pygame.mouse.set_visible(True)
+            elif event.type == pygame.MOUSEBUTTONUP:
+                if ratoli:    
+                    compra = True
+                else:
+                    ratoli = True
+                    pygame.mouse.set_visible(True)
+        pantalla.blit(fons_2, (0,-pantalla_alçada*0.15))
         text4 = font.render(str(estrelles-estrelles_gastades), True, groc)
         pantalla.blit(text4, (pantalla_amplada-(100+text4.get_width()), 28))
-        pantalla.blit(text1, (pantalla_amplada // 2 - text1.get_width() // 2, pantalla_alçada // 5 - text1.get_height() // 2 ))
+        pantalla.blit(tendas_imatg, tendas_rect)
         pygame.draw.polygon(pantalla, taronja3, z)
         pygame.draw.polygon(pantalla, taronja, x)
         for i, text in enumerate(textos):
@@ -575,22 +599,43 @@ def tenda(estrelles):
                 amplada = num_text.get_height()*1.2
             else:
                 amplada = num_text.get_width()*1.2
-            if nivell_seleccionat == i+1:
-                num_text = pygame.transform.scale(num_text, (num_text.get_width()*1.2,num_text.get_height()*1.2))
-                amplada *=1.2
-                if compra == True:
-                    compra = False
-                    if color1 == verd:
-                        estrelles_gastades += numero
-                        llista_objectes_comprats[i][0] = True
-                    if color1 == verd or color1 == blau:    
-                        if posicio_tick != pos or posar_tick == False:
-                            posar_tick = True
-                            imatge_skin = llista_objectes_comprats[i][2]
-                        else:
-                            posar_tick = False
-                            imatge_skin = None
-                        posicio_tick = pos
+            if ratoli:
+                rectangle = pygame.Rect((0,0), (amplada, amplada))
+                rectangle.center = pos
+                if rectangle.collidepoint(pygame.mouse.get_pos()):
+                    num_text = pygame.transform.scale(num_text, (num_text.get_width()*1.2,num_text.get_height()*1.2))
+                    amplada *=1.2
+                    if compra == True:
+                        compra = False
+                        if color1 == verd:
+                            estrelles_gastades += numero
+                            llista_objectes_comprats[i][0] = True
+                        if color1 == verd or color1 == blau:    
+                            if posicio_tick != pos or posar_tick == False:
+                                posar_tick = True
+                                imatge_skin = llista_objectes_comprats[i][2]
+                            else:
+                                posar_tick = False
+                                imatge_skin = None
+                            posicio_tick = pos
+                    nivell_seleccionat = i+1
+            else:    
+                if nivell_seleccionat == i+1:
+                    num_text = pygame.transform.scale(num_text, (num_text.get_width()*1.2,num_text.get_height()*1.2))
+                    amplada *=1.2
+                    if compra == True:
+                        compra = False
+                        if color1 == verd:
+                            estrelles_gastades += numero
+                            llista_objectes_comprats[i][0] = True
+                        if color1 == verd or color1 == blau:    
+                            if posicio_tick != pos or posar_tick == False:
+                                posar_tick = True
+                                imatge_skin = llista_objectes_comprats[i][2]
+                            else:
+                                posar_tick = False
+                                imatge_skin = None
+                            posicio_tick = pos
             rectangle = pygame.Rect((0,0), (amplada, amplada))
             rectangle.center = pos
             pygame.draw.rect(pantalla, color1, rectangle)
@@ -601,8 +646,13 @@ def tenda(estrelles):
             if i != 11:    
                 rectangle3.center += pygame.math.Vector2(0,18) 
             pantalla.blit(imatge_compra, rectangle3)
-            if nivell_seleccionat == i+1 and color1 != blau:
-                pantalla.blit(num_text, rectangle2)
+            if color1 != blau:
+                if ratoli:
+                    if rectangle.collidepoint(pygame.mouse.get_pos()): 
+                        pantalla.blit(num_text, rectangle2)   
+                else:
+                    if nivell_seleccionat == i+1:
+                        pantalla.blit(num_text, rectangle2)
             if posar_tick and posicio_tick == pos:
                 tick_2 = pygame.transform.scale(tick_imatge,(amplada/2,amplada/2))
                 pantalla.blit(tick_2,posicio_tick)
