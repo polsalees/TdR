@@ -302,6 +302,8 @@ class ocell():
                 if self.skin:
                     self.copia1.posar_skin(self.imatge_skin)
                     self.copia2.posar_skin(self.imatge_skin)
+                    self.copia1.invisible = self.invisible
+                    self.copia2.invisible = self.invisible
                 llista_objectes_pantalla.append(self.copia1) 
                 llista_objectes_pantalla.append(self.copia2)
                 sprites.append(self.copia1)
