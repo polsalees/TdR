@@ -64,8 +64,13 @@ skin9 = pygame.image.load("Grafics/skin9.png").convert_alpha()
 skin10 = pygame.image.load("Grafics/skin10.png").convert_alpha()
 skin11 = pygame.image.load("Grafics/skin11.png").convert_alpha()
 skin12 = pygame.image.load("Grafics/skin12.png").convert_alpha()
-tick = pygame.image.load("Grafics/tick.png").convert_alpha()
-tick_imatge = pygame.transform.scale(tick, pygame.math.Vector2(tick.get_width(), tick.get_height())/3)
+tick_imatge = pygame.image.load("Grafics/tick.png").convert_alpha()
+info_imatge = pygame.image.load("Grafics/info.png").convert_alpha()
+tenda_imatge = pygame.image.load("Grafics/tenda.png").convert_alpha()
+play_imatge = pygame.image.load("Grafics/play.png").convert_alpha()
+títol = pygame.image.load("Grafics/GALACTIC-PIUS.png").convert_alpha()
+fons_2 = pygame.image.load("Grafics/fons2.jpg").convert_alpha()
+fons_2 = pygame.transform.scale(fons_2,(pantalla_alçada*(728/410)*1.7, pantalla_alçada*1.7))
 posar_tick = False
 posicio_tick = 0
 imatge_skin = None
@@ -226,18 +231,36 @@ def selecció_nivell(estrelles):
 
 # Menú principal
 def menú(estrelles):
+    ratoli = False
     global nivell_actual
+    posicions = [(pantalla_amplada * 1 // 4, pantalla_alçada * 4 // 5),
+          (pantalla_amplada * 2 // 4, pantalla_alçada * 4 // 5),
+          (pantalla_amplada * 3 // 4, pantalla_alçada * 4 // 5)]
+    z = [pygame.math.Vector2(0, -100),pygame.math.Vector2(0, 50).rotate(72*3) , pygame.math.Vector2(0, -100).rotate(72),pygame.math.Vector2(0, 50).rotate(72*4), pygame.math.Vector2(0, -100).rotate(72*2), pygame.math.Vector2(0, 50), pygame.math.Vector2(0, -100).rotate(72*3),pygame.math.Vector2(0, 50).rotate(72), pygame.math.Vector2(0, -100).rotate(72*4), pygame.math.Vector2(0, 50).rotate(72*2)]
+    for i in z:
+        i*=0.45
+        i +=(pantalla_amplada-50,70)
+    x = [pygame.math.Vector2(0, -100),pygame.math.Vector2(0, 50).rotate(72*3) , pygame.math.Vector2(0, -100).rotate(72),pygame.math.Vector2(0, 50).rotate(72*4), pygame.math.Vector2(0, -100).rotate(72*2), pygame.math.Vector2(0, 50), pygame.math.Vector2(0, -100).rotate(72*3),pygame.math.Vector2(0, 50).rotate(72), pygame.math.Vector2(0, -100).rotate(72*4), pygame.math.Vector2(0, 50).rotate(72*2)]
+    for i in x:
+        i*=0.3
+        i += (pantalla_amplada-50,70)
+    nivell_seleccionat = 1
+    imatges = {0:info_imatge, 1:play_imatge, 2: tenda_imatge}
+    seleccionat = False
+    selecció = 4
+    imatge_títol = pygame.transform.scale(títol,(pantalla_amplada*0.9,pantalla_amplada*0.9*(70/717)))
+    títol_rect = imatge_títol.get_rect(center = (pantalla_amplada//2, pantalla_alçada*2//5))
     while True:
         for event in pygame.event.get():
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
                     return False
                 elif event.key == pygame.K_SPACE:
-                    dificultat = selecció_nivell(estrelles)
-                    if dificultat:
-                        print("Dificultat seleccionada:", dificultat)
-                        nivell_actual = dificultat
-                        return True
+                    if ratoli == False:    
+                        seleccionat = True
+                    else:
+                        ratoli = False
+                        pygame.mouse.set_visible(False)
                 elif event.key == pygame.K_i:
                     info()
                 elif event.key == pygame.K_t:
@@ -256,34 +279,87 @@ def menú(estrelles):
                     else:
                         for i in llista_ocells:
                             i.treure_skin()
-        pantalla.fill(fons2)
-
-        font = pygame.font.Font(None, 250)
-        text = font.render("Galactic Pius", True, taronja)
-        pantalla.blit(text, (pantalla_amplada // 2 - text.get_width() // 2, pantalla_alçada*2 // 5 - text.get_height() // 2))
-        font3 = pygame.font.Font(None, 75)
-        text2 = font3.render("ESPAI PER NIVELLS", True, taronja)
-        pantalla.blit(text2, (pantalla_amplada *0.25 - text2.get_width() // 2, pantalla_alçada*3.5 // 5 - text2.get_height() // 2))
-        text3 = font3.render("'i' PER INFO", True, taronja)
-        pantalla.blit(text3, (pantalla_amplada*0.75 - text3.get_width() // 2, pantalla_alçada*3.5 // 5 - text3.get_height() // 2))
-        text5 = font3.render("'t' PER TENDA", True, taronja)
-        pantalla.blit(text5, (pantalla_amplada*0.5 - text5.get_width() // 2, pantalla_alçada*4.2 // 5 - text5.get_height() // 2))
-        font2 = pygame.font.Font(None, 60)
-        text1 = font2.render("ESC per a sortir", True, groc)
-        pantalla.blit(text1, (text1.get_width()*0.2, text1.get_height()*1.5))
+                elif event.key == pygame.K_RIGHT and nivell_seleccionat < 3:
+                    pygame.mouse.set_visible(False)
+                    ratoli = False
+                    nivell_seleccionat += 1
+                elif event.key == pygame.K_LEFT and nivell_seleccionat > 1:
+                    ratoli = False
+                    pygame.mouse.set_visible(False) 
+                    nivell_seleccionat -= 1
+            elif event.type == pygame.MOUSEMOTION:
+                ratoli = True
+                pygame.mouse.set_visible(True)
+            elif event.type == pygame.MOUSEBUTTONUP:
+                if ratoli:    
+                    seleccionat = True
+                else:
+                    ratoli = True
+                    pygame.mouse.set_visible(True)
+        pantalla.blit(fons_2, (0,-pantalla_alçada*0.15))
+        pantalla.blit(imatge_títol, títol_rect)
         font = pygame.font.Font(None, 130)
         text4 = font.render(str(estrelles-estrelles_gastades), True, groc)
         pantalla.blit(text4, (pantalla_amplada-(100+text4.get_width()), 28))
-        z = [pygame.math.Vector2(0, -100),pygame.math.Vector2(0, 50).rotate(72*3) , pygame.math.Vector2(0, -100).rotate(72),pygame.math.Vector2(0, 50).rotate(72*4), pygame.math.Vector2(0, -100).rotate(72*2), pygame.math.Vector2(0, 50), pygame.math.Vector2(0, -100).rotate(72*3),pygame.math.Vector2(0, 50).rotate(72), pygame.math.Vector2(0, -100).rotate(72*4), pygame.math.Vector2(0, 50).rotate(72*2)]
-        for i in z:
-            i*=0.45
-            i +=(pantalla_amplada-50,70)
-        x = [pygame.math.Vector2(0, -100),pygame.math.Vector2(0, 50).rotate(72*3) , pygame.math.Vector2(0, -100).rotate(72),pygame.math.Vector2(0, 50).rotate(72*4), pygame.math.Vector2(0, -100).rotate(72*2), pygame.math.Vector2(0, 50), pygame.math.Vector2(0, -100).rotate(72*3),pygame.math.Vector2(0, 50).rotate(72), pygame.math.Vector2(0, -100).rotate(72*4), pygame.math.Vector2(0, 50).rotate(72*2)]
-        for i in x:
-            i*=0.3
-            i += (pantalla_amplada-50,70)
         pygame.draw.polygon(pantalla, taronja3, z)
         pygame.draw.polygon(pantalla, taronja, x)
+        for i in range(0,3):
+            pos = posicions[i]
+            amplada = 130
+            color1 = (29,86,172)
+            color2 =(19,64,132)
+            if ratoli:    
+                rectangle = pygame.Rect((0,0), (amplada, amplada))
+                rectangle.center = pos
+                if rectangle.collidepoint(pygame.mouse.get_pos()):
+                    nivell_seleccionat = i+1
+                    amplada *=1.2
+                    color1 = verd
+                    color2 = verd_fosc
+                    if seleccionat:
+                        selecció = i
+            else:
+                if nivell_seleccionat == i+1:
+                    amplada *=1.2
+                    color1 = verd
+                    color2 = verd_fosc
+                    if seleccionat:
+                        selecció = i
+            imatge = imatges[i]
+            imatge = pygame.transform.scale(imatge, (amplada*0.8,amplada*0.8))
+            rectangle2 = imatge.get_rect(center = pos)
+            rectangle = pygame.Rect((0,0), (amplada, amplada))
+            rectangle.center = pos
+            pygame.draw.rect(pantalla, color1, rectangle)
+            pygame.draw.rect(pantalla, color2, rectangle, 8)
+            pantalla.blit(imatge, rectangle2)
+        if seleccionat:
+            if selecció == 0:
+                info()
+            elif selecció == 1:
+                dificultat = selecció_nivell(estrelles)
+                if dificultat:
+                    nivell_actual = dificultat
+                    pygame.mouse.set_visible(True)
+                    return True
+            elif selecció == 2:
+                aparença = tenda(estrelles)
+                if aparença != None:
+                    if aparença == skin8:
+                        invisible = True
+                    else:
+                        invisible = False
+                    for i in llista_ocells:
+                        i.posar_skin(aparença)
+                        if invisible:
+                            i.invisible = True
+                        else:
+                            i.invisible = False
+                else:
+                    for i in llista_ocells:
+                        i.treure_skin()
+            seleccionat = False
+            selecció = 4
         pygame.display.flip()
 def info():
     global nivell_actual
