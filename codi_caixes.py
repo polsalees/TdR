@@ -230,6 +230,7 @@ class caixa():
             else:
                 for i in self.animació:
                     pygame.draw.circle(pantalla,self.color_animació,i[1]+diferencia,i[0])
+    
     def calcul_angle_rampa(self, pos):
         pos_centre1 = self.vector_centre1.rotate(-self.angle)+ self.rectangle.center
         pos_centre2 = self.vector_centre2.rotate(-self.angle)+ self.rectangle.center

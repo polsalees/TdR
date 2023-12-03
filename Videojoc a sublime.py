@@ -502,11 +502,11 @@ def info():
                     diferencia = -440
             elif event.type == pygame.MOUSEBUTTONUP:
                 click = True
-        rectangle1 = pygame.Rect(text.get_width()*0.2-20, text.get_height()*1.6+diferencia-10+100, 1050, 170)
-        rectangle2 = pygame.Rect(text.get_width()*0.2-20, text.get_height()*2.6 +text2.get_height()*5+diferencia-10+100, 1030, 170)
-        rectangle3 = pygame.Rect(text.get_width()*0.2-20, text.get_height()*2.6*2.2 +text2.get_height()*5+diferencia-10+100, 1060, 195)
-        rectangle4 = pygame.Rect(text.get_width()*0.2-20, text.get_height()*2.6*3.5 +text2.get_height()*5+diferencia-10+100, 1130, 195)
-        rectangle5 = pygame.Rect(text.get_width()*0.2-20, text.get_height()*2.6*4.8 +text2.get_height()*5+diferencia-10+100, 1070, 195)
+        rectangle1 = pygame.Rect(text.get_width()*0.2+30, text.get_height()*1.6+diferencia-10+100, 1050, 170)
+        rectangle2 = pygame.Rect(text.get_width()*0.2+30, text.get_height()*2.6 +text2.get_height()*5+diferencia-10+100, 1030, 170)
+        rectangle3 = pygame.Rect(text.get_width()*0.2+30, text.get_height()*2.6*2.2 +text2.get_height()*5+diferencia-10+100, 1060, 195)
+        rectangle4 = pygame.Rect(text.get_width()*0.2+30, text.get_height()*2.6*3.5 +text2.get_height()*5+diferencia-10+100, 1130, 195)
+        rectangle5 = pygame.Rect(text.get_width()*0.2+30, text.get_height()*2.6*4.8 +text2.get_height()*5+diferencia-10+100, 1070, 195)
         rectangles = [rectangle1, rectangle2, rectangle3, rectangle4, rectangle5]
         pantalla.blit(fons_2, (0,-pantalla_alçada*0.1+diferencia*0.1))
         for i in rectangles:
@@ -514,7 +514,7 @@ def info():
             pygame.draw.rect(pantalla, (19,64,132), i,8)
         a = 1
         b = -1
-        pantalla.blit(text15, (text.get_width()*0.2 , text.get_height()*1.6+diferencia+100))
+        pantalla.blit(text15, (text.get_width()*0.2+50, text.get_height()*1.6+diferencia+100))
         for i in textos:
             if i.get_height() > text2.get_height()+1:
                 amplada = text.get_width()*0.2
@@ -522,7 +522,7 @@ def info():
             else:
                 b+=1
                 amplada = 90
-            pantalla.blit(i, (amplada, text.get_height()*2.6*a +text2.get_height()*b+diferencia+100))
+            pantalla.blit(i, (amplada+50, text.get_height()*2.6*a +text2.get_height()*b+diferencia+100))
             if i.get_height() > text2.get_height()+1:
                 amplada = text.get_width()*0.2
                 if b == 5:    
@@ -1172,6 +1172,12 @@ def GameLoop():
                 elif event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_ESCAPE:
                         partida = pausa()
+                        if partida and sprites == [terra]:
+                            n = 0
+                            nombre_porcs = 0
+                            nombre_porcs_orig = 0
+                            nombre_ocells = 0
+                            n2 = 0
                     if event.key == pygame.K_SPACE:
                         camara.principi_nivell = False
                         camara.tornar_ocell = True
@@ -1255,7 +1261,7 @@ def GameLoop():
                 velocitat = 1
             if n2%velocitat == 0:
                 camara.update(llista_objectes_pantalla,ocell_anterior, ocells_nivell, ocell_actual, mantenint_ocell, ocell_anterior, mantenint,posició_mantenint,rectangle_mantenint, llista_ocells_llançats, factor_de_potencia, llista_ocells)
-            if nombre_porcs == 0:
+            if nombre_porcs == 0 and n!=0:
                 estrelles = nombre_porcs_orig - (len(llista_ocells_llançats)-3)
                 estrelles+=2
                 if estrelles < 1:
@@ -1273,7 +1279,7 @@ def GameLoop():
                 n2 = 0
                 if nivell_actual == 13:
                     partida = False
-            elif nombre_ocells == 0:
+            elif nombre_ocells == 0 and n!=0:
                 reinici()
                 n = 0
                 nombre_porcs = 0

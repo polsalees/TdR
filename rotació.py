@@ -48,7 +48,6 @@ def rotacions(self,x, posició_xoc_s, ns, nx, rectangle_xoc, centre1,centre2,cen
                             else:
                                 self.pivot_pantalla = self.rectangle.center
                                 self.pivot = (0.5*self.amplada, 0.5*self.alçada)
-                self.rotar = True
                 if abs(colisió_centre[2].angle_to((-1,0)) - vector_colisió.angle_to((-1,0))) <  abs(vector_negatiu.angle_to((-1,0)) - vector_colisió.angle_to((-1,0))):
                     self.velocitat_angle += vector_colisió.length()*(abs(suma_velocitat_per_rotació.length()*math.sin(math.radians(colisió_centre[2].angle_to((-1,0)) - suma_velocitat_per_rotació.angle_to((-1,0))))*x.massa/self.massa))/(0.5*self.amplada)
                 else:
@@ -197,6 +196,9 @@ def rotacions(self,x, posició_xoc_s, ns, nx, rectangle_xoc, centre1,centre2,cen
                         meitat2 = 0
                         self.rotacions.append((-1,0))
                         self.rotacions.append((1,0))
+                        self.rotar = False
+                        colisió_centre_2 = (pygame.math.Vector2(colisió_centre[0],colisió_centre[1]) - antic_centre).rotate(180) + antic_centre
+                        self.centre_no_rotar = [colisió_centre[0], colisió_centre[1], colisió_centre_2.x, colisió_centre_2.y] 
                     elif meitat5>(meitat4+meitat5+meitat6)/2:
                         meitat1 = meitat4
                         meitat2 = meitat5
@@ -206,6 +208,9 @@ def rotacions(self,x, posició_xoc_s, ns, nx, rectangle_xoc, centre1,centre2,cen
                         meitat2 = 0
                         self.rotacions.append((-1,0))
                         self.rotacions.append((1,0))
+                        self.rotar = False
+                        colisió_centre_2 = (pygame.math.Vector2(colisió_centre[0],colisió_centre[1]) - antic_centre).rotate(180) + antic_centre
+                        self.centre_no_rotar = [colisió_centre[0], colisió_centre[1], colisió_centre_2.x, colisió_centre_2.y] 
                     elif meitat4>(meitat4+meitat5+meitat6)/2:
                         meitat1 = meitat4
                         meitat2 = meitat5
@@ -271,6 +276,8 @@ def rotacions(self,x, posició_xoc_s, ns, nx, rectangle_xoc, centre1,centre2,cen
                     self.n = 0    
     elif self.rotar:
         self.angle = round(self.angle)
+        if ns == 0 and round(x.angle)%90 != round(self.angle)%90:
+            self.angle = round(x.angle)%90 + self.angle//90 *90
         self.velocitat_angle = 0
         self.rotar = False
         if posició_xoc_s in esquines or colisió == True:
