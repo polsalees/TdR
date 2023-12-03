@@ -1,5 +1,6 @@
 import pygame
 import math
+import random
 pygame.init()
 # Iniciar programa
 
@@ -71,6 +72,13 @@ tenda_imatge = pygame.image.load("Grafics/tenda.png").convert_alpha()
 repetir_imatge = pygame.image.load("Grafics/repetir.png").convert_alpha()
 home_imatge = pygame.image.load("Grafics/home.png").convert_alpha()
 play_imatge = pygame.image.load("Grafics/play.png").convert_alpha()
+pausa_imatge = pygame.image.load("Grafics/pausa.png").convert_alpha()
+pausa_imatge = pygame.transform.scale(pausa_imatge,(90*0.7,90*0.7))
+pausa_imatge_2 = pygame.transform.scale(pausa_imatge,(90*0.7*1.2,90*0.7*1.2))
+rectangle_pausa = pygame.Rect(pantalla_amplada/20,pantalla_alçada/14, 90,90)
+rectangle_pausa_2 = pygame.Rect(pantalla_amplada/20,pantalla_alçada/14, 90*1.2,90*1.2)
+rectangle_pausa_2.center = rectangle_pausa.center
+x_imatge = pygame.image.load("Grafics/x.png").convert_alpha()
 títol = pygame.image.load("Grafics/GALACTIC-PIUS.png").convert_alpha()
 nivells_imatge = pygame.image.load("Grafics/NIVELLS.png").convert_alpha()
 nivells_imatge = pygame.transform.scale(nivells_imatge,(pantalla_amplada*0.3,pantalla_amplada*0.3*(66/407)))
@@ -84,6 +92,9 @@ derrota_rect = derrota_imatge.get_rect(center = (pantalla_amplada//2, pantalla_a
 tendas_imatg = pygame.image.load("Grafics/TENDA.png").convert_alpha()
 tendas_imatg = pygame.transform.scale(tendas_imatg,(pantalla_amplada*0.3*(291/407),pantalla_amplada*0.3*(66/407)))
 tendas_rect = tendas_imatg.get_rect(center = (pantalla_amplada//2, pantalla_alçada//6))
+pausas_imatg = pygame.image.load("Grafics/PAUSA.png").convert_alpha()
+pausas_imatg = pygame.transform.scale(pausas_imatg,(pantalla_amplada*0.4*(291/407),pantalla_amplada*0.4*(66/407)))
+pausas_rect = pausas_imatg.get_rect(center = (pantalla_amplada//2, pantalla_alçada*3//8))
 fons_2 = pygame.image.load("Grafics/fons2.jpg").convert_alpha()
 fons_2 = pygame.transform.scale(fons_2,(pantalla_alçada*(728/410)*1.7, pantalla_alçada*1.7))
 posar_tick = False
@@ -153,11 +164,11 @@ def selecció_nivell(estrelles):
     polygon1 = [pygame.math.Vector2(0, -100),pygame.math.Vector2(0, 50).rotate(72*3) , pygame.math.Vector2(0, -100).rotate(72),pygame.math.Vector2(0, 50).rotate(72*4), pygame.math.Vector2(0, -100).rotate(72*2), pygame.math.Vector2(0, 50), pygame.math.Vector2(0, -100).rotate(72*3),pygame.math.Vector2(0, 50).rotate(72), pygame.math.Vector2(0, -100).rotate(72*4), pygame.math.Vector2(0, 50).rotate(72*2)]
     for i in polygon1:
         i*=0.45
-        i +=(pantalla_amplada-50,70)
+        i +=(pantalla_amplada*46.5/50,pantalla_alçada/8.5)
     polygon2 = [pygame.math.Vector2(0, -100),pygame.math.Vector2(0, 50).rotate(72*3) , pygame.math.Vector2(0, -100).rotate(72),pygame.math.Vector2(0, 50).rotate(72*4), pygame.math.Vector2(0, -100).rotate(72*2), pygame.math.Vector2(0, 50), pygame.math.Vector2(0, -100).rotate(72*3),pygame.math.Vector2(0, 50).rotate(72), pygame.math.Vector2(0, -100).rotate(72*4), pygame.math.Vector2(0, 50).rotate(72*2)]
     for i in polygon2:
         i*=0.3
-        i += (pantalla_amplada-50,70)
+        i += (pantalla_amplada*46.5/50,pantalla_alçada/8.5)
     font = pygame.font.Font(None, 150)
     text1 = font.render("Nivells", True, taronja)
     numeros = [str(i) for i in range(1, 13)]
@@ -286,7 +297,7 @@ def selecció_nivell(estrelles):
         pantalla.blit(fletxa_imatge_2, rectangle_fletxa)
         font = pygame.font.Font(None, 130)
         text4 = font.render(str(estrelles-estrelles_gastades), True, taronja)
-        pantalla.blit(text4, (pantalla_amplada-(100+text4.get_width()), 28))
+        pantalla.blit(text4, (pantalla_amplada*43/50, pantalla_alçada/14))
         pygame.draw.polygon(pantalla, taronja3, polygon1)
         pygame.draw.polygon(pantalla, taronja, polygon2)
         pygame.display.flip()
@@ -298,6 +309,7 @@ def selecció_nivell(estrelles):
 # Menú principal
 def menú(estrelles):
     ratoli = False
+    rectangle_x = pygame.Rect(pantalla_amplada/20,pantalla_alçada/14, 90,90)
     global nivell_actual
     posicions = [(pantalla_amplada * 1 // 4, pantalla_alçada * 4 // 5),
           (pantalla_amplada * 2 // 4, pantalla_alçada * 4 // 5),
@@ -305,11 +317,11 @@ def menú(estrelles):
     z = [pygame.math.Vector2(0, -100),pygame.math.Vector2(0, 50).rotate(72*3) , pygame.math.Vector2(0, -100).rotate(72),pygame.math.Vector2(0, 50).rotate(72*4), pygame.math.Vector2(0, -100).rotate(72*2), pygame.math.Vector2(0, 50), pygame.math.Vector2(0, -100).rotate(72*3),pygame.math.Vector2(0, 50).rotate(72), pygame.math.Vector2(0, -100).rotate(72*4), pygame.math.Vector2(0, 50).rotate(72*2)]
     for i in z:
         i*=0.45
-        i +=(pantalla_amplada-50,70)
+        i +=(pantalla_amplada*46.5/50,pantalla_alçada/8.5)
     x = [pygame.math.Vector2(0, -100),pygame.math.Vector2(0, 50).rotate(72*3) , pygame.math.Vector2(0, -100).rotate(72),pygame.math.Vector2(0, 50).rotate(72*4), pygame.math.Vector2(0, -100).rotate(72*2), pygame.math.Vector2(0, 50), pygame.math.Vector2(0, -100).rotate(72*3),pygame.math.Vector2(0, 50).rotate(72), pygame.math.Vector2(0, -100).rotate(72*4), pygame.math.Vector2(0, 50).rotate(72*2)]
     for i in x:
         i*=0.3
-        i += (pantalla_amplada-50,70)
+        i += (pantalla_amplada*46.5/50,pantalla_alçada/8.5)
     nivell_seleccionat = 2
     imatges = {0:info_imatge, 1:play_imatge, 2: tenda_imatge}
     seleccionat = False
@@ -317,6 +329,7 @@ def menú(estrelles):
     imatge_títol = pygame.transform.scale(títol,(pantalla_amplada*0.9,pantalla_amplada*0.9*(70/717)))
     títol_rect = imatge_títol.get_rect(center = (pantalla_amplada//2, pantalla_alçada*2//5))
     while True:
+        seleccionat = False
         for event in pygame.event.get():
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
@@ -366,7 +379,7 @@ def menú(estrelles):
         pantalla.blit(imatge_títol, títol_rect)
         font = pygame.font.Font(None, 130)
         text4 = font.render(str(estrelles-estrelles_gastades), True, taronja)
-        pantalla.blit(text4, (pantalla_amplada-(100+text4.get_width()), 28))
+        pantalla.blit(text4, (pantalla_amplada*43/50, pantalla_alçada/14))
         pygame.draw.polygon(pantalla, taronja3, z)
         pygame.draw.polygon(pantalla, taronja, x)
         for i in range(0,3):
@@ -397,6 +410,22 @@ def menú(estrelles):
             pygame.draw.rect(pantalla, color1, rectangle)
             pygame.draw.rect(pantalla, color2, rectangle, 8)
             pantalla.blit(imatge, rectangle2)
+        if rectangle_x.collidepoint(pygame.mouse.get_pos()) and ratoli:
+            rectangle_x_2 = pygame.Rect(pantalla_amplada/20,pantalla_alçada/14, 90*1.2,90*1.2)
+            rectangle_x_2.center = rectangle_x.center
+            x_imatge_2 = pygame.transform.scale(x_imatge,(90*1.2*0.8,90*1.2*0.8))
+            if seleccionat:
+                return False
+            color2 = taronja
+        else:
+            x_imatge_2 = pygame.transform.scale(x_imatge,(90*0.8,90*0.8))
+            rectangle_x_2 = rectangle_x
+            color2 =(19,64,132)
+        color = (29,86,172)
+        rectangle_x_3 = x_imatge_2.get_rect(center = rectangle_x.center)
+        pygame.draw.rect(pantalla, color, rectangle_x_2)
+        pygame.draw.rect(pantalla, color2, rectangle_x_2,8)
+        pantalla.blit(x_imatge_2, rectangle_x_3)
         if seleccionat:
             if selecció == 0:
                 info()
@@ -484,13 +513,14 @@ def pantalla_final_victoria(estrelles, estrelles2):
     z2 = [pygame.math.Vector2(0, -100),pygame.math.Vector2(0, 50).rotate(72*3) , pygame.math.Vector2(0, -100).rotate(72),pygame.math.Vector2(0, 50).rotate(72*4), pygame.math.Vector2(0, -100).rotate(72*2), pygame.math.Vector2(0, 50), pygame.math.Vector2(0, -100).rotate(72*3),pygame.math.Vector2(0, 50).rotate(72), pygame.math.Vector2(0, -100).rotate(72*4), pygame.math.Vector2(0, 50).rotate(72*2)]
     for i in z2:
         i*=0.45
-        i +=(pantalla_amplada-50,70)
+        i +=(pantalla_amplada*46.5/50,pantalla_alçada/8.5)
     x2 = [pygame.math.Vector2(0, -100),pygame.math.Vector2(0, 50).rotate(72*3) , pygame.math.Vector2(0, -100).rotate(72),pygame.math.Vector2(0, 50).rotate(72*4), pygame.math.Vector2(0, -100).rotate(72*2), pygame.math.Vector2(0, 50), pygame.math.Vector2(0, -100).rotate(72*3),pygame.math.Vector2(0, 50).rotate(72), pygame.math.Vector2(0, -100).rotate(72*4), pygame.math.Vector2(0, 50).rotate(72*2)]
     for i in x2:
         i*=0.3
-        i += (pantalla_amplada-50,70)
+        i += (pantalla_amplada*46.5/50,pantalla_alçada/8.5)
     text4 = font4.render(str(estrelles2-estrelles_gastades), True, taronja)
     while final:
+        seleccionat = False
         color = estrelles
         n = 3
         for event in pygame.event.get():
@@ -571,7 +601,7 @@ def pantalla_final_victoria(estrelles, estrelles2):
             pygame.draw.rect(pantalla, color1, rectangle)
             pygame.draw.rect(pantalla, color2, rectangle, 8)
             pantalla.blit(imatge, rectangle2)
-        pantalla.blit(text4, (pantalla_amplada-(100+text4.get_width()), 28))
+        pantalla.blit(text4, (pantalla_amplada*43/50, pantalla_alçada/14))
         pygame.draw.polygon(pantalla, taronja3, z2)
         pygame.draw.polygon(pantalla, taronja, x2)
         pygame.display.flip()
@@ -600,13 +630,14 @@ def pantalla_final_derrota(estrelles2):
     z2 = [pygame.math.Vector2(0, -100),pygame.math.Vector2(0, 50).rotate(72*3) , pygame.math.Vector2(0, -100).rotate(72),pygame.math.Vector2(0, 50).rotate(72*4), pygame.math.Vector2(0, -100).rotate(72*2), pygame.math.Vector2(0, 50), pygame.math.Vector2(0, -100).rotate(72*3),pygame.math.Vector2(0, 50).rotate(72), pygame.math.Vector2(0, -100).rotate(72*4), pygame.math.Vector2(0, 50).rotate(72*2)]
     for i in z2:
         i*=0.45
-        i +=(pantalla_amplada-50,70)
+        i +=(pantalla_amplada*46.5/50,pantalla_alçada/8.5)
     x2 = [pygame.math.Vector2(0, -100),pygame.math.Vector2(0, 50).rotate(72*3) , pygame.math.Vector2(0, -100).rotate(72),pygame.math.Vector2(0, 50).rotate(72*4), pygame.math.Vector2(0, -100).rotate(72*2), pygame.math.Vector2(0, 50), pygame.math.Vector2(0, -100).rotate(72*3),pygame.math.Vector2(0, 50).rotate(72), pygame.math.Vector2(0, -100).rotate(72*4), pygame.math.Vector2(0, 50).rotate(72*2)]
     for i in x2:
         i*=0.3
-        i += (pantalla_amplada-50,70)
+        i += (pantalla_amplada*46.5/50,pantalla_alçada/8.5)
     text4 = font4.render(str(estrelles2-estrelles_gastades), True, taronja)
     while final:
+        seleccionat = False
         n = 3
         for event in pygame.event.get():
             if event.type == pygame.KEYDOWN:
@@ -682,7 +713,7 @@ def pantalla_final_derrota(estrelles2):
             pygame.draw.rect(pantalla, color1, rectangle)
             pygame.draw.rect(pantalla, color2, rectangle, 8)
             pantalla.blit(imatge, rectangle2)
-        pantalla.blit(text4, (pantalla_amplada-(100+text4.get_width()), 28))
+        pantalla.blit(text4, (pantalla_amplada*43/50, pantalla_alçada/14))
         pygame.draw.polygon(pantalla, taronja3, z2)
         pygame.draw.polygon(pantalla, taronja, x2)
         pygame.display.flip()
@@ -706,11 +737,11 @@ def tenda(estrelles):
     z = [pygame.math.Vector2(0, -100),pygame.math.Vector2(0, 50).rotate(72*3) , pygame.math.Vector2(0, -100).rotate(72),pygame.math.Vector2(0, 50).rotate(72*4), pygame.math.Vector2(0, -100).rotate(72*2), pygame.math.Vector2(0, 50), pygame.math.Vector2(0, -100).rotate(72*3),pygame.math.Vector2(0, 50).rotate(72), pygame.math.Vector2(0, -100).rotate(72*4), pygame.math.Vector2(0, 50).rotate(72*2)]
     for i in z:
         i*=0.45
-        i +=(pantalla_amplada-50,70)
+        i +=(pantalla_amplada*46.5/50,pantalla_alçada/8.5)
     x = [pygame.math.Vector2(0, -100),pygame.math.Vector2(0, 50).rotate(72*3) , pygame.math.Vector2(0, -100).rotate(72),pygame.math.Vector2(0, 50).rotate(72*4), pygame.math.Vector2(0, -100).rotate(72*2), pygame.math.Vector2(0, 50), pygame.math.Vector2(0, -100).rotate(72*3),pygame.math.Vector2(0, 50).rotate(72), pygame.math.Vector2(0, -100).rotate(72*4), pygame.math.Vector2(0, 50).rotate(72*2)]
     for i in x:
         i*=0.3
-        i += (pantalla_amplada-50,70)
+        i += (pantalla_amplada*46.5/50,pantalla_alçada/8.5)
     numeros = [str(i) for i in range(1, 13)]
     textos = [font.render(num, True, taronja) for num in numeros]
     posicions = [(pantalla_amplada // 5, pantalla_alçada * 2 // 5),
@@ -770,7 +801,7 @@ def tenda(estrelles):
                     pygame.mouse.set_visible(True)
         pantalla.blit(fons_2, (0,-pantalla_alçada*0.15))
         text4 = font.render(str(estrelles-estrelles_gastades), True, taronja)
-        pantalla.blit(text4, (pantalla_amplada-(100+text4.get_width()), 28))
+        pantalla.blit(text4, (pantalla_amplada*43/50, pantalla_alçada/14))
         pantalla.blit(tendas_imatg, tendas_rect)
         pygame.draw.polygon(pantalla, taronja3, z)
         pygame.draw.polygon(pantalla, taronja, x)
@@ -868,7 +899,109 @@ def tenda(estrelles):
                 pantalla.blit(tick_2,posicio_tick)
         pygame.display.flip()
     return imatge_skin
-
+def pausa():
+    ratoli = True
+    posicions = [(pantalla_amplada * 1 // 4, pantalla_alçada * 5 // 8),
+          (pantalla_amplada * 2 // 4, pantalla_alçada * 5 // 8),
+          (pantalla_amplada * 3 // 4, pantalla_alçada * 5 // 8)]
+    nivell_seleccionat = 2
+    imatges = {0:home_imatge, 1:play_imatge, 2: repetir_imatge}
+    seleccionat = False
+    selecció = 4
+    pausat = True
+    rectangle_p = pygame.Rect(0,0,pantalla_amplada*0.7,pantalla_alçada*0.5)
+    p = pygame.Surface((pantalla_amplada*0.7,pantalla_alçada*0.5))
+    pygame.draw.rect(p,(227,227,208),rectangle_p)
+    llista_craters = []
+    for i in range(int(pantalla_amplada*0.7*pantalla_alçada*0.5/10000)+1):
+        random_amplada = random.randint(40, 80)
+        random_alçada = random.randint(random_amplada-10, random_amplada+10)
+        random_x = random.randint(-random_amplada, int(pantalla_amplada*0.7+ random_amplada))
+        random_y = random.randint(-random_alçada, int(pantalla_alçada*0.5+ random_alçada))
+        pygame.draw.ellipse(p, gris,(random_x,random_y, random_amplada, random_alçada))
+        llista_craters.append((random_x, random_y, random_amplada, random_alçada))
+    for i in llista_craters:
+        pygame.draw.ellipse(p, pedra,(i[0]+5,i[1]+5, i[2]-10,i[3]-10))
+    pygame.draw.rect(p,gris,rectangle_p,8)
+    rectangle_p.center = (pantalla_amplada/2,pantalla_alçada/2)
+    while pausat:
+        for event in pygame.event.get():
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    y = False
+                    pausat = False
+                elif event.key == pygame.K_r:
+                    pausat = False
+                    seleccionat = True
+                    selecció = 2
+                elif event.key == pygame.K_SPACE:
+                    if ratoli == False:    
+                        seleccionat = True
+                    else:
+                        ratoli = False
+                        pygame.mouse.set_visible(False)
+                elif event.key == pygame.K_RIGHT and nivell_seleccionat < 3:
+                    pygame.mouse.set_visible(False)
+                    ratoli = False
+                    nivell_seleccionat += 1
+                elif event.key == pygame.K_LEFT and nivell_seleccionat > 1:
+                    ratoli = False
+                    pygame.mouse.set_visible(False) 
+                    nivell_seleccionat -= 1
+            elif event.type == pygame.MOUSEMOTION:
+                ratoli = True
+                pygame.mouse.set_visible(True)
+            elif event.type == pygame.MOUSEBUTTONUP:
+                if ratoli:    
+                    seleccionat = True
+                else:
+                    ratoli = True
+                    pygame.mouse.set_visible(True)
+        pantalla.blit(p, rectangle_p)
+        pantalla.blit(pausas_imatg, pausas_rect)
+        for i in range(0,3):
+            pos = posicions[i]
+            amplada = 130
+            color1 = (29,86,172)
+            color2 =(19,64,132)
+            if ratoli:    
+                rectangle = pygame.Rect((0,0), (amplada, amplada))
+                rectangle.center = pos
+                if rectangle.collidepoint(pygame.mouse.get_pos()):
+                    nivell_seleccionat = i+1
+                    amplada *=1.2
+                    color2 = taronja
+                    if seleccionat:
+                        selecció = i
+            else:
+                if nivell_seleccionat == i+1:
+                    amplada *=1.2
+                    color2 = taronja
+                    if seleccionat:
+                        selecció = i
+            imatge = imatges[i]
+            imatge = pygame.transform.scale(imatge, (amplada*0.8,amplada*0.8))
+            rectangle2 = imatge.get_rect(center = pos)
+            rectangle = pygame.Rect((0,0), (amplada, amplada))
+            rectangle.center = pos
+            pygame.draw.rect(pantalla, color1, rectangle)
+            pygame.draw.rect(pantalla, color2, rectangle, 8)
+            pantalla.blit(imatge, rectangle2)
+        pygame.display.flip()
+        if seleccionat:
+            if selecció == 0:
+                y = False
+                pausat = False
+            elif selecció == 1:
+                y = True
+                pausat = False
+            elif selecció == 2:
+                reinici()
+                y = True
+                pausat = False
+        seleccionat = False
+    pygame.mouse.set_visible(True)
+    return y
 #Definim reinici al sortir del nivell
 def reinici():
     global llista_objectes_pantalla
@@ -947,6 +1080,7 @@ def GameLoop():
             nombre_ocells = 0
             n2 = 0
         else:
+            click = False
             n2 += 1
             if n==0:
                 sprites.extend(nivells_caixes_i_porcs[nivell_actual])
@@ -982,7 +1116,7 @@ def GameLoop():
                     partida = False
                 elif event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_ESCAPE:
-                        partida = False
+                        partida = pausa()
                     if event.key == pygame.K_SPACE:
                         camara.principi_nivell = False
                         camara.tornar_ocell = True
@@ -1003,6 +1137,7 @@ def GameLoop():
                         mantenint = False
                     elif ocell_anterior.tocat_objecte == False:
                         nombre_ocells = ocell_anterior.habilitat(llista_ocells, llista_objectes_rodons, llista_objectes_pantalla, llista_porcs, llista_objectes_rectangulars, sprites, nombre_ocells)
+                    click = True
             # Aparèixer porcs, ocells i linea
             for i in  llista_objectes_pantalla:
                 if i in llista_ocells:
@@ -1090,6 +1225,29 @@ def GameLoop():
                 nombre_porcs_orig = 0
                 n2 = 0
                 partida = pantalla_final_derrota(total_estrelles)
+            if rectangle_pausa.collidepoint(pygame.mouse.get_pos()):
+                rectangle_pausa_3 = rectangle_pausa_2
+                pausa_imatge_3 = pausa_imatge_2
+                if click:
+                    camara.update(llista_objectes_pantalla,ocell_anterior, ocells_nivell, ocell_actual, mantenint_ocell, ocell_anterior, mantenint,posició_mantenint,rectangle_mantenint, llista_ocells_llançats, factor_de_potencia, llista_ocells)
+                    pygame.display.flip()
+                    partida = pausa()
+                    if partida and sprites == [terra]:
+                        n = 0
+                        nombre_porcs = 0
+                        nombre_porcs_orig = 0
+                        nombre_ocells = 0
+                        n2 = 0
+                color2 = taronja
+            else:
+                pausa_imatge_3 = pausa_imatge
+                rectangle_pausa_3 = rectangle_pausa
+                color2 =(19,64,132)
+            color = (29,86,172)
+            rectangle_pausa_4 = pausa_imatge_3.get_rect(center = rectangle_pausa.center)
+            pygame.draw.rect(pantalla, color, rectangle_pausa_3)
+            pygame.draw.rect(pantalla, color2, rectangle_pausa_3,8)
+            pantalla.blit(pausa_imatge_3, rectangle_pausa_4)
          # Recarregar la pantalla
         pygame.display.flip()
     # Sortir del joc
