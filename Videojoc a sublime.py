@@ -83,6 +83,9 @@ títol = pygame.image.load("Grafics/GALACTIC-PIUS.png").convert_alpha()
 nivells_imatge = pygame.image.load("Grafics/NIVELLS.png").convert_alpha()
 nivells_imatge = pygame.transform.scale(nivells_imatge,(pantalla_amplada*0.3,pantalla_amplada*0.3*(66/407)))
 nivells_rect = nivells_imatge.get_rect(center = (pantalla_amplada//2, pantalla_alçada//6))
+info_imatges = pygame.image.load("Grafics/INFO.png").convert_alpha()
+info_imatges = pygame.transform.scale(info_imatges,(pantalla_amplada*0.2,pantalla_amplada*0.2*(66/230)))
+info_rect = info_imatges.get_rect(center = (pantalla_amplada//2, pantalla_alçada//8))
 victoria_imatge = pygame.image.load("Grafics/VICTORIA.png").convert_alpha()
 victoria_imatge = pygame.transform.scale(victoria_imatge,(pantalla_amplada*0.75,pantalla_amplada*0.75*(66/407)))
 victoria_rect = victoria_imatge.get_rect(center = (pantalla_amplada//2, pantalla_alçada//4))
@@ -456,47 +459,99 @@ def menú(estrelles):
         pygame.display.flip()
 def info():
     global nivell_actual
+    diferencia = 0
+    rectangle_esc = pygame.Rect(pantalla_amplada/20,pantalla_alçada/14, 140,90)
+    font = pygame.font.Font(None, 90)
+    text = font.render("Camara", True, taronja)
+    text5 = font.render("Astres espacials", True, taronja)
+    text9 = font.render("Altres objectes", True, taronja)
+    text15 = font.render("Objectiu", True, taronja)
+    text16 = font.render("Tenda i nivells", True, taronja)
+    font = pygame.font.Font(None, 35)
+    text17 = font.render("L'objectiu de GALACTIC PIUS és destruir tots els planetes que estan intentant", True, taronja)
+    text18 = font.render("suplantar a la Terra. Per tal d'aconseguir aquest objectiu tiraras diferents astres", True, taronja)
+    text19 = font.render("espacials a aquests planetes.", True, taronja)
+    text2 = font.render("Al començar un nivell, la camara anirà a la part que no és veu. Per ha anar al", True, taronja)
+    text3 = font.render("tiratxines pren espai. La camara al llançar un objecte el seguira. Per poder veure el", True, taronja)
+    text4 = font.render("mapa amb llibertat utilitza el ratoli, per tornar al tiratxines pren espai un altre", True, taronja)
+    text14 = font.render("cop. Alhora de mantenir un astre es farà un zoom out per tal de facilitçar apuntar.", True, taronja)
+    text6 = font.render("Per llançar un astre espacial arrastra'l amb el ratoli i deixa'l anar. Alguns astres", True, taronja)
+    text7 = font.render("tenen una habilitat especial que s'activa al fer click quan estan en el aire. Els", True, taronja)
+    text8 = font.render("astres poden destruir caixes i eliminar planetes Terra.", True, taronja)
+    text10 = font.render("Els planetes són l'objectiu d'aquest joc, guanyes el nivell quan has eliminat a tots.", True, taronja)
+    text11 = font.render("Les caixes són obstacles que estan protegint als porcs. Hi han de diferents tipos,", True, taronja)
+    text12 = font.render("les de pedra són les més difícils de trencar, mentre que les de vidre les més fàcils.", True, taronja)
+    text13 = font.render(" La TNT explota al xocar-se.", True, taronja)
+    text20 = font.render("La tenda és el lloc on has d'anar si vols personalitzar els teus personatges. Funciona,", True, taronja)
+    text21 = font.render("mitjançant estrelles que conseguiras al acabar cada nivell. Depenent de la teva habilitat.", True, taronja)
+    text22 = font.render("conseguiras entre 1 i 3 estrelles. Per saber cuantes estrelles tens en un nivell ", True, taronja)
+    text23 = font.render("mira el color del icono. Cada objecte de la tenda és una skin per a tots els personatges. ", True, taronja)
+    textos =  [text17, text18, text19, text5, text6, text7, text8, text9, text10, text11, text12, text13, text16, text20, text21, text22, text23, text,text2, text3, text4, text14, ]
     while True:
+        click = False
         for event in pygame.event.get():
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
                     return False
-        pantalla.fill(fons2)
-
-        font = pygame.font.Font(None, 100)
-        text = font.render("Camara", True, taronja)
-        text5 = font.render("Ocells", True, taronja)
-        text9 = font.render("Altres objectes", True, taronja)
-        pantalla.blit(text, (text.get_width()*0.2 , text.get_height()*1.6))
-        font = pygame.font.Font(None, 50)
-        text2 = font.render("Al començar un nivell, la camara anirà a la part que no és veu. Per ha anar al", True, taronja)
-        text3 = font.render("tiratxines pren espai. La camara al llançar un ocell el seguira. Per poder veure el", True, taronja)
-        text4 = font.render("mapa amb llibertat utilitza el ratoli, per tornar al tiratxines pren espai un altre cop.", True, taronja)
-        text6 = font.render("Per llançar un ocell arrastra'l amb el ratoli i deixa'l anar. Alguns ocells tenen una", True, taronja)
-        text7 = font.render("habilitat especial que s'activa al fer click quan estan en el aire. Els ocells poden ", True, taronja)
-        text8 = font.render("destruir caixes i fer despaeixer els porcs.", True, taronja)
-        text10 = font.render("Els porcs són l'objectiu d'aquest joc, guanyes el nivell quan has eliminat a tots.", True, taronja)
-        text11 = font.render("Les caixes són obstacles que estan protegint als porcs. Hi han de diferents tipos,", True, taronja)
-        text12 = font.render("les de pedra són les més difícils de trencar, mentre que les de vidre les més fàcils.", True, taronja)
-        text13 = font.render(" La TNT explota al xocar-se.", True, taronja)
-        textos = [text2,text3,text4,text5,text6,text7,text8,text9,text10,text11,text12,text13]
+            elif event.type == pygame.MOUSEWHEEL:
+                diferencia -= event.x*20
+                diferencia += event.y*20
+                if diferencia >0:
+                    diferencia = 0
+                if diferencia< -440:
+                    diferencia = -440
+            elif event.type == pygame.MOUSEBUTTONUP:
+                click = True
+        rectangle1 = pygame.Rect(text.get_width()*0.2-20, text.get_height()*1.6+diferencia-10+100, 1050, 170)
+        rectangle2 = pygame.Rect(text.get_width()*0.2-20, text.get_height()*2.6 +text2.get_height()*5+diferencia-10+100, 1030, 170)
+        rectangle3 = pygame.Rect(text.get_width()*0.2-20, text.get_height()*2.6*2.2 +text2.get_height()*5+diferencia-10+100, 1060, 195)
+        rectangle4 = pygame.Rect(text.get_width()*0.2-20, text.get_height()*2.6*3.5 +text2.get_height()*5+diferencia-10+100, 1130, 195)
+        rectangle5 = pygame.Rect(text.get_width()*0.2-20, text.get_height()*2.6*4.8 +text2.get_height()*5+diferencia-10+100, 1070, 195)
+        rectangles = [rectangle1, rectangle2, rectangle3, rectangle4, rectangle5]
+        pantalla.blit(fons_2, (0,-pantalla_alçada*0.1+diferencia*0.1))
+        for i in rectangles:
+            pygame.draw.rect(pantalla, (29,86,172), i)
+            pygame.draw.rect(pantalla, (19,64,132), i,8)
         a = 1
         b = -1
+        pantalla.blit(text15, (text.get_width()*0.2 , text.get_height()*1.6+diferencia+100))
         for i in textos:
             if i.get_height() > text2.get_height()+1:
                 amplada = text.get_width()*0.2
-                b += 1.5
+                b += 3
             else:
                 b+=1
-                amplada = 10
-            pantalla.blit(i, (amplada, text.get_height()*2.6*a +text2.get_height()*b))
+                amplada = 90
+            pantalla.blit(i, (amplada, text.get_height()*2.6*a +text2.get_height()*b+diferencia+100))
             if i.get_height() > text2.get_height()+1:
                 amplada = text.get_width()*0.2
-                a+=1.1
-                b = -1    
-        font2 = pygame.font.Font(None, 60)
-        text1 = font2.render("ESC per a sortir", True, groc)
-        pantalla.blit(text1, (text1.get_width()*0.2, text1.get_height()*1.5))
+                if b == 5:    
+                    a+=1.2
+                else:
+                    a+=1.3
+                b = -1
+        rectangle_esc_2 = rectangle_esc.copy()
+        rectangle_esc_2.center += pygame.math.Vector2(0,diferencia)
+        if rectangle_esc_2.collidepoint(pygame.mouse.get_pos()):
+            rectangle_esc_2 = pygame.Rect(pantalla_amplada/20,pantalla_alçada/14, 140*1.2,90*1.2)
+            rectangle_esc_2.center = rectangle_esc.center
+            fletxa_imatge_2 = pygame.transform.scale(fletxa_imatge,(140*1.2*0.8,90*1.2*0.8))
+            rectangle_esc_2.center += pygame.math.Vector2(0,diferencia)
+            if click:
+                return False
+            color2 = taronja
+        else:
+            fletxa_imatge_2 = pygame.transform.scale(fletxa_imatge,(140*0.8,90*0.8))
+            color2 =(19,64,132)
+        color = (29,86,172)
+        rectangle_fletxa = fletxa_imatge_2.get_rect(center = rectangle_esc.center)
+        rectangle_fletxa.center += pygame.math.Vector2(0,diferencia)
+        pygame.draw.rect(pantalla, color, rectangle_esc_2)
+        pygame.draw.rect(pantalla, color2, rectangle_esc_2,8)
+        pantalla.blit(fletxa_imatge_2, rectangle_fletxa)
+        info_rect2 = info_rect.copy()
+        info_rect2.center += pygame.math.Vector2(0,diferencia)
+        pantalla.blit(info_imatges, info_rect2)    
         pygame.display.flip()
 def pantalla_final_victoria(estrelles, estrelles2):
     ratoli = False
