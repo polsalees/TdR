@@ -1200,56 +1200,55 @@ def GameLoop():
                         nombre_ocells = ocell_anterior.habilitat(llista_ocells, llista_objectes_rodons, llista_objectes_pantalla, llista_porcs, llista_objectes_rectangulars, sprites, nombre_ocells)
                     click = True
             # Aparèixer porcs, ocells i linea
-            if click:    
-                for i in  llista_objectes_pantalla:
-                    if i in llista_ocells:
-                        nombre_ocells = i.update(nombre_ocells, llista_objectes_pantalla)
-                    else:
-                        i.update(llista_objectes_pantalla)
-                llista_objectes_pantalla.sort(key=lambda i: i.rectangle.center[1])
-                for self in llista_objectes_pantalla:
-                    if self in llista_ocells:
-                        if self.llançat:    
-                            for i in llista_objectes_pantalla:
-                                if i in llista_ocells:    
-                                    if i.llançat and i.colisionat==False and i!= self: 
-                                        if self.rectangle.colliderect(i.rectangle):
-                                            if self.mask.overlap(i.mask,(i.rectangle.x- self.rectangle.x, i.rectangle.y- self.rectangle.y)):
-                                                nombre_porcs = self.colisió(i,llista_ocells, llista_objectes_rectangulars, llista_objectes_rodons, llista_porcs,nombre_porcs, llista_objectes_pantalla)
-                                elif i in llista_objectes_rectangulars:    
-                                    if self.rectangle.colliderect(i.rectangle) and i.caixa: 
-                                        if self.mask.overlap(i.mask,(i.rectangle.x- self.rectangle.x, i.rectangle.y- self.rectangle.y)):    
-                                            nombre_porcs = self.colisió(i,llista_ocells, llista_objectes_rectangulars, llista_objectes_rodons, llista_porcs,nombre_porcs, llista_objectes_pantalla)
-                                else:    
-                                    if self.rectangle.colliderect(i.rectangle) and i.porc: 
-                                        if self.mask.overlap(i.mask,(i.rectangle.x- self.rectangle.x, i.rectangle.y- self.rectangle.y)):    
-                                            nombre_porcs = self.colisió(i,llista_ocells, llista_objectes_rectangulars, llista_objectes_rodons, llista_porcs,nombre_porcs, llista_objectes_pantalla)
-                        self.colisionat = True
-                    if self in llista_objectes_rectangulars:
-                        if self.movible and self.caixa:    
-                            for i in llista_objectes_pantalla:
-                                if i != self and i.colisionat == False and i in llista_objectes_rectangulars:
-                                    if self.rectangle.colliderect(i.rectangle) and i.caixa:
+            for i in  llista_objectes_pantalla:
+                if i in llista_ocells:
+                    nombre_ocells = i.update(nombre_ocells, llista_objectes_pantalla)
+                else:
+                    i.update(llista_objectes_pantalla)
+            llista_objectes_pantalla.sort(key=lambda i: i.rectangle.center[1])
+            for self in llista_objectes_pantalla:
+                if self in llista_ocells:
+                    if self.llançat:    
+                        for i in llista_objectes_pantalla:
+                            if i in llista_ocells:    
+                                if i.llançat and i.colisionat==False and i!= self: 
+                                    if self.rectangle.colliderect(i.rectangle):
                                         if self.mask.overlap(i.mask,(i.rectangle.x- self.rectangle.x, i.rectangle.y- self.rectangle.y)):
-                                            self.colisió(i, llista_objectes_pantalla, llista_objectes_rectangulars)
-                            self.colisionat = True
-                    if self in llista_porcs:
-                        if self.porc:    
-                            for i in llista_objectes_pantalla:
-                                if i in llista_ocells:    
-                                    if i.llançat and i.colisionat==False: 
-                                        if self.rectangle.colliderect(i.rectangle):
-                                            if self.mask.overlap(i.mask,(i.rectangle.x- self.rectangle.x, i.rectangle.y- self.rectangle.y)):
-                                                nombre_porcs = self.colisió(i,llista_ocells, llista_objectes_rectangulars, llista_objectes_rodons, llista_porcs,nombre_porcs, llista_objectes_pantalla)
-                                elif i in llista_objectes_rectangulars:    
-                                    if self.rectangle.colliderect(i.rectangle) and i.caixa: 
-                                        if self.mask.overlap(i.mask,(i.rectangle.x- self.rectangle.x, i.rectangle.y- self.rectangle.y)):    
-                                            nombre_porcs = self.colisió(i, llista_ocells, llista_objectes_rectangulars, llista_objectes_rodons, llista_porcs,nombre_porcs, llista_objectes_pantalla)
-                                elif i!= self and i.porc:    
-                                    if self.rectangle.colliderect(i.rectangle): 
-                                        if self.mask.overlap(i.mask,(i.rectangle.x- self.rectangle.x, i.rectangle.y- self.rectangle.y)):    
                                             nombre_porcs = self.colisió(i,llista_ocells, llista_objectes_rectangulars, llista_objectes_rodons, llista_porcs,nombre_porcs, llista_objectes_pantalla)
-                            self.colisionat = True
+                            elif i in llista_objectes_rectangulars:    
+                                if self.rectangle.colliderect(i.rectangle) and i.caixa: 
+                                    if self.mask.overlap(i.mask,(i.rectangle.x- self.rectangle.x, i.rectangle.y- self.rectangle.y)):    
+                                        nombre_porcs = self.colisió(i,llista_ocells, llista_objectes_rectangulars, llista_objectes_rodons, llista_porcs,nombre_porcs, llista_objectes_pantalla)
+                            else:    
+                                if self.rectangle.colliderect(i.rectangle) and i.porc: 
+                                    if self.mask.overlap(i.mask,(i.rectangle.x- self.rectangle.x, i.rectangle.y- self.rectangle.y)):    
+                                        nombre_porcs = self.colisió(i,llista_ocells, llista_objectes_rectangulars, llista_objectes_rodons, llista_porcs,nombre_porcs, llista_objectes_pantalla)
+                    self.colisionat = True
+                if self in llista_objectes_rectangulars:
+                    if self.movible and self.caixa:    
+                        for i in llista_objectes_pantalla:
+                            if i != self and i.colisionat == False and i in llista_objectes_rectangulars:
+                                if self.rectangle.colliderect(i.rectangle) and i.caixa:
+                                    if self.mask.overlap(i.mask,(i.rectangle.x- self.rectangle.x, i.rectangle.y- self.rectangle.y)):
+                                        self.colisió(i, llista_objectes_pantalla, llista_objectes_rectangulars)
+                        self.colisionat = True
+                if self in llista_porcs:
+                    if self.porc:    
+                        for i in llista_objectes_pantalla:
+                            if i in llista_ocells:    
+                                if i.llançat and i.colisionat==False: 
+                                    if self.rectangle.colliderect(i.rectangle):
+                                        if self.mask.overlap(i.mask,(i.rectangle.x- self.rectangle.x, i.rectangle.y- self.rectangle.y)):
+                                            nombre_porcs = self.colisió(i,llista_ocells, llista_objectes_rectangulars, llista_objectes_rodons, llista_porcs,nombre_porcs, llista_objectes_pantalla)
+                            elif i in llista_objectes_rectangulars:    
+                                if self.rectangle.colliderect(i.rectangle) and i.caixa: 
+                                    if self.mask.overlap(i.mask,(i.rectangle.x- self.rectangle.x, i.rectangle.y- self.rectangle.y)):    
+                                        nombre_porcs = self.colisió(i, llista_ocells, llista_objectes_rectangulars, llista_objectes_rodons, llista_porcs,nombre_porcs, llista_objectes_pantalla)
+                            elif i!= self and i.porc:    
+                                if self.rectangle.colliderect(i.rectangle): 
+                                    if self.mask.overlap(i.mask,(i.rectangle.x- self.rectangle.x, i.rectangle.y- self.rectangle.y)):    
+                                        nombre_porcs = self.colisió(i,llista_ocells, llista_objectes_rectangulars, llista_objectes_rodons, llista_porcs,nombre_porcs, llista_objectes_pantalla)
+                        self.colisionat = True
             fps_actuals = rellotge.get_fps()
             if fps_actuals!=0:
                 if 140-fps_actuals<=40:
