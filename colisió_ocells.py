@@ -218,14 +218,14 @@ def colisió_cercles(self,x, llista_ocells, llista_objectes_rectangulars, llista
                         if vector.length() < i[2].length() and vector.length() < xvector_colisió.length():
                             xcolisió_centre = i
                             xvector_colisió = vector
-                            if vector.length()<=self.radi:
-                                xvector_colisió = pygame.math.Vector2(100000,100000)    
                             xvector_negatiu = i2_negatiu
                         if vector.length() == i[2].length() and x.rotar and vector.length()>self.radi:
                             if abs(i[2].angle_to((-1,0)) - vector.angle_to((-1,0))) <  abs(i2_negatiu.angle_to((-1,0)) - vector.angle_to((-1,0))):
                                 x.velocitat_angle += vector.length()*(abs(math.sin(math.radians(i[2].angle_to((-1,0)) - x.velocitat.angle_to((-1,0)))) * x.velocitat.length()) + (suma_velocitat_per_rotació_x.length()*math.sin(math.radians(i[2].angle_to((-1,0)) - suma_velocitat_per_rotació_x.angle_to((-1,0))))*self.massa/x.massa))/(0.5*x.amplada)
                             else:
                                 x.velocitat_angle -= vector.length()*(abs(math.sin(math.radians(i[2].angle_to((-1,0)) - x.velocitat.angle_to((-1,0)))) * x.velocitat.length()) + (suma_velocitat_per_rotació_x.length()*math.sin(math.radians(i[2].angle_to((-1,0)) - suma_velocitat_per_rotació_x.angle_to((-1,0))))*self.massa/x.massa))/(0.5*x.amplada)
+                    if vector.length()<=self.radi:
+                        xvector_colisió = pygame.math.Vector2(100000,100000)    
                     if n == 0 and xvector_colisió != pygame.math.Vector2(100000,100000):
                         if x.rotar:
                             if abs(xcolisió_centre[2].angle_to((-1,0)) - xvector_colisió.angle_to((-1,0))) <  abs(xvector_negatiu.angle_to((-1,0)) - xvector_colisió.angle_to((-1,0))):
