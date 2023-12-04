@@ -38,7 +38,7 @@ info = pygame.display.Info()
 pantalla_amplada,pantalla_alçada = info.current_w,info.current_h
 from pygame.locals import *
 flags = FULLSCREEN | DOUBLEBUF
-pantalla = pygame.display.set_mode((pantalla_amplada, pantalla_alçada), flags, 16)
+pantalla = pygame.display.set_mode((pantalla_amplada, pantalla_alçada), flags,16)
 pygame.display.set_caption("Galactic Pius")
 from codi_ocells import ocell
 from codi_porcs import porc
@@ -500,12 +500,12 @@ def info():
                 if event.key == pygame.K_ESCAPE:
                     return False
             elif event.type == pygame.MOUSEWHEEL:
-                diferencia -= event.x*20*(pantalla_alçada/768)
-                diferencia += event.y*20*(pantalla_alçada/768)
+                diferencia -= event.x*20
+                diferencia += event.y*20
                 if diferencia >0:
                     diferencia = 0
-                if diferencia< -440*(pantalla_alçada/768):
-                    diferencia = -440*(pantalla_alçada/768)
+                if diferencia< -440:
+                    diferencia = -440
             elif event.type == pygame.MOUSEBUTTONUP:
                 click = True
                 if mantenint_scroll:    
@@ -513,16 +513,16 @@ def info():
                     diferencia -= pygame.mouse.get_pos()[1] - posició_inicial
                     if diferencia >0:
                         diferencia = 0
-                    if diferencia< -440*(pantalla_alçada/768):
-                        diferencia = -440*(pantalla_alçada/768)
+                    if diferencia< -440:
+                        diferencia = -440
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 click_2 = True
         if mantenint_scroll:
             diferencia -= pygame.mouse.get_pos()[1] - posició_inicial
             if diferencia >0:
                 diferencia = 0
-            if diferencia< -440*(pantalla_alçada/768):
-                diferencia = -440*(pantalla_alçada/768)
+            if diferencia< -440:
+                diferencia = -440
         rectangle1 = pygame.Rect(text.get_width()*0.2+30, text.get_height()*1.6+diferencia-10+100, 1050, 170)
         rectangle2 = pygame.Rect(text.get_width()*0.2+30, text.get_height()*2.6 +text2.get_height()*5+diferencia-10+100, 1030, 170)
         rectangle3 = pygame.Rect(text.get_width()*0.2+30, text.get_height()*2.6*2.2 +text2.get_height()*5+diferencia-10+100, 1060, 195)
@@ -573,7 +573,7 @@ def info():
         info_rect2 = info_rect.copy()
         info_rect2.center += pygame.math.Vector2(0,diferencia)
         rectangle_scroll_2 = rectangle_scroll.copy()
-        rectangle_scroll_2.center -= pygame.math.Vector2(0,diferencia)
+        rectangle_scroll_2.center -= pygame.math.Vector2(0,diferencia*(pantalla_alçada/768))
         color =(19,64,132)
         if click_2:
             if rectangle_scroll_2.collidepoint(pygame.mouse.get_pos()):
@@ -587,8 +587,8 @@ def info():
             diferencia += pygame.mouse.get_pos()[1] - posició_inicial
             if diferencia >0:
                 diferencia = 0
-            if diferencia< -440*(pantalla_alçada/768):
-                diferencia = -440*(pantalla_alçada/768)
+            if diferencia< -440:
+                diferencia = -440
         pygame.draw.rect(pantalla, (227,227,208), rectangle_scroll_fons)
         pygame.draw.rect(pantalla, gris, rectangle_scroll_fons,8)
         pygame.draw.rect(pantalla, (29,86,172), rectangle_scroll_2)
