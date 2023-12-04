@@ -487,21 +487,42 @@ def info():
     text22 = font.render("conseguiras entre 1 i 3 estrelles. Per saber cuantes estrelles tens en un nivell ", True, taronja)
     text23 = font.render("mira el color del icono. Cada objecte de la tenda és una skin per a tots els personatges. ", True, taronja)
     textos =  [text17, text18, text19, text5, text6, text7, text8, text9, text10, text11, text12, text13, text16, text20, text21, text22, text23, text,text2, text3, text4, text14, ]
+    alçada = pantalla_alçada/3
+    rectangle_scroll_fons = pygame.Rect(pantalla_amplada-40, pantalla_alçada*0.05-5, 40, pantalla_alçada*0.92)
+    rectangle_scroll = pygame.Rect(pantalla_amplada-35, pantalla_alçada*0.05, 30, alçada)
+    mantenint_scroll = False
+    click_2 = False
     while True:
         click = False
+        click_2 = False
         for event in pygame.event.get():
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
                     return False
             elif event.type == pygame.MOUSEWHEEL:
-                diferencia -= event.x*20
-                diferencia += event.y*20
+                diferencia -= event.x*20*(pantalla_alçada/768)
+                diferencia += event.y*20*(pantalla_alçada/768)
                 if diferencia >0:
                     diferencia = 0
-                if diferencia< -440:
-                    diferencia = -440
+                if diferencia< -440*(pantalla_alçada/768):
+                    diferencia = -440*(pantalla_alçada/768)
             elif event.type == pygame.MOUSEBUTTONUP:
                 click = True
+                if mantenint_scroll:    
+                    mantenint_scroll = False
+                    diferencia -= pygame.mouse.get_pos()[1] - posició_inicial
+                    if diferencia >0:
+                        diferencia = 0
+                    if diferencia< -440*(pantalla_alçada/768):
+                        diferencia = -440*(pantalla_alçada/768)
+            elif event.type == pygame.MOUSEBUTTONDOWN:
+                click_2 = True
+        if mantenint_scroll:
+            diferencia -= pygame.mouse.get_pos()[1] - posició_inicial
+            if diferencia >0:
+                diferencia = 0
+            if diferencia< -440*(pantalla_alçada/768):
+                diferencia = -440*(pantalla_alçada/768)
         rectangle1 = pygame.Rect(text.get_width()*0.2+30, text.get_height()*1.6+diferencia-10+100, 1050, 170)
         rectangle2 = pygame.Rect(text.get_width()*0.2+30, text.get_height()*2.6 +text2.get_height()*5+diferencia-10+100, 1030, 170)
         rectangle3 = pygame.Rect(text.get_width()*0.2+30, text.get_height()*2.6*2.2 +text2.get_height()*5+diferencia-10+100, 1060, 195)
@@ -551,6 +572,27 @@ def info():
         pantalla.blit(fletxa_imatge_2, rectangle_fletxa)
         info_rect2 = info_rect.copy()
         info_rect2.center += pygame.math.Vector2(0,diferencia)
+        rectangle_scroll_2 = rectangle_scroll.copy()
+        rectangle_scroll_2.center -= pygame.math.Vector2(0,diferencia)
+        color =(19,64,132)
+        if click_2:
+            if rectangle_scroll_2.collidepoint(pygame.mouse.get_pos()):
+                mantenint_scroll = True
+                posició_inicial = pygame.mouse.get_pos()[1]
+            else:
+                mantenint_scroll = False
+        if mantenint_scroll:
+            color = taronja
+        if mantenint_scroll:
+            diferencia += pygame.mouse.get_pos()[1] - posició_inicial
+            if diferencia >0:
+                diferencia = 0
+            if diferencia< -440*(pantalla_alçada/768):
+                diferencia = -440*(pantalla_alçada/768)
+        pygame.draw.rect(pantalla, (227,227,208), rectangle_scroll_fons)
+        pygame.draw.rect(pantalla, gris, rectangle_scroll_fons,8)
+        pygame.draw.rect(pantalla, (29,86,172), rectangle_scroll_2)
+        pygame.draw.rect(pantalla, color, rectangle_scroll_2,8)
         pantalla.blit(info_imatges, info_rect2)    
         pygame.display.flip()
 def pantalla_final_victoria(estrelles, estrelles2):

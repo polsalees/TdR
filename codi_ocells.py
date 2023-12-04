@@ -128,6 +128,7 @@ class ocell():
     def colisió(self,x, llista_ocells, llista_objectes_rectangulars, llista_objectes_rodons, llista_porcs,nombre_porcs,llista_objectes_pantalla):
         nombre_porcs = colisió_cercles(self,x, llista_ocells, llista_objectes_rectangulars, llista_objectes_rodons, llista_porcs, nombre_porcs,llista_objectes_pantalla)
         return nombre_porcs
+    
     def calcul_linea_direció(self, diferencia, factor_de_potencia, pantalla):
         self.linea_direció_radi = 5
         self.linea_direció_posició = [self.posició_inicial[0], self.posició_inicial[1]] + diferencia
@@ -151,14 +152,17 @@ class ocell():
                 self.linea_direció_posició[1] += self.linea_direció_velocitat[1] * 6
                 pygame.draw.circle(pantalla, blanc, self.linea_direció_posició, self.linea_direció_radi)
             self.linea_direció_moviment +=0.5
+    
     def posar_skin(self, imatge):
         self.imatge_skin = pygame.transform.scale(imatge,pygame.math.Vector2(285/447.5, 345/447.5)*self.radi*4)
         self.skin_offset = pygame.math.Vector2(0,-0.45*self.radi)
         self.diferencia_skin = pygame.math.Vector2(0,0)
         self.skin = True
         self.rectangle_skin = self.imatge_skin.get_rect(center = self.rectangle.center)
+    
     def treure_skin(self):
         self.skin = False
+    
     def estela(self,diferencia, pantalla): 
         for i in self.llista_estela:
             pygame.draw.circle(pantalla, blanc, i[0]+diferencia ,i[1])
@@ -279,6 +283,7 @@ class ocell():
         rectangle.topleft+=diferencia
         self.zona = rectangle.collidepoint(pygame.mouse.get_pos())
         return self.zona
+    
     def habilitat(self, llista_ocells, llista_objectes_rodons, llista_objectes_pantalla, llista_porcs, llista_objectes_rectangulars, sprites, nombre_ocells):
         if self.activat == False and self.color != vermell:
             self.llista_estela.append((self.rectangle.center, 10))
@@ -385,9 +390,11 @@ class ocell():
 
             self.activat = True
         return nombre_ocells
+    
     def copy(self, llista_ocells, llista_objectes_rodons):
         x = ocell(self.radi, self.color, llista_ocells, llista_objectes_rodons, self.posició_inicial, self.pantalla)
         return x
+    
     def reinici(self):
         self.temps_desde_tocar_objectes = 0
         self.activat = False
