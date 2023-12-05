@@ -543,8 +543,8 @@ class caixa():
             for i in self.mask.outline(10):
                 s = pygame.math.Vector2(i)+self.rectangle.topleft  - x.rectangle.topleft
                 if s[0] >= 0 and s[0] <= (x.rectangle.width-1):
-                    i = list(s+x.rectangle.topleft)
-                    xsuma_pes.append(i)
+                    j = list(s)
+                    xsuma_pes.append(j)
             x.suma_pes.append([xsuma_pes, self, 0])
             if rampa_x == x:    
                 x.angle_rampa = rampa_x.calcul_angle_rampa(posició_xoc)

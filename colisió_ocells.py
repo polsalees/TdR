@@ -287,8 +287,9 @@ def colisió_cercles(self,x, llista_ocells, llista_objectes_rectangulars, llista
                             xmeitat3 = 0  
                         if x.suma_pes!=[]:      
                             for i in x.suma_pes:
-                                for s in i[0]:        
-                                    s = list(s)
+                                for s in i[0]:
+                                    s[0] += self.rectangle.left     
+                                    s = list(s)        
                                     if s[0] > posició_xoc[0]:
                                         xmeitat1+=1
                                     elif s[0] < posició_xoc[0]:
