@@ -59,7 +59,7 @@ def rotacions(self,x, posició_xoc_s, ns, nx, rectangle_xoc, centre1,centre2,cen
         self.pivot_pantalla = posició_xoc_s_2 + self.rectangle.center
         self.pivot =(posició_xoc_s_2.rotate(self.angle) + antic_centre) - pygame.math.Vector2(antic_centre[0]-0.5*self.amplada, antic_centre[1]-0.5*self.alçada)
     if round(x.angle)%90 != round(self.angle)%90 or (nx!=0 and ns ==0) or (nx == 1 and ns == 1 and ((rectangle_xoc[0].width <= colisió_centre[2].length()-1))):    
-        if (self.angle%90 == 0 and colisió_centre == centre3) or (self.angle%90!=0 and (colisió_centre == centre3 or colisió_centre == centre4)) or posició_xoc_s == esquina4 or (posició_xoc_s == esquina3 and self.angle%90 > 45) or (posició_xoc_s == esquina2 and self.angle%90 < 45):
+        if (self.angle%90 == 0 and (colisió_centre == centre3 or posició_xoc_s == esquina3 or posició_xoc_s == esquina4)) or (self.angle%90!=0 and (colisió_centre == centre3 or colisió_centre == centre4)) or posició_xoc_s == esquina4 or (posició_xoc_s == esquina3 and self.angle%90 > 45) or (posició_xoc_s == esquina2 and self.angle%90 < 45):
             meitat1 = 0
             meitat2 = 0
             meitat3 = 0
