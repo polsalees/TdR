@@ -1,6 +1,6 @@
 import pygame
 import math
-from codi_ocells import distancia_ocell_ratoli
+from codi_astres import distancia_ocell_ratoli
 marró = (128, 64, 0)
 marró2 = (118, 54, 0)
 fons = pygame.image.load("Grafics/fons.jpg").convert_alpha()

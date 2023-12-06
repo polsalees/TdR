@@ -40,8 +40,8 @@ from pygame.locals import *
 flags = FULLSCREEN | DOUBLEBUF
 pantalla = pygame.display.set_mode((pantalla_amplada, pantalla_alçada), flags, 16)
 pygame.display.set_caption("Galactic Pius")
-from codi_ocells import ocell
-from codi_porcs import porc
+from codi_astres import ocell
+from codi_terres import porc
 from codi_caixes import caixa
 from codi_camera import camera 
 # LListes

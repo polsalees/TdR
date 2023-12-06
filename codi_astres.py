@@ -1,7 +1,7 @@
 import pygame
 import math
-from colisió_ocells import colisió_cercles
-from colisió_ocells import calcul_angle_cercle
+from colisió_astres import colisió_cercles
+from colisió_astres import calcul_angle_cercle
 negre = (0, 0, 0)
 blanc = (255, 255, 255)
 vermell = (255, 0, 0)

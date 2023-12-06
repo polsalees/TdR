@@ -1,7 +1,7 @@
 import pygame
 import math
 import random
-from colisió_ocells import calcul_angle_cercle 
+from colisió_astres import calcul_angle_cercle 
 from rotació import rotacions
 
 negre = (0, 0, 0)

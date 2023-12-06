@@ -1,6 +1,6 @@
 import pygame
 import math
-from colisió_ocells import colisió_cercles
+from colisió_astres import colisió_cercles
 from random import randint
 negre = (0, 0, 0)
 blanc = (255, 255, 255)
